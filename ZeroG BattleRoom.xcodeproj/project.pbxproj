@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		93A55EEF24307D280027E83E /* GameKitHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55EE924307D280027E83E /* GameKitHelper.swift */; };
+		93A55EF024307D280027E83E /* MultiplayerNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55EEA24307D280027E83E /* MultiplayerNetworking.swift */; };
+		93A55EF124307D280027E83E /* MultiplayerNetworking+GameKitHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55EEB24307D280027E83E /* MultiplayerNetworking+GameKitHelper.swift */; };
+		93A55EF224307D280027E83E /* GameKitHelperProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55EED24307D280027E83E /* GameKitHelperProtocol.swift */; };
+		93A55EF324307D280027E83E /* MultiplayerNetworkingProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55EEE24307D280027E83E /* MultiplayerNetworkingProtocol.swift */; };
+		93A55EFA24307D4F0027E83E /* SoundManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55EF524307D4F0027E83E /* SoundManager.swift */; };
+		93A55EFB24307D4F0027E83E /* CGVector+Normalize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55EF724307D4F0027E83E /* CGVector+Normalize.swift */; };
+		93A55EFC24307D4F0027E83E /* SKNode+Impulse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55EF824307D4F0027E83E /* SKNode+Impulse.swift */; };
+		93A55EFD24307D4F0027E83E /* Data+Archive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55EF924307D4F0027E83E /* Data+Archive.swift */; };
+		93A55F0024307E790027E83E /* StartMatchmakingNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55EFF24307E790027E83E /* StartMatchmakingNotification.swift */; };
 		93FEBDAB242EE0CF006CCBFB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93FEBDAA242EE0CF006CCBFB /* AppDelegate.swift */; };
 		93FEBDAD242EE0CF006CCBFB /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 93FEBDAC242EE0CF006CCBFB /* GameScene.sks */; };
 		93FEBDAF242EE0CF006CCBFB /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 93FEBDAE242EE0CF006CCBFB /* Actions.sks */; };
@@ -19,6 +29,16 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		93A55EE924307D280027E83E /* GameKitHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameKitHelper.swift; sourceTree = "<group>"; };
+		93A55EEA24307D280027E83E /* MultiplayerNetworking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultiplayerNetworking.swift; sourceTree = "<group>"; };
+		93A55EEB24307D280027E83E /* MultiplayerNetworking+GameKitHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "MultiplayerNetworking+GameKitHelper.swift"; sourceTree = "<group>"; };
+		93A55EED24307D280027E83E /* GameKitHelperProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameKitHelperProtocol.swift; sourceTree = "<group>"; };
+		93A55EEE24307D280027E83E /* MultiplayerNetworkingProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultiplayerNetworkingProtocol.swift; sourceTree = "<group>"; };
+		93A55EF524307D4F0027E83E /* SoundManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SoundManager.swift; sourceTree = "<group>"; };
+		93A55EF724307D4F0027E83E /* CGVector+Normalize.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGVector+Normalize.swift"; sourceTree = "<group>"; };
+		93A55EF824307D4F0027E83E /* SKNode+Impulse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SKNode+Impulse.swift"; sourceTree = "<group>"; };
+		93A55EF924307D4F0027E83E /* Data+Archive.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Data+Archive.swift"; sourceTree = "<group>"; };
+		93A55EFF24307E790027E83E /* StartMatchmakingNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartMatchmakingNotification.swift; sourceTree = "<group>"; };
 		93FEBDA7242EE0CF006CCBFB /* ZeroG BattleRoom.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ZeroG BattleRoom.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		93FEBDAA242EE0CF006CCBFB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		93FEBDAC242EE0CF006CCBFB /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
@@ -57,6 +77,54 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
+		93A55EE824307D280027E83E /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				93A55EFE24307E5E0027E83E /* Notifications */,
+				93A55EEC24307D280027E83E /* Protocols */,
+				93A55EE924307D280027E83E /* GameKitHelper.swift */,
+				93A55EEA24307D280027E83E /* MultiplayerNetworking.swift */,
+				93A55EEB24307D280027E83E /* MultiplayerNetworking+GameKitHelper.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		93A55EEC24307D280027E83E /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				93A55EED24307D280027E83E /* GameKitHelperProtocol.swift */,
+				93A55EEE24307D280027E83E /* MultiplayerNetworkingProtocol.swift */,
+			);
+			path = Protocols;
+			sourceTree = "<group>";
+		};
+		93A55EF424307D4F0027E83E /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				93A55EF624307D4F0027E83E /* Extensions */,
+				93A55EF524307D4F0027E83E /* SoundManager.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		93A55EF624307D4F0027E83E /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				93A55EF724307D4F0027E83E /* CGVector+Normalize.swift */,
+				93A55EF824307D4F0027E83E /* SKNode+Impulse.swift */,
+				93A55EF924307D4F0027E83E /* Data+Archive.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		93A55EFE24307E5E0027E83E /* Notifications */ = {
+			isa = PBXGroup;
+			children = (
+				93A55EFF24307E790027E83E /* StartMatchmakingNotification.swift */,
+			);
+			path = Notifications;
+			sourceTree = "<group>";
+		};
 		93FEBD9E242EE0CF006CCBFB = {
 			isa = PBXGroup;
 			children = (
@@ -77,10 +145,12 @@
 		93FEBDA9242EE0CF006CCBFB /* ZeroG BattleRoom */ = {
 			isa = PBXGroup;
 			children = (
-				93A55EE4243077830027E83E /* Resources */,
+				93A55EE824307D280027E83E /* Networking */,
 				93FEBDB0242EE0CF006CCBFB /* GameScene.swift */,
 				93FEBDB2242EE0CF006CCBFB /* GameViewController.swift */,
 				93FEBDAA242EE0CF006CCBFB /* AppDelegate.swift */,
+				93A55EE4243077830027E83E /* Resources */,
+				93A55EF424307D4F0027E83E /* Utilities */,
 			);
 			path = "ZeroG BattleRoom";
 			sourceTree = "<group>";
@@ -166,9 +236,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				93A55EFC24307D4F0027E83E /* SKNode+Impulse.swift in Sources */,
+				93A55EF324307D280027E83E /* MultiplayerNetworkingProtocol.swift in Sources */,
+				93A55EEF24307D280027E83E /* GameKitHelper.swift in Sources */,
 				93FEBDB1242EE0CF006CCBFB /* GameScene.swift in Sources */,
 				93FEBDB3242EE0CF006CCBFB /* GameViewController.swift in Sources */,
+				93A55EFB24307D4F0027E83E /* CGVector+Normalize.swift in Sources */,
+				93A55EF024307D280027E83E /* MultiplayerNetworking.swift in Sources */,
 				93FEBDAB242EE0CF006CCBFB /* AppDelegate.swift in Sources */,
+				93A55EFD24307D4F0027E83E /* Data+Archive.swift in Sources */,
+				93A55F0024307E790027E83E /* StartMatchmakingNotification.swift in Sources */,
+				93A55EF124307D280027E83E /* MultiplayerNetworking+GameKitHelper.swift in Sources */,
+				93A55EF224307D280027E83E /* GameKitHelperProtocol.swift in Sources */,
+				93A55EFA24307D4F0027E83E /* SoundManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

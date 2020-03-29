@@ -49,6 +49,8 @@ class GameScene: SKScene {
             n.strokeColor = SKColor.green
             self.addChild(n)
         }
+      
+      NotificationCenter.default.post(name: .startMatchmaking, object: nil)
     }
     
     func touchMoved(toPoint pos : CGPoint) {
