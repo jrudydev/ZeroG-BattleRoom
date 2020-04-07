@@ -34,8 +34,8 @@ class Playing: GKState {
     self.setupCamera()
     self.setupPhysics()
   
-//    self.setupWalls()
-    self.setupTestWalls()
+    self.setupWalls()
+//    self.setupTestWalls()
     
 //    self.loadLevel()
     

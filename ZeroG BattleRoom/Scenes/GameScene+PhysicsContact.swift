@@ -26,11 +26,7 @@ extension GameScene: SKPhysicsContactDelegate {
     
     if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
       secondBody.categoryBitMask == PhysicsCategoryMask.package {
-      
-//      guard let hero = self.entityManager.hero as? General else { return }
-//      guard let spriteComponent = hero.component(ofType: SpriteComponent.self),
-//        let impulseComponent = hero.component(ofType: ImpulseComponent.self) else { return }
-      
+
       guard let heroNode = firstBody.node as? SKSpriteNode,
         let resourceNode = secondBody.node as? SKShapeNode else { return }
       
@@ -38,12 +34,10 @@ extension GameScene: SKPhysicsContactDelegate {
         let impactedResource = self.entityManager.resourceWith(node: resourceNode) as? Package else { return }
       
       guard let heroResourceComponent = hero.component(ofType: ResourceComponent.self),
-        let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
         let impactedResourceComponent = impactedResource.component(ofType: ShapeComponent.self),
         !heroResourceComponent.isImpacted else { return }
       
       if let heroResource = heroResourceComponent.resource,
-        let shapeComponent = heroResource.component(ofType: ShapeComponent.self),
         let physicsComponent = heroResource.component(ofType: PhysicsComponent.self),
         !heroResourceComponent.isImpacted {
       

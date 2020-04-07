@@ -104,18 +104,6 @@ class GameScene: SKScene {
 }
 
 extension GameScene {
-  func spawnResourceNode(position: CGPoint) {
-    
-    
-//    if let resourceNode = self.viewModel.resourceNode?.copy() as! SKShapeNode? {
-//      resourceNode.position = position
-//      resourceNode.strokeColor = SKColor.green
-//
-//      self.addChild(resourceNode)
-//      resourceNode.randomeImpulse()
-//    }
-  }
-  
   func getWallSegment(number: Int,
                       orientation: GameSceneViewModel.WallOrientation = .horizontal) -> [Wall] {
     return self.viewModel.getWallSegment(number: number, orientation: orientation)
@@ -177,9 +165,6 @@ extension GameScene: MultiplayerNetworkingProtocol {
       spriteComponent.node.position = position
       physicsComponent.physicsBody.velocity = vector
     }
-//    let player = self.viewModel.players[index]
-//    player.position = position
-//    player.physicsBody?.velocity = vector
   }
   
   func moveResourceAt(index: Int, position: CGPoint, vector: CGVector) {
