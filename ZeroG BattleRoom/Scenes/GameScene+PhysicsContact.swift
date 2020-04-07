@@ -103,25 +103,25 @@ extension GameScene: SKPhysicsContactDelegate {
     
     if firstBody.categoryBitMask == PhysicsCategoryMask.hero && secondBody.categoryBitMask == PhysicsCategoryMask.wall {
       
-      if let heroNode = firstBody.node as? SKSpriteNode,
-        let hero = self.entityManager.heroWith(node: heroNode) as? General {
-        hero.impacted()
-      }
+      guard let heroNode = firstBody.node as? SKSpriteNode,
+        let beam = secondBody.node as? SKShapeNode else { return }
       
-      guard let hero = firstBody.node as? Hero,
-        let beam = secondBody.node as? SKShapeNode,
-        let wall = beam.parent,
+      guard let hero = self.entityManager.heroWith(node: heroNode) as? General,
+        let spriteComponent = hero.component(ofType: SpriteComponent.self),
+        let physicsComponent = hero.component(ofType: PhysicsComponent.self),
+        let panel = self.entityManager.panelWith(node: beam) as? Panel,
+        let panelShapeComponent = panel.component(ofType: ShapeComponent.self),
         !hero.isBeamed else { return }
+
+      physicsComponent.isEffectedByPhysics = false
       
-      hero.physicsBody?.isDynamic = false
-      hero.physicsBody?.velocity = CGVector.zero
-      hero.physicsBody?.angularVelocity = 0.0
+      let isTopBeam = beam.position.y == abs(beam.position.y)
+      let convertedPosition = beam.scene?.convert(beam.position, from: panelShapeComponent.node)
+      let rotation = isTopBeam ? beam.zRotation : panelShapeComponent.node.zRotation + CGFloat.pi
       
       DispatchQueue.main.async {
-        let isTopBeam = beam.position.y == abs(beam.position.y)
-        hero.zRotation = isTopBeam ? wall.zRotation : wall.zRotation + CGFloat.pi
-        let convertedPosition = beam.scene?.convert(beam.position, from: wall)
-        hero.position = convertedPosition ?? wall.position
+        spriteComponent.node.position = convertedPosition ?? panelShapeComponent.node.position
+        spriteComponent.node.zRotation = rotation
       }
       
       hero.switchToState(.beamed)

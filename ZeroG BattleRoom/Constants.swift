@@ -21,6 +21,7 @@ struct AppConstants {
   
   struct ComponentNames {
     static let heroPlayerName = "hero-player"
+    static let wallPanelName = "wall-panel"
     static let gameMessageName = "game-message"
     static let playerAliasLabelName = "player-alias"
     static let resourceName = "resource-name"

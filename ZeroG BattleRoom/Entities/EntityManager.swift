@@ -193,6 +193,29 @@ extension EntityManager {
     self.add(deposit)
   }
   
+  func spawnWalls() {
+    let wall = self.createWallEntity()
+    
+    self.add(wall)
+  }
+  
+}
+
+extension EntityManager {
+  private func createWallEntity() -> GKEntity {
+    let shape = SKShapeNode(rectOf: AppConstants.Layout.wallSize,
+                            cornerRadius: AppConstants.Layout.wallCornerRadius)
+    shape.name = AppConstants.ComponentNames.wallPanelName
+    shape.lineWidth = 2.5
+    shape.fillColor = UIColor.gray
+    shape.strokeColor = UIColor.white
+    
+    let physicsBody = SKPhysicsBody(rectangleOf: shape.frame.size)
+    physicsBody.isDynamic = false
+
+    return Panel(shapeNode: shape, physicsBody: physicsBody)
+  }
+  
   private func createResourceNode() {
     let width: CGFloat = 10.0
     let size = CGSize(width: width, height: width)
@@ -207,25 +230,40 @@ extension EntityManager {
 
 extension EntityManager {
   func heroWith(node: SKSpriteNode) -> GKEntity? {
-    let entity = self.playerEntites.first { entity -> Bool in
+    let player = self.playerEntites.first { entity -> Bool in
       guard let hero = entity as? General else { return false }
       guard let spriteComponent = hero.component(ofType: SpriteComponent.self) else { return false }
       
       return spriteComponent.node === node
     }
     
-    return entity
+    return player
   }
   
   func resourceWith(node: SKShapeNode) -> GKEntity? {
-    let entity = self.resourcesEntities.first { entity -> Bool in
+    let resource = self.resourcesEntities.first { entity -> Bool in
       guard let package = entity as? Package else { return false }
       guard let shapeComponent = package.component(ofType: ShapeComponent.self) else { return false }
       
       return shapeComponent.node === node
     }
     
-    return entity
+    return resource
+  }
+  
+  func panelWith(node: SKShapeNode) -> GKEntity? {
+    let panel = self.entities.first { entity -> Bool in
+      guard let panelEntity = entity as? Panel,
+        let beamComponent = panelEntity.component(ofType: TracktorBeamComponent.self) else { return false }
+      
+      let beam = beamComponent.beams.first { beam -> Bool in
+        return beam === node
+      }
+  
+      return beam == nil ? false : true
+    }
+    
+    return panel
   }
   
   func enitityWith(node: SKNode) -> GKEntity? {

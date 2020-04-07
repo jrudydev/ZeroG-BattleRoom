@@ -27,6 +27,18 @@ class PhysicsComponent: GKComponent {
   
   var physicsBody: SKPhysicsBody
   
+  var isEffectedByPhysics = true {
+    didSet {
+      if self.isEffectedByPhysics {
+        physicsBody.isDynamic = true
+      } else {
+        physicsBody.isDynamic = false
+        physicsBody.velocity = CGVector.zero
+        physicsBody.angularVelocity = 0.0
+      }
+    }
+  }
+  
   init(physicsBody: SKPhysicsBody) {
     self.physicsBody = physicsBody
     
@@ -44,6 +56,5 @@ extension PhysicsComponent {
     let randomX = (Bool.random() ? -1 : 1) * (Double.random(in: 1...2))
     let randomY = (Bool.random() ? -1 : 1) * (Double.random(in: 1...2))
     self.physicsBody.applyImpulse(CGVector(dx: randomX, dy: randomY))
-//    self.physicsBody.applyAngularImpulse(0.01)
   }
 }

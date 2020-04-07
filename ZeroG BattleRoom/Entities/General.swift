@@ -21,6 +21,14 @@ protocol GeneralImpactableProtocol {
 
 
 class General: GKEntity {
+  
+  enum State {
+    case idle
+    case moving
+    case beamed
+  }
+  
+  private var state: State = .idle
 
   init(imageName: String, team: Team, addShape: @escaping (SKShapeNode) -> Void) {
     super.init()
@@ -59,6 +67,17 @@ class General: GKEntity {
     fatalError("init(coder:) has not been implemented")
   }
   
+  func switchToState(_ state: State) {
+      switch (state) {
+      case .idle: break
+  //      self.physicsBody?.velocity = CGVector.zero
+      case .moving:
+        self.state = .moving
+      case .beamed:
+        self.state = .beamed
+      }
+    }
+  
   private func getPhysicsBody() -> SKPhysicsBody {
     let spriteComponent = self.component(ofType: SpriteComponent.self)!
     
@@ -67,6 +86,28 @@ class General: GKEntity {
     physicsBody.collisionBitMask = PhysicsCategoryMask.package
     
     return physicsBody
+  }
+  
+  // MARK: - Conform to BeamableProtocol
+  
+  static let beamResetTime: Double = 0.5
+  
+  unowned var beam: SKShapeNode? = nil
+  
+  var isBeamed: Bool {
+    get {
+      return self.state == .beamed
+    }
+  }
+  
+  func resetBeamTimer() {
+    DispatchQueue.main.asyncAfter(deadline: .now() + Hero.beamResetTime) {
+      [weak self] in
+      
+      guard let self = self else { return }
+      
+      self.switchToState(.moving)
+    }
   }
   
 }
@@ -78,6 +119,12 @@ extension General: GeneralImpulsableProtocol {
       let impulseComponent = self.component(ofType: ImpulseComponent.self) {
       
       guard !impulseComponent.isOnCooldown else { return }
+      
+      // TODO: Remove this once impulse timer is implemented
+      if physicsComponent.physicsBody.isDynamic == false {
+        physicsComponent.isEffectedByPhysics = true
+        self.resetBeamTimer()
+      }
       
       physicsComponent.physicsBody.applyImpulse(vector.normalized())
       physicsComponent.physicsBody.angularVelocity = 0.0
@@ -101,3 +148,4 @@ extension General: GeneralImpactableProtocol {
     }
   }
 }
+
