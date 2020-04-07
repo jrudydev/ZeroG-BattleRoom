@@ -34,18 +34,20 @@ class Playing: GKState {
     self.setupCamera()
     self.setupPhysics()
   
-    self.setupWalls()
-//    self.setupHeros()
-//    self.setupDepot()
+//    self.setupWalls()
+    self.setupTestWalls()
     
 //    self.loadLevel()
     
 //    self.spawnResources()
-    for _ in 0..<10 {
-      self.scene.entityManager.spawnResource()
+    if self.scene.viewModel.currentPlayerIndex == 0 {
+      for _ in 0..<numberOfSpawnedResources {
+        self.scene.entityManager.spawnResource()
+      }
     }
     
     self.scene.entityManager.spawnHeros()
+    self.scene.entityManager.spawnDeposit()
   }
   
   override func willExit(to nextState: GKState) { }
@@ -82,6 +84,36 @@ extension Playing {
     self.scene.cam = SKCameraNode()
     self.scene.camera = self.scene.cam
     self.scene.addChild(self.scene.cam!)
+  }
+  
+  private func setupTestWalls() {
+    let bottomWallBlind = self.scene.getWallSegment(number: 8)
+    for wall in bottomWallBlind {
+      wall.position = CGPoint(x: wall.position.x,
+                              y: -AppConstants.Layout.boundarySize.height)
+      self.scene.addChild(wall)
+    }
+    
+    let topWallBlind = self.scene.getWallSegment(number: 8)
+    for wall in topWallBlind {
+      wall.position = CGPoint(x: wall.position.x,
+                              y: AppConstants.Layout.boundarySize.height)
+      self.scene.addChild(wall)
+    }
+    
+    let leftWallBlind = self.scene.getWallSegment(number: 8, orientation: .vertical)
+    for wall in leftWallBlind {
+      wall.position = CGPoint(x: -AppConstants.Layout.boundarySize.width,
+                              y: wall.position.y)
+      self.scene.addChild(wall)
+    }
+    
+    let rightWallBlind = self.scene.getWallSegment(number: 8, orientation: .vertical)
+    for wall in rightWallBlind {
+      wall.position = CGPoint(x: AppConstants.Layout.boundarySize.width,
+                              y: wall.position.y)
+      self.scene.addChild(wall)
+    }
   }
   
   private func setupWalls() {
@@ -176,34 +208,34 @@ extension Playing {
   }
   
   private func setupHeros() {
-    let heros = self.scene.viewModel.players
-    
-    if heros.count == 2 {
-      let firstHero = heros[0]
-      firstHero.position.y = -UIScreen.main.bounds.height/2
-      firstHero.zPosition = 10
-      firstHero.physicsBody?.collisionBitMask = PhysicsCategoryMask.package
-      firstHero.setupPhysicsBody()
-      self.scene.addChild(firstHero)
-      
-      let firstTrailNode = SKNode()
-      self.scene.addChild(firstTrailNode)
-      firstHero.setupTrail(node: firstTrailNode)
-      firstHero.setupAliasLabel()
-      
-      let secondHero = heros[1]
-      secondHero.position.y = UIScreen.main.bounds.height/2
-      secondHero.zRotation = CGFloat.pi
-      secondHero.zPosition = 10
-      secondHero.physicsBody?.collisionBitMask = PhysicsCategoryMask.package | PhysicsCategoryMask.hero
-      secondHero.setupPhysicsBody()
-      self.scene.addChild(secondHero)
-      
-      let secondTrailNode = SKNode()
-      self.scene.addChild(secondTrailNode)
-      secondHero.setupTrail(node: secondTrailNode)
-      secondHero.setupAliasLabel()
-    }
+//    let heros = self.scene.viewModel.players
+//    
+//    if heros.count == 2 {
+//      let firstHero = heros[0]
+//      firstHero.position.y = -UIScreen.main.bounds.height/2
+//      firstHero.zPosition = 10
+//      firstHero.physicsBody?.collisionBitMask = PhysicsCategoryMask.package
+//      firstHero.setupPhysicsBody()
+//      self.scene.addChild(firstHero)
+//      
+//      let firstTrailNode = SKNode()
+//      self.scene.addChild(firstTrailNode)
+//      firstHero.setupTrail(node: firstTrailNode)
+//      firstHero.setupAliasLabel()
+//      
+//      let secondHero = heros[1]
+//      secondHero.position.y = UIScreen.main.bounds.height/2
+//      secondHero.zRotation = CGFloat.pi
+//      secondHero.zPosition = 10
+//      secondHero.physicsBody?.collisionBitMask = PhysicsCategoryMask.package | PhysicsCategoryMask.hero
+//      secondHero.setupPhysicsBody()
+//      self.scene.addChild(secondHero)
+//      
+//      let secondTrailNode = SKNode()
+//      self.scene.addChild(secondTrailNode)
+//      secondHero.setupTrail(node: secondTrailNode)
+//      secondHero.setupAliasLabel()
+//    }
   }
   
   private func setupDepot() {
@@ -214,18 +246,18 @@ extension Playing {
   }
   
   private func spawnResources() {
-    let halfWidth = (AppConstants.Layout.boundarySize.width - 50) / 2
-    let halfHeight = (AppConstants.Layout.boundarySize.height - 50) / 2
-    
-    for resource in self.scene.viewModel.resources {
-      self.scene.addChild(resource)
-      print("I'm player \(self.scene.viewModel.currentPlayerIndex + 1), isPlayer1: \(self.scene.multiplayerNetworking.isPlayer1)")
-      if self.scene.viewModel.currentPlayerIndex == 0 {
-        resource.position = CGPoint(x: CGFloat.random(in: -halfWidth...halfWidth),
-                                    y: CGFloat.random(in: -halfHeight...halfHeight))
-        resource.randomImpulse()
-      }
-    }
+//    let halfWidth = (AppConstants.Layout.boundarySize.width - 50) / 2
+//    let halfHeight = (AppConstants.Layout.boundarySize.height - 50) / 2
+//    
+//    for resource in self.scene.viewModel.resources {
+//      self.scene.addChild(resource)
+//      print("I'm player \(self.scene.viewModel.currentPlayerIndex + 1), isPlayer1: \(self.scene.multiplayerNetworking.isPlayer1)")
+//      if self.scene.viewModel.currentPlayerIndex == 0 {
+//        resource.position = CGPoint(x: CGFloat.random(in: -halfWidth...halfWidth),
+//                                    y: CGFloat.random(in: -halfHeight...halfHeight))
+//        resource.randomImpulse()
+//      }
+//    }
   }
 
 }

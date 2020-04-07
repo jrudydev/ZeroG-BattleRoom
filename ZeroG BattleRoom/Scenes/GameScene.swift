@@ -7,10 +7,19 @@
 //
 
 import SpriteKit
+import GameKit
 import GameplayKit
+import Combine
+
+
+extension Notification.Name {
+  static let restartGame = Notification.Name("restartGame")
+}
+
 
 class GameScene: SKScene {
   
+  var entityManager: EntityManager!
   var entities = [GKEntity]()
   var graphs = [String : GKGraph]()
   
@@ -20,145 +29,212 @@ class GameScene: SKScene {
     GameOver(scene: self)])
   
   private var lastUpdateTime : TimeInterval = 0
-  private var label : SKLabelNode?
-//  private var spinnyNode : SKShapeNode?
   
-  private var sceneModel: GameSceneModel!
-  var hero: Hero!
+  private(set) var viewModel: GameSceneViewModel!
   
   var cam: SKCameraNode?
+  var gameMessage: SKLabelNode?
   
-  var packagesDelivered: Int = 0 {
+  var multiplayerNetworking: MultiplayerNetworking! {
     didSet {
-      self.sceneModel.packagesDelivered = self.packagesDelivered
+      MultiplayerNetworkingSnapshot.shared.publisher
+        .sink { elements in
+          self.multiplayerNetworking.sendSnapshot(elements)
+        }
+        .store(in: &subscriptions)
+      MultiplayerNetworkingSnapshot.shared.scene = self
     }
   }
   
-  var wallNodeCopy: Wall? {
-    return self.sceneModel.wallNode?.copy() as? Wall
+  private var gameWon: Bool = false {
+    didSet {
+      if let label = self.gameMessage {
+        label.text = "\(self.gameWon ? "You Won" : "You Lost")"
+        label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
+      }
+      
+      self.gameState.enter(GameOver.self)
+//      let gameOver = self.childNode(withName: "Something") as! SKSpriteNode
+//      let textureName = self.gameWon ? "You Won" : "Game Over"
+//      let texture = SKTexture(imageNamed: textureName)
+//      let actionSequence = SKAction.sequence([
+//        SKAction.setTexture(texture),
+//        SKAction.scale(to: 1.0, duration: 0.25)])
+//      
+//      gameOver.run(actionSequence)
+    }
   }
   
-  var spinnyNodeCopy: SKShapeNode? {
-    return self.sceneModel.spinnyNode?.copy() as? SKShapeNode
-  }
-  
-  var borderBody: SKPhysicsBody {
-    return self.sceneModel.borderBody
-  }
+  private var subscriptions = Set<AnyCancellable>()
   
   override func sceneDidLoad() {
-    
     self.lastUpdateTime = 0
     
-    // Get label node from scene and store it for use later
-    self.label = self.childNode(withName: "//helloLabel") as? SKLabelNode
-    if let label = self.label {
-      label.alpha = 0.0
-      label.run(SKAction.fadeIn(withDuration: 2.0))
-    }
+    self.viewModel = GameSceneViewModel(frame: self.frame)
     
-//    // Create shape node to use during mouse interaction
-//    let w = (self.size.width + self.size.height) * 0.05
-//    self.spinnyNode = SKShapeNode.init(rectOf: CGSize.init(width: w, height: w), cornerRadius: w * 0.3)
-//    
-//    if let spinnyNode = self.spinnyNode {
-//      spinnyNode.lineWidth = 2.5
-//      
-//      spinnyNode.run(SKAction.repeatForever(SKAction.rotate(byAngle: CGFloat(Double.pi), duration: 1)))
-//      spinnyNode.run(SKAction.sequence([SKAction.wait(forDuration: 0.5),
-//                                        SKAction.fadeOut(withDuration: 0.5),
-//                                        SKAction.removeFromParent()]))
-//    }
-    
-    self.sceneModel = GameSceneModel(frame: self.frame)
+    self.entityManager = EntityManager(scene: self)
     
     let _ = SoundManager.shared
-
-    self.gameState.enter(Playing.self)
-  }
-  
-  func touchDown(atPoint pos : CGPoint) {
-    if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-      n.position = pos
-      n.strokeColor = SKColor.green
-      self.addChild(n)
-    }
     
-    NotificationCenter.default.post(name: .startMatchmaking, object: nil)
-  }
-  
-  func touchMoved(toPoint pos : CGPoint) {
-    if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-      n.position = pos
-      n.strokeColor = SKColor.blue
-      self.addChild(n)
-    }
-  }
-  
-  func touchUp(atPoint pos : CGPoint) {
-    if let n = self.spinnyNode?.copy() as! SKShapeNode? {
-      n.position = pos
-      n.strokeColor = SKColor.red
-      self.addChild(n)
-    }
-  }
-  
-  override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-    if let label = self.label {
-      label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
-    }
+    self.setupGameMessage()
     
-    for t in touches { self.touchDown(atPoint: t.location(in: self)) }
+    self.gameState.enter(WaitingForTap.self)
   }
-  
-  override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-    for t in touches { self.touchMoved(toPoint: t.location(in: self)) }
-  }
-  
-  override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-    for t in touches { self.touchUp(atPoint: t.location(in: self)) }
-  }
-  
-  override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
-    for t in touches { self.touchUp(atPoint: t.location(in: self)) }
-  }
-  
   
   override func update(_ currentTime: TimeInterval) {
-    // Called before each frame is rendered
-    
-    // Initialize _lastUpdateTime if it has not already been
     if (self.lastUpdateTime == 0) {
       self.lastUpdateTime = currentTime
     }
-    
-    // Calculate time since last update
-    let dt = currentTime - self.lastUpdateTime
-    
-    // Update entities
+    let deltaTime = currentTime - self.lastUpdateTime
+
     for entity in self.entities {
-      entity.update(deltaTime: dt)
+      entity.update(deltaTime: deltaTime)
     }
+    
+    self.entityManager.update(deltaTime)
     
     self.lastUpdateTime = currentTime
     
     self.gameState.update(deltaTime: currentTime)
+    
+    if self.isGameWon() {
+      self.gameWon = true
+    }
   }
 }
 
 extension GameScene {
-  func spawnPackage(position: CGPoint) {
-    if let package = self.sceneModel.packageNode?.copy() as! SKShapeNode? {
-      package.position = position
-      package.strokeColor = SKColor.green
-      
-      self.addChild(package)
-      package.randomeImpulse()
-    }
+  func spawnResourceNode(position: CGPoint) {
+    
+    
+//    if let resourceNode = self.viewModel.resourceNode?.copy() as! SKShapeNode? {
+//      resourceNode.position = position
+//      resourceNode.strokeColor = SKColor.green
+//
+//      self.addChild(resourceNode)
+//      resourceNode.randomeImpulse()
+//    }
   }
   
   func getWallSegment(number: Int,
-                      orientation: GameSceneModel.WallOrientation = .horizontal) -> [Wall] {
-    return self.sceneModel.getWallSegment(number: number, orientation: orientation)
+                      orientation: GameSceneViewModel.WallOrientation = .horizontal) -> [Wall] {
+    return self.viewModel.getWallSegment(number: number, orientation: orientation)
+  }
+}
+
+extension GameScene {
+  private func setupGameMessage() {
+    self.gameMessage = self.childNode(withName: "//gameMessage") as? SKLabelNode
+    if let gameMessage = self.gameMessage {
+      gameMessage.name = AppConstants.ComponentNames.gameMessageName
+      gameMessage.alpha = 0.0
+      gameMessage.run(SKAction.fadeIn(withDuration: 2.0))
+    }
+  }
+}
+
+extension GameScene: MultiplayerNetworkingProtocol {
+  func setPlayerAliases(playerAliases: [String]) {
+    for (idx, alias) in playerAliases.enumerated() {
+      let entity = self.entityManager.playerEntites[idx]
+      if let aliasComponent = entity.component(ofType: AliasComponent.self) {
+        aliasComponent.node.text = alias
+      }
+    }
+  }
+  
+  func movePlayerAt(index: Int, position: CGPoint, direction: CGVector) {
+    if let player = self.entityManager.playerEntites[index] as? General,
+      let playerComponent = player.component(ofType: SpriteComponent.self) {
+      
+      playerComponent.node.position = position
+      player.impulse(vector: direction)
+    }
+  }
+  
+  func impactPlayer(player: GKPlayer) {
+    let heroEntity = self.entityManager.playerEntites.first(where: { entity -> Bool in
+      return entity == player
+    })
+    
+    if let hero = heroEntity as? General {
+      hero.impacted()
+    }
+  }
+  
+  func syncResources(resources: MultiplayerNetworking.SnapshotElementGroup) {
+    for x in self.entityManager.resourcesEntities.count..<resources.count {
+      self.entityManager.spawnResource(position: resources[x].position,
+                                       vector: resources[x].vector)
+    }
+  }
+  
+  func syncPlayerAt(index: Int, position: CGPoint, vector: CGVector) {
+    if let player = self.entityManager.playerEntites[index] as? General,
+      let spriteComponent = player.component(ofType: SpriteComponent.self),
+      let physicsComponent = player.component(ofType: PhysicsComponent.self) {
+      
+      spriteComponent.node.position = position
+      physicsComponent.physicsBody.velocity = vector
+    }
+//    let player = self.viewModel.players[index]
+//    player.position = position
+//    player.physicsBody?.velocity = vector
+  }
+  
+  func moveResourceAt(index: Int, position: CGPoint, vector: CGVector) {
+    if let package = self.entityManager.resourcesEntities[index] as? Package,
+      let spriteComponent = package.component(ofType: SpriteComponent.self),
+      let physicsComponent = package.component(ofType: PhysicsComponent.self) {
+      
+      spriteComponent.node.position = position
+      physicsComponent.physicsBody.velocity = vector
+    }
+  }
+  
+  func syncResourceAt(index: Int, position: CGPoint, vector: CGVector) {
+    if let package = self.entityManager.resourcesEntities[index] as? Package,
+      let shapeComponent = package.component(ofType: ShapeComponent.self),
+      let physicsComponent = package.component(ofType: PhysicsComponent.self) {
+      
+      shapeComponent.node.position = position
+      physicsComponent.physicsBody.velocity = vector
+    }
+  }
+  
+  func gameOver(player1Won: Bool) {
+    self.gameWon = player1Won
+  }
+  
+  func setCurrentPlayerAt(index: Int) {
+    self.viewModel.currentPlayerIndex = index
+    self.gameState.enter(Playing.self)
+    
+    MultiplayerNetworkingSnapshot.shared.isSendingSnapshots = true
+  }
+}
+
+extension GameScene {
+  func isGameWon() -> Bool {
+    guard self.entityManager.playerEntites.count > 0 else { return false }
+        
+    if let hero = self.entityManager.hero as? General,
+      let teamComponent = hero.component(ofType: TeamComponent.self),
+      let winningTeam = self.entityManager.winningTeam {
+      
+      var hostDidWin = false
+      switch winningTeam {
+      case .team1:
+        hostDidWin = teamComponent.team == .team1
+      case .team2:
+        hostDidWin = teamComponent.team == .team2
+      }
+      print(hostDidWin ? "Won" : "Lost")
+      self.multiplayerNetworking.sendGameEnd(player1Won: hostDidWin)
+      
+      return true
+    }
+    
+    return false 
   }
 }

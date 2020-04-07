@@ -9,16 +9,21 @@
 import Foundation
 
 extension Data {
-  static func archive<T>(object:T) -> Data {
+  static func archiveUnsafeBytes<T>(object:T) -> Data {
     var mutableObject = object
+
     return Data(bytes: &mutableObject, count: MemoryLayout<T>.stride)
   }
 
-  static func unarchive<T>(data: Data) -> T {
-//    guard data.count == MemoryLayout<T>.stride else {
-//      fatalError("Error when unarchiving data.")
-//    }
-
+  static func unarchiveUnsafeBytes<T>(data: Data) -> T {
     return data.withUnsafeBytes { $0.load(as: T.self) }
+  }
+  
+  static func archiveJSON<T: Encodable>(object:T) -> Data {
+    return try! JSONEncoder().encode(object)
+  }
+
+  static func unarchiveJSON<T: Decodable>(data: Data) -> T {
+    return try! JSONDecoder().decode(T.self, from: data)
   }
 }

@@ -7,3 +7,11 @@
 //
 
 import Foundation
+import SpriteKit
+import GameplayKit
+
+
+class DepositComponent: GKComponent {
+  var team1Deposits = 0
+  var team2Deposits = 0
+}

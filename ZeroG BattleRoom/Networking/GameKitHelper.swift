@@ -15,6 +15,8 @@ class GameKitHelper: NSObject {
   static let shared = GameKitHelper()
   
   var match: GKMatch?
+  var playersDict = [String: GKPlayer]()
+  
   private var delegate: GameKitHelperDelegate?
   
   private var isAuthenticated = false
@@ -69,7 +71,9 @@ class GameKitHelper: NSObject {
     
     for player in match.players {
       print("Player found: \(player.alias)")
+      self.playersDict[player.gamePlayerID] = player
     }
+    self.playersDict[GKLocalPlayer.local.gamePlayerID] = GKLocalPlayer.local
     
     self.matchStarted = true
     self.delegate?.matchStarted()
@@ -95,7 +99,7 @@ extension GameKitHelper: GKMatchmakerViewControllerDelegate {
     match.delegate = self
     
     if !self.matchStarted && match.expectedPlayerCount == 0 {
-      print("Ready to start the match")
+      print("Ready to start match")
       foundPlayers()
     }
   }

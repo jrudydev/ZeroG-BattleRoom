@@ -7,3 +7,21 @@
 //
 
 import Foundation
+import SpriteKit
+import GameplayKit
+
+
+class ShapeComponent: GKComponent {
+  let node: SKShapeNode
+  
+  init(node: SKShapeNode) {
+    self.node = node
+    
+    super.init()
+  }
+  
+  required init?(coder: NSCoder) {
+    fatalError("init(coder:) has not been implemented")
+  }
+  
+}

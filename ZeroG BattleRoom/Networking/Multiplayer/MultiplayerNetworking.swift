@@ -11,9 +11,25 @@ import SpriteKit
 import GameKit
 
 
-class MulitplayerNetworking {
-  static let playerKey = "PlayerKey"
-  static let randomNumberKey = "RandomNumberKey"
+extension Notification.Name {
+  static let startMatchmaking = Notification.Name("start_match_making")
+}
+
+
+class MultiplayerNetworking {
+  
+  enum DetailsKeys: String, CaseIterable {
+    case player = "PlayerKey"
+    case randomNumber = "RandomNumberKey"
+    
+    static var playerKey: String {
+      return DetailsKeys.player.rawValue
+    }
+    
+    static var randomNumberKey: String {
+      return DetailsKeys.randomNumber.rawValue
+    }
+  }
   
   enum GameState: Int {
     case waitingForMatch
@@ -44,8 +60,8 @@ class MulitplayerNetworking {
   
   init() {
     self.orderOfPlayers = [[
-      MulitplayerNetworking.playerKey: GKLocalPlayer.local,
-      MulitplayerNetworking.randomNumberKey: self.ourRandomNumber]]
+      DetailsKeys.playerKey: GKLocalPlayer.local,
+      DetailsKeys.randomNumberKey: self.ourRandomNumber]]
   }
   
   func sendData(_ data: Data, mode: GKMatch.SendDataMode = .reliable) {
@@ -60,40 +76,46 @@ class MulitplayerNetworking {
   }
 }
 
-extension MulitplayerNetworking {
+extension MultiplayerNetworking {
   func sendMove(start pos: CGPoint, direction: CGVector) {
-    var message = MessageMove(mesage: Message(type: .move),
-                              position: pos,
-                              vector: direction)
-    
-    let data = Data(bytes: &message, count: MemoryLayout<MessageMove>.stride)
-    self.sendData(data)
+    let playerElement = MessageSnapshotElement(position: pos, vector: direction)
+    let message = UnifiedMessage(type: .move, elements: [[playerElement]])
+    self.sendData(Data.archiveJSON(object: message))
   }
   
-  func sendSnapshot(_ elements: [(CGPoint, CGVector)]) {
-    var message = MessageSnapshot(message: Message(type: .snapshot),
-                                  elements: elements)
-    
-    let data = Data(bytes: &message, count: MemoryLayout<MessageSnapshot>.stride)
-    self.sendData(data, mode: .unreliable)
+  func sendImpacted() {
+    let message = UnifiedMessage(type: .impacted)
+    self.sendData(Data.archiveJSON(object: message))
+  }
+  
+  func sendResourceMoveAt(index: Int, start pos: CGPoint, direction: CGVector) {
+    let resourceElement = MessageSnapshotElement(position: pos, vector: direction)
+    let message = UnifiedMessage(type: .moveResource, index: index, elements: [[resourceElement]])
+    self.sendData(Data.archiveJSON(object: message))
+  }
+  
+  func sendSnapshot(_ elements: [SnapshotElementGroup]) {
+    let message = UnifiedMessage(type: .snapshot, elements: elements)
+    self.sendData(Data.archiveJSON(object: message), mode: .unreliable)
   }
   
   func sendRandomNumber() {
-    var message = MessageRandomNumber(mesage: Message(type: .randomeNumber),
-                                      randomNumber: self.ourRandomNumber)
-    let data = Data(bytes: &message, count: MemoryLayout<MessageRandomNumber>.stride)
-    self.sendData(data)
+    let message = UnifiedMessage(type: .randomeNumber, randomNumber: self.ourRandomNumber)
+    self.sendData(Data.archiveJSON(object: message))
   }
   
   func sendGameBegin() {
-    var message = MessageGameBegin(mesage: Message(type: .gameBegin))
-    
-    let data = Data(bytes: &message, count: MemoryLayout<MessageGameBegin>.stride)
-    self.sendData(data)
+    let message = UnifiedMessage(type: .gameBegin)
+    self.sendData(Data.archiveJSON(object: message))
+  }
+  
+  func sendGameEnd(player1Won: Bool) {
+    let message = UnifiedMessage(type: .gameOver, player1Won: player1Won)
+    self.sendData(Data.archiveJSON(object: message))
   }
 }
 
-extension MulitplayerNetworking {
+extension MultiplayerNetworking {
   func processReceivedRandomNumber(randomNumberDetails: [String: Any]) {
     guard randomNumberDetails.count > 0 else {
       print("Error: Expected random details missing.")
@@ -101,30 +123,26 @@ extension MulitplayerNetworking {
     }
     
     let contains = self.orderOfPlayers.contains { details -> Bool in
-      let detailsPlayer = details[MulitplayerNetworking.playerKey] as? GKPlayer
-      let detailsNumber = details[MulitplayerNetworking.randomNumberKey] as? Double
-      let player = randomNumberDetails[MulitplayerNetworking.playerKey] as? GKPlayer
-      let randomNumber = randomNumberDetails[MulitplayerNetworking.randomNumberKey] as? Double
+      let detailsPlayer = details[DetailsKeys.playerKey] as! GKPlayer
+      let player = randomNumberDetails[DetailsKeys.playerKey] as! GKPlayer
 
-      return detailsPlayer == player && detailsNumber == randomNumber
+      return detailsPlayer == player
     }
     
     if contains {
       let index = self.orderOfPlayers.firstIndex { details -> Bool in
-        let detailsPlayer = details[MulitplayerNetworking.playerKey] as? GKPlayer
-        let detailsNumber = details[MulitplayerNetworking.randomNumberKey] as? Double
-        let player = randomNumberDetails[MulitplayerNetworking.playerKey] as? GKPlayer
-        let randomNumber = randomNumberDetails[MulitplayerNetworking.randomNumberKey] as? Double
+        let detailsPlayer = details[DetailsKeys.playerKey] as! GKPlayer
+        let player = randomNumberDetails[DetailsKeys.playerKey] as! GKPlayer
         
-        return detailsPlayer == player && detailsNumber == randomNumber
+        return detailsPlayer == player
       }
       self.orderOfPlayers.remove(at: index!)
     }
     
     self.orderOfPlayers.append(randomNumberDetails)
     self.orderOfPlayers.sort { first, second in
-      let firstNumber = (first[MulitplayerNetworking.randomNumberKey] as? Double)!
-      let secondNumber = (second[MulitplayerNetworking.randomNumberKey] as? Double)!
+      let firstNumber = first[DetailsKeys.randomNumberKey] as! Double
+      let secondNumber = second[DetailsKeys.randomNumberKey] as! Double
     
       return firstNumber > secondNumber
     }
@@ -136,51 +154,24 @@ extension MulitplayerNetworking {
   
   private func indexForLocal(player: GKPlayer) -> Int {
     return self.orderOfPlayers.firstIndex { details -> Bool in
-      let detailsPlayer = (details[MulitplayerNetworking.playerKey] as? GKPlayer)!
+      let detailsPlayer = details[DetailsKeys.playerKey] as! GKPlayer
       
       return player == detailsPlayer
     }!
   }
-}
-
-
-// MARK: - Messanging Objects
-
-extension MulitplayerNetworking {
-  enum MessageType: Int {
-    case randomeNumber
-    case gameBegin
-    case move
-    case gameOver
-    case snapshot
-  }
   
-  struct Message {
-    let type: MessageType
-  }
-  
-  struct MessageRandomNumber {
-    let mesage: Message
-    let randomNumber: Double
-  }
-  
-  struct MessageGameBegin {
-    let mesage: Message
-  }
-  
-  struct MessageMove {
-    let mesage: Message
-    let position: CGPoint
-    let vector: CGVector
-  }
-  
-  struct MessageGameOver {
-    let message: Message
-    let player1Won: Bool
-  }
-  
-  struct MessageSnapshot {
-    let message: Message
-    let elements: [(CGPoint, CGVector)]
+  func processPlayerAliases() {
+    if self.allRandomNumbersReceived {
+      var playerAliases = [String]()
+      for playerDetails in self.orderOfPlayers {
+        if let player = playerDetails[DetailsKeys.playerKey] as? GKPlayer {
+          playerAliases.append(player.alias)
+        }
+      }
+      
+      if playerAliases.count > 0 {
+        self.delegate?.setPlayerAliases(playerAliases: playerAliases)
+      }
+    }
   }
 }

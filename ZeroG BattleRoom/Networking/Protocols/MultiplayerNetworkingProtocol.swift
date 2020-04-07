@@ -7,8 +7,17 @@
 //
 
 import Foundation
+import SpriteKit
+import GameKit
 
 protocol MultiplayerNetworkingProtocol {
-  func matchEnded()
-  func setCurrentPlayer(index: Int)
+  func movePlayerAt(index: Int, position: CGPoint, direction: CGVector)
+  func impactPlayer(player: GKPlayer)
+  func syncPlayerAt(index: Int, position: CGPoint, vector: CGVector)
+  func moveResourceAt(index: Int, position: CGPoint, vector: CGVector)
+  func syncResources(resources: MultiplayerNetworking.SnapshotElementGroup)
+  func syncResourceAt(index: Int, position: CGPoint, vector: CGVector)
+  func gameOver(player1Won: Bool)
+  func setCurrentPlayerAt(index: Int)
+  func setPlayerAliases(playerAliases: [String])
 }

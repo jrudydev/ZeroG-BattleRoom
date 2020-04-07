@@ -7,3 +7,10 @@
 //
 
 import Foundation
+import SpriteKit
+import GameplayKit
+
+
+class ImpulseComponent: GKComponent {
+  var isOnCooldown: Bool = false
+}

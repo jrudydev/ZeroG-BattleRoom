@@ -9,10 +9,7 @@
 import Foundation
 import GameKit
 
-extension MulitplayerNetworking: GameKitHelperDelegate {
-  
-  // MARK: - Conform to GameKitHelperDelegate
-  
+extension MultiplayerNetworking: GameKitHelperDelegate {
   public func matchStarted() {
     print("Match has started successfully")
     self.gameState = self.recievedAllRandomNumbers ? .waitingForStart : .waitingForRandomNumber
@@ -26,72 +23,49 @@ extension MulitplayerNetworking: GameKitHelperDelegate {
   }
   
   func match(_ match: GKMatch, didReceive data: Data, from player: GKPlayer) {
-    let message: Message = Data.unarchive(data: data)
+//    let message: Message = data.withUnsafeBytes { $0.load(as: Message.self) }
+    
+    let message: UnifiedMessage = Data.unarchiveJSON(data: data)
     
     switch message.type {
     case .randomeNumber:
-      self.handleRandomNumberMessage(data: data, player: player)
+      self.handleRandomNumber(message, player: player)
     case .gameBegin:
-      self.handleGameBeginMessage()
+      self.handleGameBegin(message)
     case .move:
-      self.handleMoveMessage(data: data)
+      self.handleMove(message)
+    case .impacted:
+      self.handleImpacted(message, player: player)
+    case .moveResource:
+      self.handleMoveResource(message)
     case .gameOver:
-      self.handleGameOver(data: data)
+      self.handleGameOver(message)
     case .snapshot:
-      self.handleSnapshot(data: data)
+      self.handleSnapshot(message)
     }
   }
   
-  private func handleSnapshot(data: Data) {
-    let snapshotMessage: MessageSnapshot = Data.unarchive(data: data)
-//      let expectdNumberOfElements = MultiplayerNetworkingSnapshot.ElementIndex.allCases.count
-//      guard snapshotMessage.elements.count == expectdNumberOfElements else { return }
-      guard snapshotMessage.elements.count == 2 else { return }
-      
-      let host = snapshotMessage.elements[0]
-      let client = snapshotMessage.elements[1]
-      
-      print("Snapshot received")
-      
-      self.delegate?.movePlayerAt(index: 0, position: host.0, direction: host.1)
-      self.delegate?.movePlayerAt(index: 1, position: client.0, direction: client.1)
-  }
+}
+
+extension MultiplayerNetworking {
   
-  private func handleGameOver(data: Data) {
-    print("Game over message received")
-  }
+  // MARK: - Handler Methods
   
-  private func handleMoveMessage(data: Data) {
-    print("Move game message received")
-    let moveMessage: MessageMove = Data.unarchive(data: data)
-    
-    self.delegate?.movePlayerAt(index: self.indicesForPlayers.remote,
-                                position: moveMessage.position,
-                                direction: moveMessage.vector)
-  }
-  
-  private func handleGameBeginMessage() {
-    print("Begin game message received")
-    self.gameState = .active
-    
-    self.delegate?.setCurrentPlayerAt(index: self.indicesForPlayers.local)
-  }
-  
-  private func handleRandomNumberMessage(data: Data, player: GKPlayer) {
-    let randomMessage: MessageRandomNumber = Data.unarchive(data: data)
+  private func handleRandomNumber(_ snapshot: UnifiedMessage, player: GKPlayer) {
+    let randomNumber = snapshot.randomNumber!
         
-    print("Recieved random number: \(randomMessage.randomNumber)")
+    print("Recieved random number: \(randomNumber)")
     
     var tie = false
-    if randomMessage.randomNumber == self.ourRandomNumber {
+    if randomNumber == self.ourRandomNumber {
       print("Tie")
       tie = true
       self.ourRandomNumber = Double.random(in: 0.0...1000.0)
       self.sendRandomNumber()
     } else {
       self.processReceivedRandomNumber(randomNumberDetails: [
-        MulitplayerNetworking.playerKey: player,
-        MulitplayerNetworking.randomNumberKey: randomMessage.randomNumber])
+        DetailsKeys.playerKey: player,
+        DetailsKeys.randomNumberKey: randomNumber])
     }
     
     if self.recievedAllRandomNumbers {
@@ -106,24 +80,120 @@ extension MulitplayerNetworking: GameKitHelperDelegate {
     }
   }
   
+  private func handleGameBegin(_ snapshot: UnifiedMessage) {
+    print("Begin game message received")
+    self.gameState = .active
+    
+    self.delegate?.setCurrentPlayerAt(index: self.indicesForPlayers.local)
+    self.processPlayerAliases()
+  }
+  
+  private func handleMove(_ snapshot: UnifiedMessage) {
+    let elements = snapshot.elements!
+    
+    guard elements.count > 0 else { fatalError("Error: Elements array is empty.") }
+    
+    let playerGroup = elements[0]
+    guard playerGroup.count > 0 else { fatalError("Error: Player group array is empty.")}
+    
+    print("Move message received")
+    self.delegate?.movePlayerAt(index: self.indicesForPlayers.remote,
+                                position: playerGroup[0].position,
+                                direction: playerGroup[0].vector)
+  }
+  
+  private func handleImpacted(_ snapshot: UnifiedMessage, player: GKPlayer) {
+    print("Impacted message received")
+    self.delegate?.impactPlayer(player: player)
+  }
+  
+  private func handleMoveResource(_ snapshot: UnifiedMessage) {
+    let elements = snapshot.elements!
+    
+    guard elements.count > 0 else { fatalError("Error: Elements array is empty.") }
+    
+    let resoureceGroup = elements[0]
+    guard resoureceGroup.count > 0 else { fatalError("Error: Element group array is empty.")}
+    guard let index = snapshot.index else { fatalError("Error: Index is missing.") }
+    
+    print("Resource move message received")
+    self.delegate?.moveResourceAt(index: index,
+                                  position: resoureceGroup[0].position,
+                                  vector: resoureceGroup[0].vector)
+  }
+  
+  private func handleGameOver(_ snapshot: UnifiedMessage) {
+    let player1Won = snapshot.player1Won!
+    
+    print("Game over message received - Host \(player1Won ? "Won" : "Lost" )")
+    self.delegate?.gameOver(player1Won: player1Won)
+  }
+  
+  private func handleSnapshot(_ snapshot: UnifiedMessage) {
+    let elements = snapshot.elements!
+    let expectdNumberOfElements = MultiplayerNetworkingSnapshot.GroupIndecies.allCases.count
+    guard elements.count == expectdNumberOfElements else {
+      fatalError("Error: Missing Elements: \(elements)")
+    }
+    
+    print("Snapshot received")
+    
+    let playerGroup = elements[MultiplayerNetworkingSnapshot.GroupIndecies.players.rawValue]
+    guard playerGroup.count > 0 else {
+      fatalError("Error: Missing players: \(playerGroup)")
+    }
+    
+    for (idx, player) in playerGroup.enumerated() {
+      guard idx != self.indicesForPlayers.local else {
+        print("Skip remote player sync.")
+        continue
+      }
+      
+      self.delegate?.syncPlayerAt(index: idx,
+                                  position: player.position,
+                                  vector: player.vector)
+    }
+    
+    guard !self.isLocalPlayerHost() else {
+      print("Only update game elements for client devices.")
+      return
+    }
+    
+    let resourceGroup = elements[MultiplayerNetworkingSnapshot.GroupIndecies.resources.rawValue]
+    guard resourceGroup.count > 0 else {
+      fatalError("Error: Missing resources: \(resourceGroup)")
+    }
+    
+    // Spawn resources as needed
+    self.delegate?.syncResources(resources: resourceGroup)
+    
+    for (idx, resource) in resourceGroup.enumerated() {
+      self.delegate?.syncResourceAt(index: idx,
+                                    position: resource.position,
+                                    vector: resource.vector)
+    }
+  }
+  
   private func isLocalPlayerHost() -> Bool {
     guard let firstPlayer = self.orderOfPlayers.first,
-      let player = firstPlayer[MulitplayerNetworking.playerKey] as? GKPlayer else { return false }
+      let player = firstPlayer[DetailsKeys.playerKey] as? GKPlayer else { return false }
     
     print("I'm player \(player == GKLocalPlayer.local ? 1 : 2)")
     return player == GKLocalPlayer.local
   }
 }
 
-extension MulitplayerNetworking {
+extension MultiplayerNetworking {
   private func tryStartGame() {
     if self.isPlayer1 && self.gameState == .waitingForStart {
       self.gameState = .active
+      
       self.sendGameBegin()
       
       self.delegate?.setCurrentPlayerAt(index: 0)
+      self.processPlayerAliases()
       
-      MultiplayerNetworkingSnapshot.shared.isSendingSnapshots = true
+      MultiplayerNetworkingSnapshot.shared.includeResources = true
     }
   }
 }

@@ -12,4 +12,5 @@ import SpriteKit
 
 protocol CollectorProtocol {
   var resourceNode: SKShapeNode? { get set }
+  var collectedResources: Int { get }
 }

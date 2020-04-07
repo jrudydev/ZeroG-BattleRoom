@@ -9,20 +9,8 @@
 import Foundation
 import SpriteKit
 
-let numberOfSpawnedResources = 1
 
-struct PhysicsCategoryMask {
-  static var hero     : UInt32 = 0x1 << 0
-  static var base     : UInt32 = 0x1 << 1
-  static var wall     : UInt32 = 0x1 << 2
-  static var strap    : UInt32 = 0x1 << 3
-  static var payload  : UInt32 = 0x1 << 4
-  static var package  : UInt32 = 0x1 << 5
-  static var deposit  : UInt32 = 0x1 << 6
-  static var pod      : UInt32 = 0x1 << 7
-}
-
-public class GameSceneModel {
+public class GameSceneViewModel {
   enum WallOrientation {
     case vertical
     case horizontal
@@ -30,13 +18,7 @@ public class GameSceneModel {
     case risingDiag
   }
   
-  var players = [Hero(imageNamed: "spacesuit-blue"), Hero(imageNamed: "spacesuit-red")]
-  var hero: Hero {
-    return players[self.currentPlayerIndex]
-  }
   var currentPlayerIndex = 0
-  
-  var resourcesArray = [SKShapeNode]()
   var resourcesDelivered = 0
   
   var resourceNode: SKShapeNode?
@@ -47,6 +29,14 @@ public class GameSceneModel {
   var subTitleMessage: SKLabelNode?
   
   var borderBody: SKPhysicsBody
+  
+  var wallNodeCopy: Wall? {
+    return self.wallNode?.copy() as? Wall
+  }
+
+  var spinnyNodeCopy: SKShapeNode? {
+    return self.spinnyNode?.copy() as? SKShapeNode
+  }
   
   init(frame: CGRect) {
     let borderBody = SKPhysicsBody(edgeLoopFrom: frame)
@@ -80,15 +70,33 @@ public class GameSceneModel {
   }
 }
 
-extension GameSceneModel {
+extension GameSceneViewModel {
   private func createResourceNodes() {
-    for _ in 0..<numberOfSpawnedResources {
-      guard let resourceNode = self.resourceNode?.copy() as! SKShapeNode? else { return }
-      
-      resourceNode.strokeColor = SKColor.green
-      
-      self.resourcesArray.append(resourceNode)
-    }
+//    for _ in 0..<numberOfSpawnedResources {
+////      guard let resourceNode = self.resourceNode?.copy() as! SKShapeNode? else { return }
+////
+////      resourceNode.strokeColor = SKColor.green
+////
+////      self.resources.append(resourceNode)
+//      let width: CGFloat = 10.0
+//      let size = CGSize(width: width, height: width)
+//     let resourceNode = SKShapeNode(rectOf: size, cornerRadius: width * 0.3)
+//      resourceNode.lineWidth = 2.5
+//            
+//      let radius = resourceNode.frame.size.height / 2.0
+//      let physicsBody = SKPhysicsBody(circleOfRadius: radius)
+//      physicsBody.friction = 0.0
+//      physicsBody.restitution = 1.0
+//      physicsBody.linearDamping = 0.0
+//      physicsBody.angularDamping = 0.0
+//      physicsBody.categoryBitMask = PhysicsCategoryMask.package
+//      physicsBody.contactTestBitMask = PhysicsCategoryMask.hero
+//      physicsBody.collisionBitMask = PhysicsCategoryMask.hero
+//      resourceNode.physicsBody = physicsBody
+//      
+//      resourceNode.strokeColor = SKColor.green
+//      self.resources.append(resourceNode)
+//    }
   }
   
   private func createShapeNodeForResource() {
@@ -140,7 +148,7 @@ extension GameSceneModel {
   }
 }
 
-extension GameSceneModel.WallOrientation {
+extension GameSceneViewModel.WallOrientation {
   var rotation: CGFloat {
     var rotation: CGFloat = 0.0
     if case .vertical = self {
