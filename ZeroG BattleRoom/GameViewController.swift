@@ -43,7 +43,8 @@ class GameViewController: UIViewController {
           view.showsNodeCount = true
         }
         
-        self.setupNetworkingNotifcations(delegate: self)
+        sceneNode.multiplayerNetworking = MultiplayerNetworking()
+        self.setupNetworkingNotifcations(delegate: sceneNode)
       }
     }
     
@@ -67,11 +68,18 @@ class GameViewController: UIViewController {
   override var prefersStatusBarHidden: Bool {
     return true
   }
+  
+  override func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    guard let view = self.view as? SKView else { return }
+    let resize = view.frame.size.asepctFill(UIScreen.main.bounds.size)
+    view.scene?.size = resize
+  }
 }
 
 extension GameViewController {
   private func setupNetworkingNotifcations(delegate: MultiplayerNetworkingProtocol) {
-    let networking = MulitplayerNetworking()
+    let networking = MultiplayerNetworking()
     networking.delegate = delegate
     NotificationCenter.Publisher(center: .default, name: .startMatchmaking, object: nil)
       .sink(receiveValue: { notification in
@@ -80,15 +88,5 @@ extension GameViewController {
         }
       })
       .store(in: &subscriptions)
-  }
-}
-
-extension GameViewController: MultiplayerNetworkingProtocol {
-  func matchEnded() {
-    
-  }
-  
-  func setCurrentPlayer(index: Int) {
-    
   }
 }

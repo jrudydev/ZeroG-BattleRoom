@@ -10,6 +10,7 @@ import Foundation
 import SpriteKit
 import GameKit
 
+
 class MulitplayerNetworking {
   static let playerKey = "PlayerKey"
   static let randomNumberKey = "RandomNumberKey"
@@ -22,37 +23,6 @@ class MulitplayerNetworking {
     case done
   }
   
-  enum MessageType: Int {
-    case randomeNumber
-    case gameBegin
-    case move
-    case gameOver
-  }
-  
-  struct Message {
-    let type: MessageType
-  }
-  
-  struct MessageRandomNumber {
-    let mesage: Message
-    let randomNumber: Double
-  }
-  
-  struct MessageGameBegin {
-    let mesage: Message
-  }
-  
-  struct MessageMove {
-    let mesage: Message
-    let position: CGPoint
-    let vector: CGVector
-  }
-  
-  struct MessageGameOver {
-    let message: Message
-    let player1Won: Bool
-  }
-  
   var gameState: GameState = .waitingForMatch
   
   var ourRandomNumber = Double.random(in: 0.0...1000.0)
@@ -62,17 +32,12 @@ class MulitplayerNetworking {
     return self.orderOfPlayers.count == match.players.count + 1
   }
   
-  var isPlayer1 = false
+  var orderOfPlayers: [[String: Any]]
   var recievedAllRandomNumbers = false
+  var isPlayer1 = false
   
-  private var orderOfPlayers: [[String: Any]]
-  
-  var isLocalPlayerPlayer1: Bool {
-    guard let firstPlayer = self.orderOfPlayers.first,
-      let player = firstPlayer[MulitplayerNetworking.playerKey] as? GKPlayer else { return false }
-    
-    print("I'm player \(player == GKLocalPlayer.local ? 1 : 2)")
-    return player == GKLocalPlayer.local
+  var indicesForPlayers: (local: Int, remote: Int ) {
+    return self.isPlayer1 ? (local: 0, remote: 1) :  (local: 1, remote: 0)
   }
   
   var delegate: MultiplayerNetworkingProtocol?
@@ -83,15 +48,48 @@ class MulitplayerNetworking {
       MulitplayerNetworking.randomNumberKey: self.ourRandomNumber]]
   }
   
-  func sendData(_ data: Data) {
+  func sendData(_ data: Data, mode: GKMatch.SendDataMode = .reliable) {
     guard let match = GameKitHelper.shared.match else { return }
     
     do {
-      try match.send(data, to: match.players, dataMode: .reliable)
+      try match.send(data, to: match.players, dataMode: mode)
     } catch {
       print("Error sending data: \(error.localizedDescription)")
       self.matchEnded()
     }
+  }
+}
+
+extension MulitplayerNetworking {
+  func sendMove(start pos: CGPoint, direction: CGVector) {
+    var message = MessageMove(mesage: Message(type: .move),
+                              position: pos,
+                              vector: direction)
+    
+    let data = Data(bytes: &message, count: MemoryLayout<MessageMove>.stride)
+    self.sendData(data)
+  }
+  
+  func sendSnapshot(_ elements: [(CGPoint, CGVector)]) {
+    var message = MessageSnapshot(message: Message(type: .snapshot),
+                                  elements: elements)
+    
+    let data = Data(bytes: &message, count: MemoryLayout<MessageSnapshot>.stride)
+    self.sendData(data, mode: .unreliable)
+  }
+  
+  func sendRandomNumber() {
+    var message = MessageRandomNumber(mesage: Message(type: .randomeNumber),
+                                      randomNumber: self.ourRandomNumber)
+    let data = Data(bytes: &message, count: MemoryLayout<MessageRandomNumber>.stride)
+    self.sendData(data)
+  }
+  
+  func sendGameBegin() {
+    var message = MessageGameBegin(mesage: Message(type: .gameBegin))
+    
+    let data = Data(bytes: &message, count: MemoryLayout<MessageGameBegin>.stride)
+    self.sendData(data)
   }
 }
 
@@ -145,3 +143,44 @@ extension MulitplayerNetworking {
   }
 }
 
+
+// MARK: - Messanging Objects
+
+extension MulitplayerNetworking {
+  enum MessageType: Int {
+    case randomeNumber
+    case gameBegin
+    case move
+    case gameOver
+    case snapshot
+  }
+  
+  struct Message {
+    let type: MessageType
+  }
+  
+  struct MessageRandomNumber {
+    let mesage: Message
+    let randomNumber: Double
+  }
+  
+  struct MessageGameBegin {
+    let mesage: Message
+  }
+  
+  struct MessageMove {
+    let mesage: Message
+    let position: CGPoint
+    let vector: CGVector
+  }
+  
+  struct MessageGameOver {
+    let message: Message
+    let player1Won: Bool
+  }
+  
+  struct MessageSnapshot {
+    let message: Message
+    let elements: [(CGPoint, CGVector)]
+  }
+}
