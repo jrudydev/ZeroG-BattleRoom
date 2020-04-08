@@ -57,6 +57,8 @@ class EntityManager {
   
   private var resourceNode : SKShapeNode?
   
+  private var panelFactory = PanelFactory()
+  
   unowned let scene: GameScene
   
   init(scene: GameScene) {
@@ -193,29 +195,80 @@ extension EntityManager {
     self.add(deposit)
   }
   
-  func spawnWalls() {
-    let wall = self.createWallEntity()
+  func spawnPanels() {
+    let factory = self.scene.entityManager.panelFactory
+    let wallPanels = factory.perimeterWallFrom(size: AppConstants.Layout.boundarySize)
+    let centerPanels = self.centerPanels()
+    let blinderPanels = self.blinderPanels()
+    let extraPanels = self.extraPanels()
     
-    self.add(wall)
+    for enitity in wallPanels + centerPanels + blinderPanels + extraPanels {
+      self.add(enitity)
+    }
   }
   
+  private func centerPanels() -> [GKEntity] {
+    let position = CGPoint(x: 80.0, y: 120.0)
+    let topLeftPosition = CGPoint(x: -position.x, y: position.y)
+    let topLeftWall = self.panelFactory.panelSegment(beamConfig: .both,
+                                                     number: 2,
+                                                     position: topLeftPosition,
+                                                     orientation: .risingDiag)
+    let topRightPosition = CGPoint(x: position.x, y: position.y)
+    let topRightWall = self.panelFactory.panelSegment(beamConfig: .both,
+                                                      number: 2,
+                                                      position: topRightPosition,
+                                                      orientation: .fallingDiag)
+    let bottomLeftPosition = CGPoint(x: -position.x, y: -position.y)
+    let bottomLeftWall = self.panelFactory.panelSegment(beamConfig: .both,
+                                                        number: 2,
+                                                        position: bottomLeftPosition,
+                                                        orientation: .fallingDiag)
+    let bottomRightPosition = CGPoint(x: position.x, y: -position.y)
+    let bottomRightWall = self.panelFactory.panelSegment(beamConfig: .both,
+                                                         number: 2,
+                                                         position: bottomRightPosition,
+                                                         orientation: .risingDiag)
+
+    return topLeftWall + topRightWall + bottomLeftWall + bottomRightWall
+  }
+  
+  private func blinderPanels() -> [GKEntity] {
+    let yPosRatio: CGFloat = 0.3
+    let numberOfSegments = 5
+    let topBlinderPosition = CGPoint(x: 0.0,
+                                     y: AppConstants.Layout.boundarySize.height * yPosRatio)
+    let topBlinder = self.panelFactory.panelSegment(beamConfig: .both,
+                                                    number: numberOfSegments,
+                                                    position: topBlinderPosition)
+    
+    let bottomBlinderPosition = CGPoint(x: 0.0,
+                                        y: -AppConstants.Layout.boundarySize.height * yPosRatio)
+    let bottomBlinder = self.panelFactory.panelSegment(beamConfig: .both,
+                                                       number: numberOfSegments,
+                                                       position: bottomBlinderPosition)
+    return topBlinder + bottomBlinder
+  }
+  
+  private func extraPanels() -> [GKEntity] {
+    let width = AppConstants.Layout.boundarySize.width
+    let wallLength = AppConstants.Layout.wallSize.width
+    let numberOfSegments = 2
+  
+    let leftBlinderPosition = CGPoint(x: -width / 2 + wallLength + 10, y: 0.0)
+    let leftBlinder = self.panelFactory.panelSegment(beamConfig: .both,
+                                                     number: numberOfSegments,
+                                                     position: leftBlinderPosition)
+ 
+    let rightBlinderPosition = CGPoint(x: width / 2 - wallLength - 10, y: 0.0)
+    let rightBlinder = self.panelFactory.panelSegment(beamConfig: .both,
+                                                      number: numberOfSegments,
+                                                      position: rightBlinderPosition)
+    return leftBlinder + rightBlinder
+  }
 }
 
 extension EntityManager {
-  private func createWallEntity() -> GKEntity {
-    let shape = SKShapeNode(rectOf: AppConstants.Layout.wallSize,
-                            cornerRadius: AppConstants.Layout.wallCornerRadius)
-    shape.name = AppConstants.ComponentNames.wallPanelName
-    shape.lineWidth = 2.5
-    shape.fillColor = UIColor.gray
-    shape.strokeColor = UIColor.white
-    
-    let physicsBody = SKPhysicsBody(rectangleOf: shape.frame.size)
-    physicsBody.isDynamic = false
-
-    return Panel(shapeNode: shape, physicsBody: physicsBody)
-  }
-  
   private func createResourceNode() {
     let width: CGFloat = 10.0
     let size = CGSize(width: width, height: width)

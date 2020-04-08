@@ -36,6 +36,7 @@
 		93873A1C2439DC1D00A6E59A /* TrailComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93873A1B2439DC1D00A6E59A /* TrailComponent.swift */; };
 		93A0779D243C982200D52205 /* Panel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A0779C243C982200D52205 /* Panel.swift */; };
 		93A077A3243C9E8700D52205 /* TractorBeamComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A077A2243C9E8700D52205 /* TractorBeamComponent.swift */; };
+		93A077A5243D3CE300D52205 /* PanelFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A077A4243D3CE300D52205 /* PanelFactory.swift */; };
 		93A55EEF24307D280027E83E /* GameKitHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55EE924307D280027E83E /* GameKitHelper.swift */; };
 		93A55EF024307D280027E83E /* MultiplayerNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55EEA24307D280027E83E /* MultiplayerNetworking.swift */; };
 		93A55EF124307D280027E83E /* MultiplayerNetworking+GameKitHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55EEB24307D280027E83E /* MultiplayerNetworking+GameKitHelper.swift */; };
@@ -100,6 +101,7 @@
 		93873A1B2439DC1D00A6E59A /* TrailComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrailComponent.swift; sourceTree = "<group>"; };
 		93A0779C243C982200D52205 /* Panel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Panel.swift; sourceTree = "<group>"; };
 		93A077A2243C9E8700D52205 /* TractorBeamComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TractorBeamComponent.swift; sourceTree = "<group>"; };
+		93A077A4243D3CE300D52205 /* PanelFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanelFactory.swift; sourceTree = "<group>"; };
 		93A55EE924307D280027E83E /* GameKitHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameKitHelper.swift; sourceTree = "<group>"; };
 		93A55EEA24307D280027E83E /* MultiplayerNetworking.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MultiplayerNetworking.swift; sourceTree = "<group>"; };
 		93A55EEB24307D280027E83E /* MultiplayerNetworking+GameKitHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "MultiplayerNetworking+GameKitHelper.swift"; sourceTree = "<group>"; };
@@ -201,6 +203,7 @@
 				93873A0F2438ACC000A6E59A /* Package.swift */,
 				93A0779C243C982200D52205 /* Panel.swift */,
 				93873A0924389FEB00A6E59A /* EntityManager.swift */,
+				93A077A4243D3CE300D52205 /* PanelFactory.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -463,6 +466,7 @@
 				93873A142438B87600A6E59A /* PhysicsComponent.swift in Sources */,
 				93A55EEF24307D280027E83E /* GameKitHelper.swift in Sources */,
 				93873A1C2439DC1D00A6E59A /* TrailComponent.swift in Sources */,
+				93A077A5243D3CE300D52205 /* PanelFactory.swift in Sources */,
 				93873A1A24397A3900A6E59A /* ResourceComponent.swift in Sources */,
 				93FEBDB1242EE0CF006CCBFB /* GameScene.swift in Sources */,
 				93FEBDB3242EE0CF006CCBFB /* GameViewController.swift in Sources */,
