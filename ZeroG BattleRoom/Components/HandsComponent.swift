@@ -11,8 +11,9 @@ import SpriteKit
 import GameplayKit
 
 
-class ResourceComponent: GKComponent {
-  var resource: Package? = nil {
+class HandsComponent: GKComponent {
+  
+  var leftHandSlot: Package? = nil {
     willSet {
       if newValue != nil {
         guard let resource = newValue else { return }
@@ -20,18 +21,44 @@ class ResourceComponent: GKComponent {
         
         shapeComponent.node.removeFromParent()
       } else {
-        guard let resource = self.resource else { return }
+        guard let resource = self.leftHandSlot else { return }
         guard let shapeComponent = resource.component(ofType: ShapeComponent.self) else { return }
         
         shapeComponent.node.removeFromParent()
         self.didRemoveResourece(shapeComponent.node)
       }
     }
+    
     didSet {
-      guard let resource = self.resource else { return }
+      guard let resource = self.leftHandSlot else { return }
       guard let shapeComponent = resource.component(ofType: ShapeComponent.self) else { return }
       
       shapeComponent.node.position = CGPoint(x: 10.0, y: 10.0)
+      self.didSetResource(shapeComponent.node)
+    }
+  }
+  
+  var rightHandSlot: Package? = nil {
+    willSet {
+      if newValue != nil {
+        guard let resource = newValue else { return }
+        guard let shapeComponent = resource.component(ofType: ShapeComponent.self) else { return }
+        
+        shapeComponent.node.removeFromParent()
+      } else {
+        guard let resource = self.rightHandSlot else { return }
+        guard let shapeComponent = resource.component(ofType: ShapeComponent.self) else { return }
+        
+        shapeComponent.node.removeFromParent()
+        self.didRemoveResourece(shapeComponent.node)
+      }
+    }
+    
+    didSet {
+      guard let resource = self.rightHandSlot else { return }
+      guard let shapeComponent = resource.component(ofType: ShapeComponent.self) else { return }
+      
+      shapeComponent.node.position = CGPoint(x: -10.0, y: 10.0)
       self.didSetResource(shapeComponent.node)
     }
   }

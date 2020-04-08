@@ -33,23 +33,29 @@ extension GameScene: SKPhysicsContactDelegate {
       guard let hero = self.entityManager.heroWith(node: heroNode) as? General,
         let impactedResource = self.entityManager.resourceWith(node: resourceNode) as? Package else { return }
       
-      guard let heroResourceComponent = hero.component(ofType: ResourceComponent.self),
+      guard let heroHandsComponent = hero.component(ofType: HandsComponent.self),
         let impactedResourceComponent = impactedResource.component(ofType: ShapeComponent.self),
-        !heroResourceComponent.isImpacted else { return }
+        !heroHandsComponent.isImpacted else { return }
       
-      if let heroResource = heroResourceComponent.resource,
-        let physicsComponent = heroResource.component(ofType: PhysicsComponent.self),
-        !heroResourceComponent.isImpacted {
+      if let heroLeftHand = heroHandsComponent.leftHandSlot,
+        let heroRightHand = heroHandsComponent.rightHandSlot,
+        let leftHandPhysicsComponent = heroLeftHand.component(ofType: PhysicsComponent.self),
+        let rightHandPhysicsComponent = heroRightHand.component(ofType: PhysicsComponent.self) {
       
         hero.impacted()
         
         if self.viewModel.currentPlayerIndex == 0 {
-          physicsComponent.randomImpulse()
+          leftHandPhysicsComponent.randomImpulse()
+          rightHandPhysicsComponent.randomImpulse()
         }
       } else {
         impactedResource.disableCollisionDetection()
-        impactedResourceComponent.node.zPosition = 100
-        heroResourceComponent.resource = impactedResource
+//        impactedResourceComponent.node.zPosition = 100
+        if heroHandsComponent.leftHandSlot == nil {
+          heroHandsComponent.leftHandSlot = impactedResource
+        } else {
+          heroHandsComponent.rightHandSlot = impactedResource
+        }
       }
       
       self.run(SoundManager.shared.blipPaddleSound)
@@ -64,18 +70,39 @@ extension GameScene: SKPhysicsContactDelegate {
       guard let hero = self.entityManager.heroWith(node: heroNode) as? General,
         let deposit = self.entityManager.enitityWith(node: depositNode) as? Deposit else { return }
       
-      guard let spriteComponent = hero.component(ofType: SpriteComponent.self),
-        let resourceComponent = hero.component(ofType: ResourceComponent.self),
+      guard let handsComponent = hero.component(ofType: HandsComponent.self),
         let teamComponent = hero.component(ofType: TeamComponent.self),
         let depositShapeComponent = deposit.component(ofType: ShapeComponent.self),
         let depositComponent = deposit.component(ofType: DepositComponent.self),
-        resourceComponent.resource != nil else { return }
+        (handsComponent.leftHandSlot != nil || handsComponent.rightHandSlot != nil) else { return }
         
-      self.viewModel.resourcesDelivered += 1
+      var total = 0
+      if let lefthanditem = handsComponent.leftHandSlot {
+        handsComponent.leftHandSlot = nil
+        
+        if let shapeComponent = lefthanditem.component(ofType: ShapeComponent.self) {
+          shapeComponent.node.removeFromParent()
+        }
+        
+        total += 1
+      }
+      
+      if let rightHandItem = handsComponent.rightHandSlot {
+        handsComponent.rightHandSlot = nil
+        
+        if let shapeComponent = rightHandItem.component(ofType: ShapeComponent.self) {
+          shapeComponent.node.removeFromParent()
+        }
+        
+        total += 1
+      }
+      
+      self.viewModel.resourcesDelivered += total
+      hero.numberOfDeposits += total
       
       switch teamComponent.team {
-      case .team1: depositComponent.team1Deposits += 1
-      case .team2: depositComponent.team2Deposits += 1
+      case .team1: depositComponent.team1Deposits += total
+      case .team2: depositComponent.team2Deposits += total
       }
       
       if let label = self.gameMessage {
@@ -90,13 +117,6 @@ extension GameScene: SKPhysicsContactDelegate {
         particles.run(SKAction.sequence([SKAction.wait(forDuration: 1.0), SKAction.removeFromParent()]))
       }
     
-      let resource = resourceComponent.resource
-      resourceComponent.resource = nil
-      
-      if let shapeComponent = resource?.component(ofType: ShapeComponent.self) {
-        shapeComponent.node.removeFromParent()
-      }
-      
       self.run(SoundManager.shared.bambooBreakSound)
       print("deposit occured")
     }

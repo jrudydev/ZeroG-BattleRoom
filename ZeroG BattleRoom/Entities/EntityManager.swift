@@ -11,7 +11,7 @@ import SpriteKit
 import GameplayKit
 
 
-let numberOfSpawnedResources = 3
+let numberOfSpawnedResources = 10
 let resourcesNeededToWin = 6
 
 

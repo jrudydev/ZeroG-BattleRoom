@@ -29,6 +29,8 @@ class General: GKEntity {
   }
   
   private var state: State = .idle
+  
+  var numberOfDeposits = 0
 
   init(imageName: String, team: Team, addShape: @escaping (SKShapeNode) -> Void) {
     super.init()
@@ -45,7 +47,7 @@ class General: GKEntity {
 
     self.addComponent(ImpulseComponent())
     
-    self.addComponent(ResourceComponent(didSetResource: { shapeNode in
+    self.addComponent(HandsComponent(didSetResource: { shapeNode in
       spriteComponent.node.addChild(shapeNode)
     }, didRemoveResourece: { shapeNode in
       addShape(shapeNode)
@@ -135,14 +137,15 @@ extension General: GeneralImpulsableProtocol {
 
 extension General: GeneralImpactableProtocol {
   func impacted() {
-    guard let heroResourceComponent = self.component(ofType: ResourceComponent.self),
+    guard let heroHandsComponent = self.component(ofType: HandsComponent.self),
       let heroSpriteComponent = self.component(ofType: SpriteComponent.self) else { return }
     
-    if let heroResource = heroResourceComponent.resource,
+    if let heroResource = heroHandsComponent.leftHandSlot,
       let shapeComponent = heroResource.component(ofType: ShapeComponent.self) {
       
-      heroResourceComponent.isImpacted = true
-      heroResourceComponent.resource = nil
+      heroHandsComponent.isImpacted = true
+      heroHandsComponent.leftHandSlot = nil
+      heroHandsComponent.rightHandSlot = nil
       shapeComponent.node.position = heroSpriteComponent.node.position
       heroResource.enableCollisionDetections()
     }
