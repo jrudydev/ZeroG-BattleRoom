@@ -20,7 +20,6 @@ extension Notification.Name {
 class GameScene: SKScene {
   
   var entityManager: EntityManager!
-  var entities = [GKEntity]()
   var graphs = [String : GKGraph]()
   
   lazy var gameState: GKStateMachine = GKStateMachine(states: [
@@ -29,6 +28,8 @@ class GameScene: SKScene {
     GameOver(scene: self)])
   
   private var lastUpdateTime : TimeInterval = 0
+  
+  var lastTapDownPoint: CGPoint = .zero
   
   private(set) var viewModel: GameSceneViewModel!
   
@@ -54,14 +55,6 @@ class GameScene: SKScene {
       }
       
       self.gameState.enter(GameOver.self)
-//      let gameOver = self.childNode(withName: "Something") as! SKSpriteNode
-//      let textureName = self.gameWon ? "You Won" : "Game Over"
-//      let texture = SKTexture(imageNamed: textureName)
-//      let actionSequence = SKAction.sequence([
-//        SKAction.setTexture(texture),
-//        SKAction.scale(to: 1.0, duration: 0.25)])
-//      
-//      gameOver.run(actionSequence)
     }
   }
   
@@ -71,11 +64,9 @@ class GameScene: SKScene {
     self.lastUpdateTime = 0
     
     self.viewModel = GameSceneViewModel(frame: self.frame)
-    
     self.entityManager = EntityManager(scene: self)
     
     let _ = SoundManager.shared
-    
     self.setupGameMessage()
     
     self.gameState.enter(WaitingForTap.self)
@@ -86,17 +77,11 @@ class GameScene: SKScene {
       self.lastUpdateTime = currentTime
     }
     let deltaTime = currentTime - self.lastUpdateTime
-
-    for entity in self.entities {
-      entity.update(deltaTime: deltaTime)
-    }
-    
     self.entityManager.update(deltaTime)
     
     self.lastUpdateTime = currentTime
-    
     self.gameState.update(deltaTime: currentTime)
-    
+
     if self.isGameWon() {
       self.gameWon = true
     }

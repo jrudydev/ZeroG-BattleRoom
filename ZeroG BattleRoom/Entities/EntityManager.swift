@@ -28,6 +28,9 @@ class EntityManager {
   var toRemove = Set<GKEntity>()
   
   var hero: GKEntity? {
+    guard self.playerEntites.count > 0 else { return nil }
+    guard self.scene.viewModel.currentPlayerIndex < self.playerEntites.count else { return nil }
+    
     return self.playerEntites[self.scene.viewModel.currentPlayerIndex]
   }
   

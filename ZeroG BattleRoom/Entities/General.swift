@@ -28,8 +28,7 @@ class General: GKEntity {
     case beamed
   }
   
-  private var state: State = .idle
-  
+  var state: State = .idle
   var numberOfDeposits = 0
 
   init(imageName: String, team: Team, addShape: @escaping (SKShapeNode) -> Void) {
@@ -63,6 +62,10 @@ class General: GKEntity {
     let nameComponent = AliasComponent()
     self.addComponent(nameComponent)
     spriteComponent.node.addChild(nameComponent.node)
+    
+    let launchComponent = LaunchComponent()
+    spriteComponent.node.addChild(launchComponent.node)
+    self.addComponent(launchComponent)
   }
   
   required init?(coder: NSCoder) {

@@ -20,6 +20,15 @@ class GameOver: GKState {
   override func didEnter(from previousState: GKState?) {
 //    let scale = SKAction.scale(to: 1.0, duration: 0.25)
 //    scene.childNode(withName: GameMessageName)!.run(scale)
+    
+    //      let gameOver = self.childNode(withName: "Something") as! SKSpriteNode
+    //      let textureName = self.gameWon ? "You Won" : "Game Over"
+    //      let texture = SKTexture(imageNamed: textureName)
+    //      let actionSequence = SKAction.sequence([
+    //        SKAction.setTexture(texture),
+    //        SKAction.scale(to: 1.0, duration: 0.25)])
+    //
+    //      gameOver.run(actionSequence)
   }
   
   override func willExit(to nextState: GKState) {

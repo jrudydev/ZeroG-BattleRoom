@@ -28,7 +28,11 @@ class GameViewController: UIViewController {
     NotificationCenter.Publisher(center: .default, name: .restartGame, object: nil)
       .sink(receiveValue: { [weak self] notification in
         guard let self = self else { return }
-        
+//      let newScene = GameScene(fileNamed: "GameScene")!
+//      newScene.scaleMode = .aspectFill
+//      let reveal = SKTransition.flipVertical(withDuration: 0.5)
+//      self.view?.presentScene(newScene, transition: reveal)
+            
         self.loadScene()
       })
       .store(in: &subscriptions)
@@ -68,8 +72,8 @@ extension GameViewController {
       if let sceneNode = scene.rootNode as! GameScene? {
         
         // Copy gameplay related content over to the scene
-        sceneNode.entities = scene.entities
-        sceneNode.graphs = scene.graphs
+//        sceneNode.entities = scene.entities
+//        sceneNode.graphs = scene.graphs
         
         // Set the scale mode to scale to fit the window
         sceneNode.scaleMode = .aspectFill

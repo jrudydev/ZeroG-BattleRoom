@@ -25,6 +25,13 @@ struct AppConstants {
     static let gameMessageName = "game-message"
     static let playerAliasLabelName = "player-alias"
     static let resourceName = "resource-name"
+    static let directionNode = "direciton-node"
+    static let angleNode = "angle-node"
+  }
+  
+  struct Touch {
+    static let maxSwipeDistance: CGFloat = 100.0
+    static let maxRotation: CGFloat = 100.0
   }
 }
 

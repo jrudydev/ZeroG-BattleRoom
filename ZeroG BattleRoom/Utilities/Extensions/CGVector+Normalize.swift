@@ -22,4 +22,8 @@ extension CGVector {
   static public func / (vector: CGVector, scalar: CGFloat) -> CGVector {
     return CGVector(dx: vector.dx / scalar, dy: vector.dy / scalar)
   }
+  
+  static public func * (vector: CGVector, scalar: CGFloat) -> CGVector {
+    return CGVector(dx: vector.dx * scalar, dy: vector.dy * scalar)
+  }
 }
