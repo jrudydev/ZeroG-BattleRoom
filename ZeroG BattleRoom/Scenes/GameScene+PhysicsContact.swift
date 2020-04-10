@@ -129,6 +129,7 @@ extension GameScene: SKPhysicsContactDelegate {
       guard let hero = self.entityManager.heroWith(node: heroNode) as? General,
         let spriteComponent = hero.component(ofType: SpriteComponent.self),
         let physicsComponent = hero.component(ofType: PhysicsComponent.self),
+        let impulseComponent = hero.component(ofType: ImpulseComponent.self),
         let panel = self.entityManager.panelWith(node: beam) as? Panel,
         let panelShapeComponent = panel.component(ofType: ShapeComponent.self),
         !hero.isBeamed else { return }
@@ -146,7 +147,7 @@ extension GameScene: SKPhysicsContactDelegate {
         hero.switchToState(.beamed)
       }
       
-      
+      impulseComponent.isOnCooldown = false
       
       self.run(SoundManager.shared.blipSound)
       print("wall hit\(rotation)")

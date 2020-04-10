@@ -169,7 +169,7 @@ extension General: GeneralImpulsableProtocol {
                              dy: location.y - spriteComponent.node.position.y)
     
     self.impulse(vector: moveVector.normalized() * self.defaultImpulseMagnitude)
-//    impulseComponent.isOnCooldown = true
+    impulseComponent.isOnCooldown = true
     
     completion(spriteComponent.node, moveVector)
   }
