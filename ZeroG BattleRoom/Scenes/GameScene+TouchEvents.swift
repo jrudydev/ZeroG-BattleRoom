@@ -114,6 +114,13 @@ extension GameScene {
   }
   
   override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+    guard let hero = self.entityManager.hero as? General,
+      let launchComponent = hero.component(ofType: LaunchComponent.self) else { return }
+    
+    if touches.count > 1 {
+      launchComponent.hide()
+    }
+    
     for t in touches { self.touchMoved(toPoint: t.location(in: self)) }
   }
   
