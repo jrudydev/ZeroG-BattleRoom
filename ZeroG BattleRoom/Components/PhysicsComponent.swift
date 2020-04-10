@@ -31,10 +31,12 @@ class PhysicsComponent: GKComponent {
     didSet {
       if self.isEffectedByPhysics {
         physicsBody.isDynamic = true
+        physicsBody.allowsRotation = true
       } else {
         physicsBody.isDynamic = false
         physicsBody.velocity = CGVector.zero
         physicsBody.angularVelocity = 0.0
+        physicsBody.allowsRotation = false
       }
     }
   }

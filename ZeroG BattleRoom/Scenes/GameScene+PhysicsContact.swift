@@ -142,9 +142,11 @@ extension GameScene: SKPhysicsContactDelegate {
       DispatchQueue.main.async {
         spriteComponent.node.position = convertedPosition
         spriteComponent.node.zRotation = rotation
+        
+        hero.switchToState(.beamed)
       }
       
-      hero.switchToState(.beamed)
+      
       
       self.run(SoundManager.shared.blipSound)
       print("wall hit\(rotation)")

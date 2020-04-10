@@ -25,29 +25,29 @@ extension GameScene {
       let lastTouchDown = launchComponent.launchInfo.lastTouchDown,
       hero.isBeamed else { return }
     
-    var localTouchPosition = self.convert(lastTouchDown, to: spriteComponent.node)
-    localTouchPosition.y = abs(localTouchPosition.y)
-    localTouchPosition = self.convert(localTouchPosition, from: spriteComponent.node)
+    var safeTouchPosition = self.convert(lastTouchDown, to: spriteComponent.node)
+    safeTouchPosition.y = abs(safeTouchPosition.y)
+    safeTouchPosition = self.convert(safeTouchPosition, from: spriteComponent.node)
     
-    var moveTouchPosition = self.convert(pos, to: spriteComponent.node)
-    let isLeftRotation = moveTouchPosition.x > 0
-    moveTouchPosition.y = abs(moveTouchPosition.y)
-    moveTouchPosition = self.convert(moveTouchPosition, from: spriteComponent.node)
+    var safeMovePosition = self.convert(pos, to: spriteComponent.node)
+    let isLeftRotation = safeMovePosition.x > 0
+    safeMovePosition.y = abs(safeMovePosition.y)
+    safeMovePosition = self.convert(safeMovePosition, from: spriteComponent.node)
     
-    let directionVector = spriteComponent.node.position.vectorTo(point: localTouchPosition)
+    let directionVector = spriteComponent.node.position.vectorTo(point: safeTouchPosition)
     let directionRotation = directionVector.rotation - spriteComponent.node.zRotation
     
-    let touchSlope = spriteComponent.node.position.slopeTo(point: localTouchPosition)
-    let intersect = localTouchPosition.intersection(m1: touchSlope, P2: moveTouchPosition,
+    let touchSlope = spriteComponent.node.position.slopeTo(point: safeTouchPosition)
+    let intersect = safeTouchPosition.intersection(m1: touchSlope, P2: safeMovePosition,
                                                     m2: -1 / touchSlope)
     
     let halfMaxSwipeDist = AppConstants.Touch.maxSwipeDistance / 2
     let adjustmentVector = directionVector.reversed().normalized() * halfMaxSwipeDist
-    let adjustmentPosition = CGPoint(x: localTouchPosition.x + adjustmentVector.dx,
-                                      y: localTouchPosition.y + adjustmentVector.dy)
+    let adjustmentPosition = CGPoint(x: safeTouchPosition.x + adjustmentVector.dx,
+                                      y: safeTouchPosition.y + adjustmentVector.dy)
     
     let moveVector = intersect.vectorTo(point: adjustmentPosition)
-    let rotationVector = moveTouchPosition.vectorTo(point: intersect)
+    let rotationVector = safeMovePosition.vectorTo(point: intersect)
     
     
     launchComponent.update(directionVector: directionVector,

@@ -32,7 +32,14 @@ class General: GKEntity {
     case beamed
   }
   
-  var state: State = .idle
+  var state: State = .idle {
+    didSet {
+      guard self.state == .moving else { return }
+      guard let physicsComponent = self.component(ofType: PhysicsComponent.self) else { return }
+    
+      physicsComponent.isEffectedByPhysics = true
+    }
+  }
   var numberOfDeposits = 0
   
   private let defaultImpulseMagnitude: CGFloat = 3.0
@@ -177,7 +184,7 @@ extension General: GeneralLaunchableProtocol {
       let rotationPercent = launchComponent.launchInfo.rotationPercent,
       let isLeftRotation = launchComponent.launchInfo.isLeftRotation else { return }
     
-    physicsComponent.physicsBody.isDynamic = true
+    physicsComponent.isEffectedByPhysics = true
     
     let launchMagnitude = self.defaultImpulseMagnitude * 2
     let impulseVector = moveVector.normalized() * launchMagnitude * movePercent
