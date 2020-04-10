@@ -16,7 +16,6 @@ extension GameScene {
       let launchComponent = hero.component(ofType: LaunchComponent.self) else { return }
     
     launchComponent.launchInfo.lastTouchDown = pos
-    self.lastTapDownPoint = pos
   }
   
   func touchMoved(toPoint pos : CGPoint) {
@@ -26,29 +25,36 @@ extension GameScene {
       let lastTouchDown = launchComponent.launchInfo.lastTouchDown,
       hero.isBeamed else { return }
     
-    let directionVector = spriteComponent.node.position.vectorTo(point: self.lastTapDownPoint)
-    let touchVector = spriteComponent.node.position.vectorTo(point: pos)
-  
-    let directionRotation = directionVector.rotation - spriteComponent.node.zRotation
-    let touchRotation = touchVector.rotation - spriteComponent.node.zRotation
+    var localTouchPosition = self.convert(lastTouchDown, to: spriteComponent.node)
+    localTouchPosition.y = abs(localTouchPosition.y)
+    localTouchPosition = self.convert(localTouchPosition, from: spriteComponent.node)
     
-    let touchSlope = spriteComponent.node.position.slopeTo(point: lastTouchDown)
-    let intersect = lastTouchDown.intersection(m1: touchSlope, P2: pos, m2: -1 / touchSlope)
+    var moveTouchPosition = self.convert(pos, to: spriteComponent.node)
+    let isLeftRotation = moveTouchPosition.x > 0
+    moveTouchPosition.y = abs(moveTouchPosition.y)
+    moveTouchPosition = self.convert(moveTouchPosition, from: spriteComponent.node)
+    
+    let directionVector = spriteComponent.node.position.vectorTo(point: localTouchPosition)
+    let directionRotation = directionVector.rotation - spriteComponent.node.zRotation
+    
+    let touchSlope = spriteComponent.node.position.slopeTo(point: localTouchPosition)
+    let intersect = localTouchPosition.intersection(m1: touchSlope, P2: moveTouchPosition,
+                                                    m2: -1 / touchSlope)
     
     let halfMaxSwipeDist = AppConstants.Touch.maxSwipeDistance / 2
     let adjustmentVector = directionVector.reversed().normalized() * halfMaxSwipeDist
-    let adjustmentPosition = CGPoint(x: lastTouchDown.x + adjustmentVector.dx,
-                                      y: lastTouchDown.y + adjustmentVector.dy)
+    let adjustmentPosition = CGPoint(x: localTouchPosition.x + adjustmentVector.dx,
+                                      y: localTouchPosition.y + adjustmentVector.dy)
     
     let moveVector = intersect.vectorTo(point: adjustmentPosition)
-    let rotationVector = pos.vectorTo(point: intersect)
+    let rotationVector = moveTouchPosition.vectorTo(point: intersect)
     
-    let localTouchPosition = self.convert(pos, to: spriteComponent.node)
+    
     launchComponent.update(directionVector: directionVector,
                            moveVector: moveVector,
                            rotationVector: rotationVector,
                            directionRotation: directionRotation,
-                           isLeftRotation: localTouchPosition.x > 0)
+                           isLeftRotation: isLeftRotation)
     
     if let n = self.viewModel.spinnyNodeCopy {
       n.position = intersect

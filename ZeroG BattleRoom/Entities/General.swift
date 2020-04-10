@@ -36,7 +36,7 @@ class General: GKEntity {
   var numberOfDeposits = 0
   
   private let defaultImpulseMagnitude: CGFloat = 3.0
-  private let defaultLaunchRotation: CGFloat = 6.0
+  private let defaultLaunchRotation: CGFloat = 10.0
 
   init(imageName: String, team: Team, addShape: @escaping (SKShapeNode) -> Void) {
     super.init()

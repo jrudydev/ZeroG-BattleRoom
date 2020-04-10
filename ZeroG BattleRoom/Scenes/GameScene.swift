@@ -29,8 +29,6 @@ class GameScene: SKScene {
   
   private var lastUpdateTime : TimeInterval = 0
   
-  var lastTapDownPoint: CGPoint = .zero
-  
   private(set) var viewModel: GameSceneViewModel!
   
   var cam: SKCameraNode?

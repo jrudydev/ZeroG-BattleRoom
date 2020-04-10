@@ -136,18 +136,18 @@ extension GameScene: SKPhysicsContactDelegate {
       physicsComponent.isEffectedByPhysics = false
       
       let isTopBeam = beam.position.y == abs(beam.position.y)
-      let convertedPosition = beam.scene?.convert(beam.position, from: panelShapeComponent.node)
-      let rotation = isTopBeam ? beam.zRotation : panelShapeComponent.node.zRotation + CGFloat.pi
+      let convertedPosition = self.convert(beam.position, from: panelShapeComponent.node)
+      let rotation = isTopBeam ? panelShapeComponent.node.zRotation : panelShapeComponent.node.zRotation + CGFloat.pi
       
       DispatchQueue.main.async {
-        spriteComponent.node.position = convertedPosition ?? panelShapeComponent.node.position
+        spriteComponent.node.position = convertedPosition
         spriteComponent.node.zRotation = rotation
       }
       
       hero.switchToState(.beamed)
       
       self.run(SoundManager.shared.blipSound)
-      print("wall hit")
+      print("wall hit\(rotation)")
     }
   }
 }
