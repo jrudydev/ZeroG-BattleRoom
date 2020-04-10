@@ -12,11 +12,15 @@ import GameplayKit
 
 
 protocol GeneralImpulsableProtocol {
-  func impulse(vector: CGVector)
+  func impulseTo(location: CGPoint, completion: (SKSpriteNode, CGVector) -> Void)
 }
 
 protocol GeneralImpactableProtocol {
   func impacted()
+}
+
+protocol GeneralLaunchableProtocol {
+  func launch()
 }
 
 
@@ -30,6 +34,9 @@ class General: GKEntity {
   
   var state: State = .idle
   var numberOfDeposits = 0
+  
+  private let defaultImpulseMagnitude: CGFloat = 3.0
+  private let defaultLaunchRotation: CGFloat = 6.0
 
   init(imageName: String, team: Team, addShape: @escaping (SKShapeNode) -> Void) {
     super.init()
@@ -117,27 +124,6 @@ class General: GKEntity {
   
 }
 
-extension General: GeneralImpulsableProtocol {
-  func impulse(vector: CGVector) {
-    if let physicsComponent = self.component(ofType: PhysicsComponent.self),
-      let spriteComponent = self.component(ofType: SpriteComponent.self),
-      let impulseComponent = self.component(ofType: ImpulseComponent.self) {
-      
-      guard !impulseComponent.isOnCooldown else { return }
-      
-      // TODO: Remove this once impulse timer is implemented
-      if physicsComponent.physicsBody.isDynamic == false {
-        physicsComponent.isEffectedByPhysics = true
-        self.resetBeamTimer()
-      }
-      
-      physicsComponent.physicsBody.applyImpulse(vector.normalized())
-      physicsComponent.physicsBody.angularVelocity = 0.0
-      spriteComponent.node.zRotation = atan2(vector.dy, vector.dx) - CGFloat.pi / 2
-    }
-  }
-}
-
 extension General: GeneralImpactableProtocol {
   func impacted() {
     guard let heroHandsComponent = self.component(ofType: HandsComponent.self),
@@ -155,3 +141,51 @@ extension General: GeneralImpactableProtocol {
   }
 }
 
+extension General: GeneralImpulsableProtocol {
+  func impulse(vector: CGVector, angularVelocity: CGFloat = 0.0) {
+    if let physicsComponent = self.component(ofType: PhysicsComponent.self),
+      let spriteComponent = self.component(ofType: SpriteComponent.self) {
+  
+      physicsComponent.physicsBody.applyImpulse(vector)
+      physicsComponent.physicsBody.angularVelocity = angularVelocity
+      spriteComponent.node.zRotation = vector.rotation
+    }
+  }
+  
+  func impulseTo(location: CGPoint, completion: (SKSpriteNode, CGVector) -> Void) {
+    guard let spriteComponent = self.component(ofType: SpriteComponent.self),
+      let impulseComponent = self.component(ofType: ImpulseComponent.self) else { return }
+    
+    guard !impulseComponent.isOnCooldown else { return }
+    
+    let moveVector = CGVector(dx: location.x - spriteComponent.node.position.x,
+                             dy: location.y - spriteComponent.node.position.y)
+    
+    self.impulse(vector: moveVector.normalized() * self.defaultImpulseMagnitude)
+//    impulseComponent.isOnCooldown = true
+    
+    completion(spriteComponent.node, moveVector)
+  }
+}
+
+extension General: GeneralLaunchableProtocol {
+  func launch() {
+    guard let physicsComponent = self.component(ofType: PhysicsComponent.self),
+      let launchComponent = self.component(ofType: LaunchComponent.self),
+      let moveVector = launchComponent.launchInfo.direction,
+      let movePercent = launchComponent.launchInfo.directionPercent,
+      let rotationPercent = launchComponent.launchInfo.rotationPercent,
+      let isLeftRotation = launchComponent.launchInfo.isLeftRotation else { return }
+    
+    physicsComponent.physicsBody.isDynamic = true
+    
+    let launchMagnitude = self.defaultImpulseMagnitude * 2
+    let impulseVector = moveVector.normalized() * launchMagnitude * movePercent
+    let angularVelocity = self.defaultLaunchRotation * rotationPercent
+    self.impulse(vector: impulseVector,
+                 angularVelocity: isLeftRotation ? -1 * angularVelocity : angularVelocity)
+    
+    launchComponent.hide()
+    self.resetBeamTimer()
+  }
+}

@@ -12,61 +12,61 @@ import GameKit
 
 extension GameScene {
   func touchDown(atPoint pos : CGPoint) {
+    guard let hero = self.entityManager.hero as? General,
+      let launchComponent = hero.component(ofType: LaunchComponent.self) else { return }
+    
+    launchComponent.launchInfo.lastTouchDown = pos
     self.lastTapDownPoint = pos
   }
   
   func touchMoved(toPoint pos : CGPoint) {
-    guard let hero = self.entityManager.hero as? General else { return }
-    guard let spriteComponent = hero.component(ofType: SpriteComponent.self),
-      let launchComponent = hero.component(ofType: LaunchComponent.self) else { return }
+    guard let hero = self.entityManager.hero as? General,
+      let spriteComponent = hero.component(ofType: SpriteComponent.self),
+      let launchComponent = hero.component(ofType: LaunchComponent.self),
+      let lastTouchDown = launchComponent.launchInfo.lastTouchDown,
+      hero.isBeamed else { return }
     
-    let touchSlope = spriteComponent.node.position.slopeTo(point: self.lastTapDownPoint)
-    let intersectingPoint = self.intersectingPoint(P1: self.lastTapDownPoint,
-                                                   m1: touchSlope,
-                                                   P2: pos,
-                                                   m2: -1 / touchSlope)
-    
-    let spriteRotation = CGFloat.pi / 2 - spriteComponent.node.zRotation
-    let directionVector = CGVector(dx: self.lastTapDownPoint.x - spriteComponent.node.position.x,
-                                   dy: self.lastTapDownPoint.y - spriteComponent.node.position.y)
-    let directionAngle = atan2(directionVector.dy, directionVector.dx) - spriteRotation
-    let reversedVectorDirection = CGVector(dx: -directionVector.dx,
-                                           dy: -directionVector.dy)
-    let adjustmentVector = reversedVectorDirection.normalized() * AppConstants.Touch.maxSwipeDistance / 2
-    let adjustmentPosition = CGPoint(x: intersectingPoint.x + adjustmentVector.dx,
-                                     y: intersectingPoint.y + adjustmentVector.dy)
-    
-    let touchVector = CGVector(dx: adjustmentPosition.x - self.lastTapDownPoint.x,
-                               dy: adjustmentPosition.y - self.lastTapDownPoint.y)
-    let distance = min(AppConstants.Touch.maxSwipeDistance, touchVector.length())
-    let percent = distance / 100
-        
-    let rotationVector = CGVector(dx: intersectingPoint.x - pos.x,
-                                  dy: intersectingPoint.y - pos.y)
-    let rotationAngle = atan2(rotationVector.dy, rotationVector.dx)// - spriteRotation
-    
-    let rotationDistatnce = min(AppConstants.Touch.maxRotation, rotationVector.length())
-    let rotationPercent = rotationDistatnce / 100
-    
-    launchComponent.node.zRotation = directionAngle
-    if let directionNode = launchComponent.node.childNode(withName: AppConstants.ComponentNames.directionNode),
-      let angleNode = launchComponent.node.childNode(withName: AppConstants.ComponentNames.angleNode){
-      
-      directionNode.yScale = percent
-      directionNode.position = CGPoint(x: 0.0, y: AppConstants.Touch.maxSwipeDistance * percent / 2)
-      directionNode.alpha = percent
-      
-      angleNode.xScale = rotationPercent
-      angleNode.position = CGPoint(x: AppConstants.Touch.maxRotation * rotationPercent / 4, y: 0.0)
-      angleNode.position.x *= rotationAngle < 0 ? -1 : 1
-      angleNode.alpha = rotationPercent
-    }
+    let directionVector = spriteComponent.node.position.vectorTo(point: self.lastTapDownPoint)
+    let touchVector = spriteComponent.node.position.vectorTo(point: pos)
   
-//    if let n = self.viewModel.spinnyNodeCopy {
-//      n.position = adjustmentPosition
-//      n.strokeColor = SKColor.blue
-//      self.addChild(n)
-//    }
+    let directionRotation = directionVector.rotation - spriteComponent.node.zRotation
+    let touchRotation = touchVector.rotation - spriteComponent.node.zRotation
+    
+    let touchSlope = spriteComponent.node.position.slopeTo(point: lastTouchDown)
+    let intersect = lastTouchDown.intersection(m1: touchSlope, P2: pos, m2: -1 / touchSlope)
+    
+    let halfMaxSwipeDist = AppConstants.Touch.maxSwipeDistance / 2
+    let adjustmentVector = directionVector.reversed().normalized() * halfMaxSwipeDist
+    let adjustmentPosition = CGPoint(x: lastTouchDown.x + adjustmentVector.dx,
+                                      y: lastTouchDown.y + adjustmentVector.dy)
+    
+    let moveVector = intersect.vectorTo(point: adjustmentPosition)
+    let rotationVector = pos.vectorTo(point: intersect)
+    
+    let localTouchPosition = self.convert(pos, to: spriteComponent.node)
+    launchComponent.update(directionVector: directionVector,
+                           moveVector: moveVector,
+                           rotationVector: rotationVector,
+                           directionRotation: directionRotation,
+                           isLeftRotation: localTouchPosition.x > 0)
+    
+    if let n = self.viewModel.spinnyNodeCopy {
+      n.position = intersect
+      n.strokeColor = SKColor.green
+      self.addChild(n)
+    }
+                          
+    if let n = self.viewModel.spinnyNodeCopy {
+      n.position = adjustmentPosition
+      n.strokeColor = SKColor.yellow
+      self.addChild(n)
+    }
+    
+    if let n = self.viewModel.spinnyNodeCopy {
+      n.position = pos
+      n.strokeColor = SKColor.blue
+      self.addChild(n)
+    }
   }
     
   func touchUp(atPoint pos : CGPoint) {
@@ -75,12 +75,15 @@ extension GameScene {
 //      NotificationCenter.default.post(name: .startMatchmaking, object: nil)
       self.gameState.enter(Playing.self)
     case is Playing:
-      guard let hero = self.entityManager.hero as? General else { return }
+      guard let hero = self.entityManager.hero as? General,
+        self.viewModel.currentPlayerIndex != -1 else { return }
       
       if case .beamed = hero.state {
-        
+        hero.launch()
       } else  {
-        self.impulse(hero: hero, tapPosition: pos)
+        hero.impulseTo(location: pos) { sprite, vector in
+          self.multiplayerNetworking.sendMove(start: sprite.position, direction: vector)
+        }
       }
       
       if let n = self.viewModel.spinnyNodeCopy {
@@ -92,24 +95,6 @@ extension GameScene {
       NotificationCenter.default.post(name: .restartGame, object: nil)
     default: break
     }
-    
-  }
-  
-  private func impulse(hero: General, tapPosition: CGPoint) {
-    guard let spriteComponent = hero.component(ofType: SpriteComponent.self),
-      let impulseComponent = hero.component(ofType: ImpulseComponent.self) else { return }
-    
-    guard self.viewModel.currentPlayerIndex != -1,
-      !impulseComponent.isOnCooldown else { return }
-    
-    let tapVector = CGVector(dx: tapPosition.x - spriteComponent.node.position.x,
-                             dy: tapPosition.y - spriteComponent.node.position.y)
-    
-    hero.impulse(vector: tapVector)
-    impulseComponent.isOnCooldown = true
-    
-    self.multiplayerNetworking.sendMove(start: spriteComponent.node.position,
-                                        direction: tapVector)
   }
 }
  
@@ -135,8 +120,12 @@ extension GameScene {
   }
 }
 
-extension GameScene {
-  func intersectingPoint(P1: CGPoint, m1: CGFloat, P2: CGPoint, m2: CGFloat) -> CGPoint {
+extension CGPoint {
+  func vectorTo(point: CGPoint) -> CGVector {
+    return CGVector(dx: point.x - self.x, dy: point.y - self.y)
+  }
+  
+  func intersection(m1: CGFloat, P2: CGPoint, m2: CGFloat) -> CGPoint {
     // Note: Point/slope form intersection equations
     //
     // Solve for x: m1(x - P1x) + P1y = m2(x - P2x) + P2y
@@ -150,13 +139,11 @@ extension GameScene {
     // Solve for y: y = m(x - Px) + Py
     
     
-    let x = (-1 * m2 * P2.x + P2.y - P1.y + m1 * P1.x) / (m1 - m2)
-    let y = m1 * x - m1 * P1.x + P1.y
+    let x = (-1 * m2 * P2.x + P2.y - self.y + m1 * self.x) / (m1 - m2)
+    let y = m1 * x - m1 * self.x + self.y
     return CGPoint(x: x, y: y)
   }
-}
-
-extension CGPoint {
+  
   func slopeTo(point: CGPoint) -> CGFloat {
     // Note: Slope equation: m = (y - Py) / (x - Px)
     return (self.y - point.y) / (self.x - point.x)
