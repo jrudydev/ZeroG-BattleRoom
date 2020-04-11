@@ -110,6 +110,8 @@ extension GameScene: SKPhysicsContactDelegate {
       
       guard let handsComponent = hero.component(ofType: HandsComponent.self),
         let teamComponent = hero.component(ofType: TeamComponent.self),
+        let spriteComponent = hero.component(ofType: SpriteComponent.self),
+        let aliasComponent = hero.component(ofType: AliasComponent.self),
         let depositShapeComponent = deposit.component(ofType: ShapeComponent.self),
         let depositComponent = deposit.component(ofType: DepositComponent.self),
         (handsComponent.leftHandSlot != nil || handsComponent.rightHandSlot != nil) else { return }
@@ -137,6 +139,9 @@ extension GameScene: SKPhysicsContactDelegate {
       
       self.viewModel.resourcesDelivered += total
       hero.numberOfDeposits += total
+      
+      let alias = self.multiplayerNetworking.playerAliases [self.viewModel.currentPlayerIndex]
+      aliasComponent.node.text = "\(alias) (\(hero.numberOfDeposits)/\(resourcesNeededToWin))"
       
       switch teamComponent.team {
       case .team1: depositComponent.team1Deposits += total

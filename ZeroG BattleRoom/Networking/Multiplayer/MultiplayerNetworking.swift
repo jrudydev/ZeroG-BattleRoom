@@ -56,6 +56,17 @@ class MultiplayerNetworking {
     return self.isPlayer1 ? (local: 0, remote: 1) :  (local: 1, remote: 0)
   }
   
+  var playerAliases: [String] {
+    var aliases = [String]()
+    for playerDetails in self.orderOfPlayers {
+      if let player = playerDetails[DetailsKeys.playerKey] as? GKPlayer {
+        aliases.append(player.alias)
+      }
+    }
+    
+    return aliases
+  }
+  
   var delegate: MultiplayerNetworkingProtocol?
   
   init() {
@@ -169,15 +180,8 @@ extension MultiplayerNetworking {
   
   func processPlayerAliases() {
     if self.allRandomNumbersReceived {
-      var playerAliases = [String]()
-      for playerDetails in self.orderOfPlayers {
-        if let player = playerDetails[DetailsKeys.playerKey] as? GKPlayer {
-          playerAliases.append(player.alias)
-        }
-      }
-      
       if playerAliases.count > 0 {
-        self.delegate?.setPlayerAliases(playerAliases: playerAliases)
+        self.delegate?.setPlayerAliases(playerAliases: self.playerAliases)
       }
     }
   }

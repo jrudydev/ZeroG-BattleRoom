@@ -138,7 +138,7 @@ extension EntityManager {
       let aliasComponent = heroBlue.component(ofType: AliasComponent.self) {
       spriteComponent.node.position = CGPoint(x: 0.0,
                                               y: -AppConstants.Layout.boundarySize.height/2 + 20)
-      aliasComponent.node.text = "Player 1"
+      aliasComponent.node.text = "Player 1 (0/\(resourcesNeededToWin))"
       self.scene.addChild(spriteComponent.node)
     }
     self.playerEntites.append(heroBlue)
@@ -156,7 +156,7 @@ extension EntityManager {
       
       spriteComponent.node.position = CGPoint(x: 0.0,
                                               y: AppConstants.Layout.boundarySize.height/2 - 20)
-      aliasComponent.node.text = "Player 2"
+      aliasComponent.node.text = "Player 2 (0/\(resourcesNeededToWin))"
       spriteComponent.node.zRotation = CGFloat.pi
       self.scene.addChild(spriteComponent.node)
     }
