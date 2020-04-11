@@ -34,7 +34,7 @@ extension GameScene: SKPhysicsContactDelegate {
         let impactedResource = self.entityManager.resourceWith(node: resourceNode) as? Package else { return }
       
       guard let heroHandsComponent = hero.component(ofType: HandsComponent.self),
-        let impactedResourceComponent = impactedResource.component(ofType: ShapeComponent.self),
+        let resourceShapeComponent = impactedResource.component(ofType: ShapeComponent.self),
         !heroHandsComponent.isImpacted else { return }
       
       if let heroLeftHand = heroHandsComponent.leftHandSlot,
@@ -50,12 +50,12 @@ extension GameScene: SKPhysicsContactDelegate {
         }
       } else {
         impactedResource.disableCollisionDetection()
-//        impactedResourceComponent.node.zPosition = 100
-        if heroHandsComponent.leftHandSlot == nil {
-          heroHandsComponent.leftHandSlot = impactedResource
-        } else {
-          heroHandsComponent.rightHandSlot = impactedResource
-        }
+        heroHandsComponent.grab(resource: impactedResource)
+      }
+      
+      if let index = self.entityManager.indexForResource(shape: resourceShapeComponent.node) {
+        self.multiplayerNetworking.sendGrabbed(index: index,
+                                               playerIndex: self.viewModel.currentPlayerIndex)
       }
       
       self.run(SoundManager.shared.blipPaddleSound)

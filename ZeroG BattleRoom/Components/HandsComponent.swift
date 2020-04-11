@@ -75,6 +75,20 @@ class HandsComponent: GKComponent {
     }
   }
   
+  private var heldResources: [Package] {
+    var packages = [Package]()
+    
+    if let leftHandPackage = self.leftHandSlot {
+      packages.append(leftHandPackage)
+    }
+    
+    if let rightHandPackage = self.rightHandSlot {
+      packages.append(rightHandPackage)
+    }
+    
+    return packages
+  }
+  
   private let didSetResource: (SKShapeNode) -> Void
   private let didRemoveResourece: (SKShapeNode) -> Void
   
@@ -88,5 +102,51 @@ class HandsComponent: GKComponent {
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
+  }
+  
+  func isHolding(shapeComponent: ShapeComponent) -> Bool {
+    for packageComponent in self.heldResources {
+      if let shapeComponent = packageComponent.component(ofType: ShapeComponent.self),
+        shapeComponent.node == packageComponent {
+        
+        return true
+      }
+    }
+    return false
+  }
+}
+
+extension HandsComponent {
+  func grab(resource: Package) {
+    if self.leftHandSlot == nil {
+      self.leftHandSlot = resource
+    }
+    
+    if self.rightHandSlot == nil {
+      self.rightHandSlot = resource
+    }
+  }
+  
+  @discardableResult
+  func release(resource: Package) -> Package? {
+    guard let resourceShapeComponent = resource.component(ofType: ShapeComponent.self) else { return nil }
+    
+    if let item = self.leftHandSlot,
+      let itemShapeComponent = item.component(ofType: ShapeComponent.self),
+      itemShapeComponent.node === resourceShapeComponent.node {
+    
+      self.leftHandSlot = nil
+      return resource
+    }
+    
+    if let item = self.rightHandSlot,
+      let itemShapeComponent = item.component(ofType: ShapeComponent.self),
+      itemShapeComponent.node === resourceShapeComponent.node {
+    
+      self.leftHandSlot = nil
+      return resource
+    }
+    
+    return nil
   }
 }

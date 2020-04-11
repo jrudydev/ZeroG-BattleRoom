@@ -19,6 +19,7 @@ extension MultiplayerNetworking {
     case move
     case moveResource
     case impacted
+    case grabResource
     case gameOver
     case snapshot
   }
@@ -62,18 +63,18 @@ extension MultiplayerNetworking {
   struct UnifiedMessage: Codable {
     let type: MessageType
     let randomNumber: Double?
-    let player1Won: Bool?
+    let isPlayer1: Bool?
     let index: Int?
     let elements: [SnapshotElementGroup]?
     
     init(type: MessageType,
          randomNumber: Double? = nil,
-         player1Won: Bool? = nil,
+         isPlayer1: Bool? = nil,
          index: Int? = nil,
          elements: [SnapshotElementGroup]? = nil) {
       self.type = type
       self.randomNumber = randomNumber
-      self.player1Won = player1Won
+      self.isPlayer1 = isPlayer1
       self.index = index
       self.elements = elements
     }

@@ -38,6 +38,8 @@ extension MultiplayerNetworking: GameKitHelperDelegate {
       self.handleImpacted(message, player: player)
     case .moveResource:
       self.handleMoveResource(message)
+    case .grabResource:
+      self.handleGrabResource(message, player: player)
     case .gameOver:
       self.handleGameOver(message)
     case .snapshot:
@@ -108,12 +110,11 @@ extension MultiplayerNetworking {
   }
   
   private func handleMoveResource(_ snapshot: UnifiedMessage) {
-    let elements = snapshot.elements!
+    guard let elements = snapshot.elements,
+      elements.count > 0 else { fatalError("Error: Elements array is empty.") }
     
-    guard elements.count > 0 else { fatalError("Error: Elements array is empty.") }
-    
-    let resoureceGroup = elements[0]
-    guard resoureceGroup.count > 0 else { fatalError("Error: Element group array is empty.")}
+    guard let resoureceGroup = elements.first,
+      resoureceGroup.count > 0 else { fatalError("Error: Element group array is empty.")}
     guard let index = snapshot.index else { fatalError("Error: Index is missing.") }
     
     print("Resource move message received")
@@ -122,8 +123,21 @@ extension MultiplayerNetworking {
                                   vector: resoureceGroup[0].vector)
   }
   
+  private func handleGrabResource(_ snapshot: UnifiedMessage, player: GKPlayer) {
+    guard let elements = snapshot.elements,
+      elements.count > 0 else { fatalError("Error: Elements array is empty.") }
+    
+    guard let resoureceGroup = elements.first,
+      resoureceGroup.count > 0 else { fatalError("Error: Element group array is empty.")}
+    guard let index = snapshot.index else { fatalError("Error: Index is missing.") }
+    guard let atHost = snapshot.isPlayer1 else { fatalError("Error: Host bool is missing.") }
+    
+    print("Grab message received")
+    self.delegate?.grabResourceAt(index: index, atHost: atHost, player: player)
+  }
+  
   private func handleGameOver(_ snapshot: UnifiedMessage) {
-    let player1Won = snapshot.player1Won!
+    let player1Won = snapshot.isPlayer1!
     
     print("Game over message received - Host \(player1Won ? "Won" : "Lost" )")
     self.delegate?.gameOver(player1Won: player1Won)
