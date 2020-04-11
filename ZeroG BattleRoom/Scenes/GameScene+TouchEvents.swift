@@ -45,8 +45,13 @@ extension GameScene {
   func touchUp(atPoint pos : CGPoint) {
     switch self.gameState.currentState {
     case is WaitingForTap:
-      NotificationCenter.default.post(name: .startMatchmaking, object: nil)
-//      self.gameState.enter(Playing.self)
+      let touchedNode = self.atPoint(pos)
+      if let name = touchedNode.name, name == AppConstants.ComponentNames.localLabelName {
+        self.gameState.enter(Playing.self)
+      }
+      if let name = touchedNode.name, name == AppConstants.ComponentNames.onlineLabelName {
+        NotificationCenter.default.post(name: .startMatchmaking, object: nil)
+      }
     case is Playing:
       guard let hero = self.entityManager.hero as? General,
         self.viewModel.currentPlayerIndex != -1 else { return }

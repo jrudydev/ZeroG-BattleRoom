@@ -100,7 +100,7 @@ extension GameScene {
     if let gameMessage = self.gameMessage {
       gameMessage.name = AppConstants.ComponentNames.gameMessageName
       gameMessage.alpha = 0.0
-      gameMessage.run(SKAction.fadeIn(withDuration: 2.0))
+//      gameMessage.run(SKAction.fadeIn(withDuration: 2.0))
     }
   }
 }
