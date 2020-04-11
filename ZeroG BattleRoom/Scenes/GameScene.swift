@@ -31,6 +31,7 @@ class GameScene: SKScene {
   
   private(set) var viewModel: GameSceneViewModel!
   
+  var numberOfTouches = 0
   var cam: SKCameraNode?
   var gameMessage: SKLabelNode?
   
