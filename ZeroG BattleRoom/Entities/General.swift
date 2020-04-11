@@ -26,6 +26,9 @@ protocol GeneralLaunchableProtocol {
 
 class General: GKEntity {
   
+  private let defaultImpulseMagnitude: CGFloat = 3.0
+  private let defaultLaunchRotation: CGFloat = 10.0
+  
   enum State {
     case idle
     case moving
@@ -42,8 +45,7 @@ class General: GKEntity {
   }
   var numberOfDeposits = 0
   
-  private let defaultImpulseMagnitude: CGFloat = 3.0
-  private let defaultLaunchRotation: CGFloat = 10.0
+  unowned var tractorBeamComponent: TracktorBeamComponent? = nil
 
   init(imageName: String, team: Team, addShape: @escaping (SKShapeNode) -> Void) {
     super.init()
@@ -103,6 +105,8 @@ class General: GKEntity {
     let physicsBody = SKPhysicsBody(circleOfRadius: spriteComponent.node.size.height / 2)
     physicsBody.categoryBitMask = PhysicsCategoryMask.hero
     physicsBody.collisionBitMask = PhysicsCategoryMask.package
+    physicsBody.collisionBitMask = PhysicsCategoryMask.hero
+    physicsBody.contactTestBitMask = PhysicsCategoryMask.hero
     
     return physicsBody
   }
@@ -188,7 +192,10 @@ extension General: GeneralLaunchableProtocol {
       let rotationPercent = launchComponent.launchInfo.rotationPercent,
       let isLeftRotation = launchComponent.launchInfo.isLeftRotation else { return }
     
-    physicsComponent.isEffectedByPhysics = true
+    if let tractorBeamComponent = self.tractorBeamComponent {
+      physicsComponent.isEffectedByPhysics = true
+      tractorBeamComponent.isOccupied = false
+    }
     
     let launchMagnitude = self.defaultImpulseMagnitude * 2
     let impulseVector = moveVector.normalized() * launchMagnitude * movePercent

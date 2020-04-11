@@ -25,6 +25,45 @@ extension GameScene: SKPhysicsContactDelegate {
     }
     
     if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
+      secondBody.categoryBitMask == PhysicsCategoryMask.hero {
+      
+      guard let firstHeroNode = firstBody.node as? SKSpriteNode,
+        let secondHeroNode = secondBody.node as? SKSpriteNode else { return }
+      guard let firstHero = self.entityManager.heroWith(node: firstHeroNode) as? General,
+        let firstHeroHandsComponent = firstHero.component(ofType: HandsComponent.self),
+        let secondHero = self.entityManager.heroWith(node: secondHeroNode) as? General,
+        let secondHeroHandsComponent = secondHero.component(ofType: HandsComponent.self),
+        !firstHeroHandsComponent.isImpacted && !secondHeroHandsComponent.isImpacted else { return }
+      
+      firstHero.impacted()
+      secondHero.impacted()
+      
+      if self.viewModel.currentPlayerIndex == 0 {
+        if let leftHand = firstHeroHandsComponent.leftHandSlot,
+          let leftHandPhysicsComponent = leftHand.component(ofType: PhysicsComponent.self) {
+          
+          leftHandPhysicsComponent.randomImpulse()
+        }
+        if let rightHand = firstHeroHandsComponent.rightHandSlot,
+          let rightHandPhysicsComponent = rightHand.component(ofType: PhysicsComponent.self) {
+          
+          rightHandPhysicsComponent.randomImpulse()
+        }
+        
+        if let leftHand = secondHeroHandsComponent.leftHandSlot,
+          let leftHandPhysicsComponent = leftHand.component(ofType: PhysicsComponent.self) {
+          
+          leftHandPhysicsComponent.randomImpulse()
+        }
+        if let rightHand = secondHeroHandsComponent.rightHandSlot,
+          let rightHandPhysicsComponent = rightHand.component(ofType: PhysicsComponent.self) {
+          
+          rightHandPhysicsComponent.randomImpulse()
+        }
+      }
+    }
+    
+    if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
       secondBody.categoryBitMask == PhysicsCategoryMask.package {
 
       guard let heroNode = firstBody.node as? SKSpriteNode,
@@ -52,8 +91,8 @@ extension GameScene: SKPhysicsContactDelegate {
         impactedResource.disableCollisionDetection()
         heroHandsComponent.grab(resource: impactedResource)
         if let index = self.entityManager.indexForResource(shape: resourceShapeComponent.node) {
-//          self.multiplayerNetworking.sendGrabbed(index: index,
-//                                                 playerIndex: self.viewModel.currentPlayerIndex)
+          self.multiplayerNetworking.sendGrabbed(index: index,
+                                                 playerIndex: self.viewModel.currentPlayerIndex)
         }
       }
       
@@ -131,7 +170,8 @@ extension GameScene: SKPhysicsContactDelegate {
         let impulseComponent = hero.component(ofType: ImpulseComponent.self),
         let panel = self.entityManager.panelWith(node: beam) as? Panel,
         let panelShapeComponent = panel.component(ofType: ShapeComponent.self),
-        !hero.isBeamed else { return }
+        let tractorBeamComponent = panel.component(ofType: TracktorBeamComponent.self),
+        !hero.isBeamed && !tractorBeamComponent.isOccupied else { return }
 
       physicsComponent.isEffectedByPhysics = false
       
@@ -142,14 +182,15 @@ extension GameScene: SKPhysicsContactDelegate {
       DispatchQueue.main.async {
         spriteComponent.node.position = convertedPosition
         spriteComponent.node.zRotation = rotation
-        
-        hero.switchToState(.beamed)
       }
       
+      hero.switchToState(.beamed)
+      hero.tractorBeamComponent = tractorBeamComponent
+      tractorBeamComponent.isOccupied = true
       impulseComponent.isOnCooldown = false
       
       self.run(SoundManager.shared.blipSound)
-      print("wall hit\(rotation)")
+      print("wall hit")
     }
   }
 }

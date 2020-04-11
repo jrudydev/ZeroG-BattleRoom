@@ -16,7 +16,7 @@ extension GameScene {
     
     guard let hero = self.entityManager.hero as? General,
       let launchComponent = hero.component(ofType: LaunchComponent.self) else { return }
-    
+
     guard self.numberOfTouches <= 1 else {
       launchComponent.hide()
       return
@@ -24,8 +24,6 @@ extension GameScene {
     
     launchComponent.launchInfo.lastTouchDown = pos
 //    self.updateLaunchComponents(pos: pos)
-    
-    print("Number of touches: \(self.numberOfTouches)")
     
     if let n = self.viewModel.spinnyNodeCopy {
       n.position = pos
@@ -47,8 +45,8 @@ extension GameScene {
   func touchUp(atPoint pos : CGPoint) {
     switch self.gameState.currentState {
     case is WaitingForTap:
-//      NotificationCenter.default.post(name: .startMatchmaking, object: nil)
-      self.gameState.enter(Playing.self)
+      NotificationCenter.default.post(name: .startMatchmaking, object: nil)
+//      self.gameState.enter(Playing.self)
     case is Playing:
       guard let hero = self.entityManager.hero as? General,
         self.viewModel.currentPlayerIndex != -1 else { return }
