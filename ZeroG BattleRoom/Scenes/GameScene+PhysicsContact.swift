@@ -51,11 +51,10 @@ extension GameScene: SKPhysicsContactDelegate {
       } else {
         impactedResource.disableCollisionDetection()
         heroHandsComponent.grab(resource: impactedResource)
-      }
-      
-      if let index = self.entityManager.indexForResource(shape: resourceShapeComponent.node) {
-        self.multiplayerNetworking.sendGrabbed(index: index,
-                                               playerIndex: self.viewModel.currentPlayerIndex)
+        if let index = self.entityManager.indexForResource(shape: resourceShapeComponent.node) {
+//          self.multiplayerNetworking.sendGrabbed(index: index,
+//                                                 playerIndex: self.viewModel.currentPlayerIndex)
+        }
       }
       
       self.run(SoundManager.shared.blipPaddleSound)

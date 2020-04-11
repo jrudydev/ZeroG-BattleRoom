@@ -33,8 +33,8 @@ extension GameScene {
   func touchUp(atPoint pos : CGPoint) {
     switch self.gameState.currentState {
     case is WaitingForTap:
-      NotificationCenter.default.post(name: .startMatchmaking, object: nil)
-//      self.gameState.enter(Playing.self)
+//      NotificationCenter.default.post(name: .startMatchmaking, object: nil)
+      self.gameState.enter(Playing.self)
     case is Playing:
       guard let hero = self.entityManager.hero as? General,
         self.viewModel.currentPlayerIndex != -1 else { return }

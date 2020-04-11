@@ -17,7 +17,7 @@ protocol MultiplayerNetworkingProtocol {
   func moveResourceAt(index: Int, position: CGPoint, vector: CGVector)
   func syncResources(resources: MultiplayerNetworking.SnapshotElementGroup)
   func syncResourceAt(index: Int, position: CGPoint, vector: CGVector)
-  func grabResourceAt(index: Int, atHost: Bool, player: GKPlayer)
+  func grabResourceAt(index: Int, playerIndex: Int, player: GKPlayer)
   func assignResourceAt(index: Int, heroIndex: Int)
   func gameOver(player1Won: Bool)
   func setCurrentPlayerAt(index: Int)

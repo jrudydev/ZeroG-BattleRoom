@@ -63,19 +63,22 @@ extension MultiplayerNetworking {
   struct UnifiedMessage: Codable {
     let type: MessageType
     let randomNumber: Double?
-    let isPlayer1: Bool?
-    let index: Int?
+    let player1Won: Bool?
+    let resourceIndex: Int?
+    let playerIndex: Int?
     let elements: [SnapshotElementGroup]?
     
     init(type: MessageType,
          randomNumber: Double? = nil,
-         isPlayer1: Bool? = nil,
-         index: Int? = nil,
+         player1Won: Bool? = nil,
+         resourceIndex: Int? = nil,
+         playerIndex: Int? = nil,
          elements: [SnapshotElementGroup]? = nil) {
       self.type = type
       self.randomNumber = randomNumber
-      self.isPlayer1 = isPlayer1
-      self.index = index
+      self.player1Won = player1Won
+      self.resourceIndex = resourceIndex
+      self.playerIndex = playerIndex
       self.elements = elements
     }
   }

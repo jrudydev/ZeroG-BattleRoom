@@ -89,13 +89,15 @@ extension MultiplayerNetworking {
   }
   
   func sendGrabbed(index: Int, playerIndex: Int) {
-    let message = UnifiedMessage(type: .grabResource, isPlayer1: (playerIndex == 0), index: index)
+    let message = UnifiedMessage(type: .grabResource, resourceIndex: index,
+                                 playerIndex: playerIndex)
     self.sendData(Data.archiveJSON(object: message))
   }
   
   func sendResourceMoveAt(index: Int, start pos: CGPoint, direction: CGVector) {
     let resourceElement = MessageSnapshotElement(position: pos, vector: direction)
-    let message = UnifiedMessage(type: .moveResource, index: index, elements: [[resourceElement]])
+    let message = UnifiedMessage(type: .moveResource, resourceIndex: index,
+                                 elements: [[resourceElement]])
     self.sendData(Data.archiveJSON(object: message))
   }
   
@@ -115,7 +117,7 @@ extension MultiplayerNetworking {
   }
   
   func sendGameEnd(player1Won: Bool) {
-    let message = UnifiedMessage(type: .gameOver, isPlayer1: player1Won)
+    let message = UnifiedMessage(type: .gameOver, player1Won: player1Won)
     self.sendData(Data.archiveJSON(object: message))
   }
 }

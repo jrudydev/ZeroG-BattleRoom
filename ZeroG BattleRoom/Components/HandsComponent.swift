@@ -120,9 +120,7 @@ extension HandsComponent {
   func grab(resource: Package) {
     if self.leftHandSlot == nil {
       self.leftHandSlot = resource
-    }
-    
-    if self.rightHandSlot == nil {
+    } else if self.rightHandSlot == nil {
       self.rightHandSlot = resource
     }
   }

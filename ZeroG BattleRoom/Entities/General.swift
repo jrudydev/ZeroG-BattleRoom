@@ -136,14 +136,18 @@ extension General: GeneralImpactableProtocol {
     guard let heroHandsComponent = self.component(ofType: HandsComponent.self),
       let heroSpriteComponent = self.component(ofType: SpriteComponent.self) else { return }
     
-    if let heroResource = heroHandsComponent.leftHandSlot,
-      let shapeComponent = heroResource.component(ofType: ShapeComponent.self) {
+    if let leftHandResource = heroHandsComponent.leftHandSlot,
+      let rightHandResource = heroHandsComponent.rightHandSlot,
+      let leftHandResourceShapeComponent = leftHandResource.component(ofType: ShapeComponent.self),
+      let rightHandResourceShapeComponent = rightHandResource.component(ofType: ShapeComponent.self){
       
       heroHandsComponent.isImpacted = true
       heroHandsComponent.leftHandSlot = nil
       heroHandsComponent.rightHandSlot = nil
-      shapeComponent.node.position = heroSpriteComponent.node.position
-      heroResource.enableCollisionDetections()
+      leftHandResourceShapeComponent.node.position = heroSpriteComponent.node.position
+      rightHandResourceShapeComponent.node.position = heroSpriteComponent.node.position
+      leftHandResource.enableCollisionDetections()
+      rightHandResource.enableCollisionDetections()
     }
   }
 }

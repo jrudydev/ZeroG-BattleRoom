@@ -111,11 +111,10 @@ extension MultiplayerNetworking {
   
   private func handleMoveResource(_ snapshot: UnifiedMessage) {
     guard let elements = snapshot.elements,
-      elements.count > 0 else { fatalError("Error: Elements array is empty.") }
-    
-    guard let resoureceGroup = elements.first,
+      elements.count > 0,
+      let resoureceGroup = elements.first,
       resoureceGroup.count > 0 else { fatalError("Error: Element group array is empty.")}
-    guard let index = snapshot.index else { fatalError("Error: Index is missing.") }
+    guard let index = snapshot.resourceIndex else { fatalError("Error: Resource index is missing.") }
     
     print("Resource move message received")
     self.delegate?.moveResourceAt(index: index,
@@ -124,20 +123,15 @@ extension MultiplayerNetworking {
   }
   
   private func handleGrabResource(_ snapshot: UnifiedMessage, player: GKPlayer) {
-    guard let elements = snapshot.elements,
-      elements.count > 0 else { fatalError("Error: Elements array is empty.") }
-    
-    guard let resoureceGroup = elements.first,
-      resoureceGroup.count > 0 else { fatalError("Error: Element group array is empty.")}
-    guard let index = snapshot.index else { fatalError("Error: Index is missing.") }
-    guard let atHost = snapshot.isPlayer1 else { fatalError("Error: Host bool is missing.") }
+    guard let index = snapshot.resourceIndex else { fatalError("Error: Resource index is missing.") }
+    guard let playerIndex = snapshot.playerIndex else { fatalError("Error: Player index is missing.") }
     
     print("Grab message received")
-    self.delegate?.grabResourceAt(index: index, atHost: atHost, player: player)
+    self.delegate?.grabResourceAt(index: index, playerIndex: playerIndex, player: player)
   }
   
   private func handleGameOver(_ snapshot: UnifiedMessage) {
-    let player1Won = snapshot.isPlayer1!
+    let player1Won = snapshot.player1Won!
     
     print("Game over message received - Host \(player1Won ? "Won" : "Lost" )")
     self.delegate?.gameOver(player1Won: player1Won)

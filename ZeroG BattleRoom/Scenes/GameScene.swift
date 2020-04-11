@@ -170,12 +170,11 @@ extension GameScene: MultiplayerNetworkingProtocol {
     }
   }
   
-  func grabResourceAt(index: Int, atHost: Bool, player: GKPlayer) {
+  func grabResourceAt(index: Int, playerIndex: Int, player: GKPlayer) {
     guard let senderEntity = self.entityManager.playerEntites.first(where: { entity -> Bool in
       return entity == player
     }) else { return }
     
-    let playerIndex = atHost ? 0 : 1
     let playerEntity = self.entityManager.playerEntites[playerIndex]
     
     guard let playerHandsComponent = playerEntity.component(ofType: HandsComponent.self),
