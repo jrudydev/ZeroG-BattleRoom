@@ -124,11 +124,35 @@ class EntityManager {
       }
     }
     self.toRemove.removeAll()
+    
+    self.updateResourceVelocity()
   }
   
   private func addToComponentSysetem(entity: GKEntity) {
     for componentSystem in self.componentSystems {
       componentSystem.addComponent(foundIn: entity)
+    }
+  }
+  
+  private func updateResourceVelocity() {
+    let maxSpeed: CGFloat = 400.0
+    for resource in self.resourcesEntities {
+      guard let physicsComponent = resource.component(ofType: PhysicsComponent.self) else { return }
+      
+      let xSpeed = sqrt(physicsComponent.physicsBody.velocity.dy * physicsComponent.physicsBody.velocity.dx)
+      let ySpeed = sqrt(physicsComponent.physicsBody.velocity.dy * physicsComponent.physicsBody.velocity.dy)
+      
+      let speed = sqrt(physicsComponent.physicsBody.velocity.dx * physicsComponent.physicsBody.velocity.dx + physicsComponent.physicsBody.velocity.dy * physicsComponent.physicsBody.velocity.dy)
+      
+      if xSpeed <= 10.0 {
+        physicsComponent.randomImpulse(y: 0.0)
+      }
+      
+      if ySpeed <= 10.0 {
+        physicsComponent.randomImpulse(x: 0.0)
+      }
+      
+      physicsComponent.physicsBody.linearDamping = speed > maxSpeed ? 0.4 : 0.0
     }
   }
 }

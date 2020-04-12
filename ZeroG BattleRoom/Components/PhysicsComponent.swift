@@ -54,9 +54,9 @@ class PhysicsComponent: GKComponent {
 }
 
 extension PhysicsComponent {
-  func randomImpulse() {
+  func randomImpulse(x: Double? = nil, y: Double? = nil) {
     let randomX = (Bool.random() ? -1 : 1) * (Double.random(in: 1...2))
     let randomY = (Bool.random() ? -1 : 1) * (Double.random(in: 1...2))
-    self.physicsBody.applyImpulse(CGVector(dx: randomX, dy: randomY))
+    self.physicsBody.applyImpulse(CGVector(dx: x ??  randomX, dy: y ?? randomY))
   }
 }
