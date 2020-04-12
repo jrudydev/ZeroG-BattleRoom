@@ -178,10 +178,10 @@ extension GameScene: MultiplayerNetworkingProtocol {
     
     let playerEntity = self.entityManager.playerEntites[playerIndex]
     
-    guard let playerHandsComponent = playerEntity.component(ofType: HandsComponent.self),
+    guard let sendersHandsComponent = playerEntity.component(ofType: HandsComponent.self),
       let resource = self.entityManager.resourcesEntities[index] as? Package,
       let resourceShapeComponent = resource.component(ofType: ShapeComponent.self),
-      !playerHandsComponent.isHolding(shapeComponent: resourceShapeComponent) else { return }
+      !sendersHandsComponent.isHolding(shapeComponent: resourceShapeComponent) else { return }
 
     // Check if sender was the host
     if senderEntity === self.entityManager.playerEntites[0] {
@@ -197,7 +197,7 @@ extension GameScene: MultiplayerNetworkingProtocol {
         }
       }
     
-      playerHandsComponent.grab(resource: resource)
+      sendersHandsComponent.grab(resource: resource)
     } else {
       
       // Check if there are any other players holding the resource
@@ -207,31 +207,28 @@ extension GameScene: MultiplayerNetworkingProtocol {
         
         if handsComponent.isHolding(shapeComponent: resourceShapeComponent) {
           // If so cancel and send correction back to client
-          playerHandsComponent.release(resource: resource)
+          sendersHandsComponent.release(resource: resource)
           handsComponent.grab(resource: resource)
-          // TODO: Send message to correct the owner
+          
+          self.multiplayerNetworking.sendAssignResource(index: index, playerIndex: playerIndex)
+          
           return
         }
       }
     
-      playerHandsComponent.grab(resource: resource)
+      sendersHandsComponent.grab(resource: resource)
     }
   }
   
-  func assignResourceAt(index: Int, heroIndex: Int) {
-    guard let hero = self.entityManager.playerEntites[heroIndex] as? General,
-      let heroHandsComponent = hero.component(ofType: HandsComponent.self),
+  func assignResourceAt(index: Int, playerIndex: Int) {
+    guard let hero = self.entityManager.hero as? General,
+      let heroHandscomponent = hero.component(ofType: HandsComponent.self),
+      let player = self.entityManager.playerEntites[playerIndex] as? General,
+      let playerHandsComponent = player.component(ofType: HandsComponent.self),
       let package = self.entityManager.resourcesEntities[index] as? Package else { return }
     
-    if heroHandsComponent.rightHandSlot == nil {
-      heroHandsComponent.rightHandSlot = package
-      return
-    }
-    
-    if heroHandsComponent.leftHandSlot == nil {
-      heroHandsComponent.leftHandSlot = package
-      return
-    }
+    heroHandscomponent.release(resource: package)
+    playerHandsComponent.grab(resource: package)
   }
   
   func gameOver(player1Won: Bool) {

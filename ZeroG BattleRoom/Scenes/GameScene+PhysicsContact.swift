@@ -91,8 +91,8 @@ extension GameScene: SKPhysicsContactDelegate {
         impactedResource.disableCollisionDetection()
         heroHandsComponent.grab(resource: impactedResource)
         if let index = self.entityManager.indexForResource(shape: resourceShapeComponent.node) {
-          self.multiplayerNetworking.sendGrabbed(index: index,
-                                                 playerIndex: self.viewModel.currentPlayerIndex)
+          self.multiplayerNetworking.sendGrabbedResource(index: index,
+                                                         playerIndex: self.viewModel.currentPlayerIndex)
         }
       }
       

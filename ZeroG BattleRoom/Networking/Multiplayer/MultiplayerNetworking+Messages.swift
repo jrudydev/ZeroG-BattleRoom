@@ -20,6 +20,7 @@ extension MultiplayerNetworking {
     case moveResource
     case impacted
     case grabResource
+    case assignResource
     case gameOver
     case snapshot
   }

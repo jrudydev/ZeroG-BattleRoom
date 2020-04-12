@@ -99,8 +99,14 @@ extension MultiplayerNetworking {
     self.sendData(Data.archiveJSON(object: message))
   }
   
-  func sendGrabbed(index: Int, playerIndex: Int) {
+  func sendGrabbedResource(index: Int, playerIndex: Int) {
     let message = UnifiedMessage(type: .grabResource, resourceIndex: index,
+                                 playerIndex: playerIndex)
+    self.sendData(Data.archiveJSON(object: message))
+  }
+  
+  func sendAssignResource(index: Int, playerIndex: Int) {
+    let message = UnifiedMessage(type: .assignResource, resourceIndex: index,
                                  playerIndex: playerIndex)
     self.sendData(Data.archiveJSON(object: message))
   }

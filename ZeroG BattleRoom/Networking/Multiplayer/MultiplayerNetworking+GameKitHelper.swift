@@ -40,6 +40,8 @@ extension MultiplayerNetworking: GameKitHelperDelegate {
       self.handleMoveResource(message)
     case .grabResource:
       self.handleGrabResource(message, player: player)
+    case .assignResource:
+      self.handleAssignResource(message)
     case .gameOver:
       self.handleGameOver(message)
     case .snapshot:
@@ -128,6 +130,14 @@ extension MultiplayerNetworking {
     
     print("Grab message received")
     self.delegate?.grabResourceAt(index: index, playerIndex: playerIndex, player: player)
+  }
+  
+  private func handleAssignResource(_ snapshot: UnifiedMessage) {
+    guard let index = snapshot.resourceIndex else { fatalError("Error: Resource index is missing.") }
+    guard let playerIndex = snapshot.playerIndex else { fatalError("Error: Player index is missing.") }
+    
+    print("Grab message received")
+    self.delegate?.assignResourceAt(index: index, playerIndex: playerIndex)
   }
   
   private func handleGameOver(_ snapshot: UnifiedMessage) {
