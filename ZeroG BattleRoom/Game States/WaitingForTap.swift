@@ -72,6 +72,8 @@ class WaitingForTap: GKState {
       localLabel.removeFromParent()
       let onlineLabel = self.scene.childNode(withName: AppConstants.ComponentNames.onlineLabelName)!
       onlineLabel.removeFromParent()
+      let shopLabel = self.scene.childNode(withName: AppConstants.ComponentNames.onlineLabelName)!
+      shopLabel.removeFromParent()
     }
   }
   
