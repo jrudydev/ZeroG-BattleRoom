@@ -22,7 +22,14 @@ class WaitingForTap: GKState {
     let menuImage = SKSpriteNode(imageNamed: "ZGG")
     menuImage.name = AppConstants.ComponentNames.menuImageName
     menuImage.aspectFillToSize(fillSize: UIScreen.main.bounds.size)
-    menuImage.position = CGPoint(x: 100, y: 0.0)
+    
+    let texture = SKTexture(imageNamed: "ZGG")
+    let textureSize = texture.size()
+    let screenSize = UIScreen.main.bounds
+    let scaledWidth = screenSize.height / textureSize.height * screenSize.width
+    
+    let diff = (scaledWidth - screenSize.width) / 2
+    menuImage.position = CGPoint(x: -diff, y: 0.0)
     
     self.scene.addChild(menuImage)
     
