@@ -47,6 +47,18 @@ class Playing: GKState {
     
     self.scene.entityManager.spawnHeros()
     self.scene.entityManager.spawnDeposit()
+    
+    let backButton = SKLabelNode(text: "Back")
+    backButton.name = AppConstants.ComponentNames.backButtonName
+    backButton.fontSize = 30.0
+    backButton.position = CGPoint(x: backButton.frame.width / 2, y: -backButton.frame.height / 2)
+    let newPosX = backButton.position.x + -UIScreen.main.bounds.width / 2 + 20.0
+    let newPosY = backButton.position.y + UIScreen.main.bounds.height / 2 - 40.0
+    backButton.position = CGPoint(x: newPosX, y: newPosY)
+    backButton.zPosition = 100
+    backButton.isUserInteractionEnabled = false
+    
+    self.scene.cam!.addChild(backButton)
   }
   
   override func willExit(to nextState: GKState) { }

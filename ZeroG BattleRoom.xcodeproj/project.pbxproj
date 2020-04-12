@@ -265,9 +265,9 @@
 		93A55F03243089840027E83E /* Game States */ = {
 			isa = PBXGroup;
 			children = (
-				93A55F04243089840027E83E /* WaitingForTap.swift */,
 				93A55F05243089840027E83E /* GameOver.swift */,
 				93A55F06243089840027E83E /* Playing.swift */,
+				93A55F04243089840027E83E /* WaitingForTap.swift */,
 			);
 			path = "Game States";
 			sourceTree = "<group>";

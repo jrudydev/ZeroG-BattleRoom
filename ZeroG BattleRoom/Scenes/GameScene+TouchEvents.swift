@@ -53,6 +53,12 @@ extension GameScene {
         NotificationCenter.default.post(name: .startMatchmaking, object: nil)
       }
     case is Playing:
+      let touchedNode = self.atPoint(pos)
+      if let name = touchedNode.name, name == AppConstants.ComponentNames.backButtonName {
+        NotificationCenter.default.post(name: .restartGame, object: nil)
+        return
+      }
+      
       guard let hero = self.entityManager.hero as? General,
         self.entityManager.currentPlayerIndex != -1 else { return }
       

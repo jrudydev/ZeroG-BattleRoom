@@ -25,6 +25,7 @@ struct AppConstants {
     static let localLabelName = "local-label"
     static let onlineLabelName = "online-label"
     static let shopLabelName = "shop-label"
+    static let backButtonName = "back-button"
     static let wallPanelName = "wall-panel"
     static let gameMessageName = "game-message"
     static let playerAliasLabelName = "player-alias"
