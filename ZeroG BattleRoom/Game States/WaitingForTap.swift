@@ -34,20 +34,33 @@ class WaitingForTap: GKState {
     self.scene.addChild(menuImage)
     
     let fontSize: CGFloat = 80.0
-    let localLabel = SKLabelNode(text: "Local")
+    let secondFontSize: CGFloat = 50.0
+    let localLabel = SKLabelNode(text: "Play")
     localLabel.name = AppConstants.ComponentNames.localLabelName
     localLabel.fontSize = fontSize
-    localLabel.position = CGPoint(x: -10.0, y: fontSize)
+    localLabel.position = CGPoint(x: localLabel.frame.width / 2, y: fontSize)
+    localLabel.position = CGPoint(x: localLabel.position.x - 140, y: localLabel.position.y)
     localLabel.zPosition = 100
     localLabel.isUserInteractionEnabled = false
     self.scene.addChild(localLabel)
     
-    let onlineLabel = SKLabelNode(text: "Online")
+    let onlineLabel = SKLabelNode(text: "Online Match")
     onlineLabel.name = AppConstants.ComponentNames.onlineLabelName
-    onlineLabel.fontSize = fontSize
+    onlineLabel.fontSize = secondFontSize
+    onlineLabel.position = CGPoint(x: onlineLabel.frame.width / 2, y: 0.0)
+    onlineLabel.position = CGPoint(x: onlineLabel.position.x - 120, y: onlineLabel.position.y)
     onlineLabel.zPosition = 100
     onlineLabel.isUserInteractionEnabled = false
     self.scene.addChild(onlineLabel)
+    
+    let customizeLabel = SKLabelNode(text: "Shop")
+    customizeLabel.name = AppConstants.ComponentNames.onlineLabelName
+    customizeLabel.fontSize = secondFontSize
+    customizeLabel.position = CGPoint(x: customizeLabel.frame.width / 2, y: -fontSize)
+    customizeLabel.position = CGPoint(x: customizeLabel.position.x - 120, y: customizeLabel.position.y)
+    customizeLabel.zPosition = 100
+    customizeLabel.isUserInteractionEnabled = false
+    self.scene.addChild(customizeLabel)
     
   }
   
