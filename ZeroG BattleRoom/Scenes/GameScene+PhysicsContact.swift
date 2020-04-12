@@ -38,7 +38,7 @@ extension GameScene: SKPhysicsContactDelegate {
       firstHero.impacted()
       secondHero.impacted()
       
-      if self.viewModel.currentPlayerIndex == 0 {
+      if self.entityManager.currentPlayerIndex == 0 {
         if let leftHand = firstHeroHandsComponent.leftHandSlot,
           let leftHandPhysicsComponent = leftHand.component(ofType: PhysicsComponent.self) {
           
@@ -83,7 +83,7 @@ extension GameScene: SKPhysicsContactDelegate {
       
         hero.impacted()
         
-        if self.viewModel.currentPlayerIndex == 0 {
+        if self.entityManager.currentPlayerIndex == 0 {
           leftHandPhysicsComponent.randomImpulse()
           rightHandPhysicsComponent.randomImpulse()
         }
@@ -91,8 +91,8 @@ extension GameScene: SKPhysicsContactDelegate {
         impactedResource.disableCollisionDetection()
         heroHandsComponent.grab(resource: impactedResource)
         if let index = self.entityManager.indexForResource(shape: resourceShapeComponent.node) {
-          self.multiplayerNetworking.sendGrabbedResource(index: index,
-                                                         playerIndex: self.viewModel.currentPlayerIndex)
+          let playerIndex = self.entityManager.currentPlayerIndex
+          self.multiplayerNetworking.sendGrabbedResource(index: index, playerIndex: playerIndex)
         }
       }
       
@@ -137,10 +137,10 @@ extension GameScene: SKPhysicsContactDelegate {
         total += 1
       }
       
-      self.viewModel.resourcesDelivered += total
+      self.entityManager.resourcesDelivered += total
       hero.numberOfDeposits += total
       
-      let alias = self.multiplayerNetworking.playerAliases [self.viewModel.currentPlayerIndex]
+      let alias = self.multiplayerNetworking.playerAliases [self.entityManager.currentPlayerIndex]
       aliasComponent.node.text = "\(alias) (\(hero.numberOfDeposits)/\(resourcesNeededToWin))"
       
       switch teamComponent.team {

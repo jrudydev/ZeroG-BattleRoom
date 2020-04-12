@@ -11,18 +11,6 @@ import SpriteKit
 import GameplayKit
 
 
-protocol GeneralImpulsableProtocol {
-  func impulseTo(location: CGPoint, completion: (SKSpriteNode, CGVector) -> Void)
-}
-
-protocol GeneralImpactableProtocol {
-  func impacted()
-}
-
-protocol GeneralLaunchableProtocol {
-  func launch()
-}
-
 
 class General: GKEntity {
   
@@ -123,7 +111,7 @@ class General: GKEntity {
   }
   
   func resetBeamTimer() {
-    DispatchQueue.main.asyncAfter(deadline: .now() + Hero.beamResetTime) {
+    DispatchQueue.main.asyncAfter(deadline: .now() + General.beamResetTime) {
       [weak self] in
       
       guard let self = self else { return }
@@ -134,7 +122,7 @@ class General: GKEntity {
   
 }
 
-extension General: GeneralImpactableProtocol {
+extension General: ImpactableProtocol {
   func impacted() {
     guard let heroHandsComponent = self.component(ofType: HandsComponent.self),
       let heroSpriteComponent = self.component(ofType: SpriteComponent.self) else { return }
@@ -155,7 +143,7 @@ extension General: GeneralImpactableProtocol {
   }
 }
 
-extension General: GeneralImpulsableProtocol {
+extension General: ImpulsableProtocol {
   func impulse(vector: CGVector, angularVelocity: CGFloat = 0.0) {
     if let physicsComponent = self.component(ofType: PhysicsComponent.self),
       let spriteComponent = self.component(ofType: SpriteComponent.self) {
@@ -182,7 +170,7 @@ extension General: GeneralImpulsableProtocol {
   }
 }
 
-extension General: GeneralLaunchableProtocol {
+extension General: LaunchableProtocol {
   func launch() {
     guard let physicsComponent = self.component(ofType: PhysicsComponent.self),
       let launchComponent = self.component(ofType: LaunchComponent.self),

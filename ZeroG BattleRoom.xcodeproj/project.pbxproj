@@ -14,11 +14,9 @@
 		9347C8B124314AD60099AE53 /* game-won.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 9347C8AC24314AD50099AE53 /* game-won.mp3 */; };
 		9347C8B524315D030099AE53 /* BallTrail.sks in Resources */ = {isa = PBXBuildFile; fileRef = 9347C8B324315D030099AE53 /* BallTrail.sks */; };
 		9347C8B624315D030099AE53 /* Deposit.sks in Resources */ = {isa = PBXBuildFile; fileRef = 9347C8B424315D030099AE53 /* Deposit.sks */; };
-		9347C8B92431DFD40099AE53 /* BasePlayerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9347C8B82431DFD40099AE53 /* BasePlayerNode.swift */; };
 		9347C8BB2431E1970099AE53 /* BallTrail-Silver.sks in Resources */ = {isa = PBXBuildFile; fileRef = 9347C8BA2431E1970099AE53 /* BallTrail-Silver.sks */; };
 		9347C8BE2431E2220099AE53 /* BallTrail-Blue.sks in Resources */ = {isa = PBXBuildFile; fileRef = 9347C8BC2431E2220099AE53 /* BallTrail-Blue.sks */; };
 		9347C8BF2431E2220099AE53 /* BallTrail-Red.sks in Resources */ = {isa = PBXBuildFile; fileRef = 9347C8BD2431E2220099AE53 /* BallTrail-Red.sks */; };
-		9347C8C12431E8D00099AE53 /* CollectorProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9347C8C02431E8D00099AE53 /* CollectorProtocol.swift */; };
 		9347C8C32431EB7D0099AE53 /* SnapshotManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9347C8C22431EB7D0099AE53 /* SnapshotManager.swift */; };
 		934A5F302433221700A3D232 /* MultiplayerNetworking+Messages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A5F2F2433221700A3D232 /* MultiplayerNetworking+Messages.swift */; };
 		937911212439E4A500CEC9C6 /* AliasComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937911202439E4A500CEC9C6 /* AliasComponent.swift */; };
@@ -53,14 +51,10 @@
 		93A55F0C24308A630027E83E /* CGSize+AspectFill.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55F0B24308A630027E83E /* CGSize+AspectFill.swift */; };
 		93A55F1124308AEE0027E83E /* GameScene+PhysicsContact.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55F0E24308AEE0027E83E /* GameScene+PhysicsContact.swift */; };
 		93A55F1224308AEE0027E83E /* GameScene+TouchEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55F0F24308AEE0027E83E /* GameScene+TouchEvents.swift */; };
-		93A55F1E24308C230027E83E /* GameSceneViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55F1624308C230027E83E /* GameSceneViewModel.swift */; };
-		93A55F1F24308C230027E83E /* Hero.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55F1724308C230027E83E /* Hero.swift */; };
-		93A55F2024308C230027E83E /* Captain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55F1824308C230027E83E /* Captain.swift */; };
-		93A55F2124308C230027E83E /* Wall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55F1924308C230027E83E /* Wall.swift */; };
-		93A55F2224308C230027E83E /* BeamableProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55F1B24308C230027E83E /* BeamableProtocol.swift */; };
-		93A55F2324308C230027E83E /* ImpactableProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55F1C24308C230027E83E /* ImpactableProtocol.swift */; };
-		93A55F2424308C230027E83E /* ImpulsableProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55F1D24308C230027E83E /* ImpulsableProtocol.swift */; };
 		93A55F2624308D1E0027E83E /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55F2524308D1E0027E83E /* Constants.swift */; };
+		93F3DCB5244309960058B288 /* ImpulsableProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F3DCB4244309960058B288 /* ImpulsableProtocol.swift */; };
+		93F3DCB7244309A80058B288 /* ImpactableProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F3DCB6244309A80058B288 /* ImpactableProtocol.swift */; };
+		93F3DCB9244309B80058B288 /* LaunchableProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F3DCB8244309B80058B288 /* LaunchableProtocol.swift */; };
 		93FEBDAB242EE0CF006CCBFB /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93FEBDAA242EE0CF006CCBFB /* AppDelegate.swift */; };
 		93FEBDAD242EE0CF006CCBFB /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 93FEBDAC242EE0CF006CCBFB /* GameScene.sks */; };
 		93FEBDAF242EE0CF006CCBFB /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 93FEBDAE242EE0CF006CCBFB /* Actions.sks */; };
@@ -80,11 +74,9 @@
 		9347C8AC24314AD50099AE53 /* game-won.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "game-won.mp3"; sourceTree = "<group>"; };
 		9347C8B324315D030099AE53 /* BallTrail.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = BallTrail.sks; sourceTree = "<group>"; };
 		9347C8B424315D030099AE53 /* Deposit.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Deposit.sks; sourceTree = "<group>"; };
-		9347C8B82431DFD40099AE53 /* BasePlayerNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasePlayerNode.swift; sourceTree = "<group>"; };
 		9347C8BA2431E1970099AE53 /* BallTrail-Silver.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = "BallTrail-Silver.sks"; sourceTree = "<group>"; };
 		9347C8BC2431E2220099AE53 /* BallTrail-Blue.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = "BallTrail-Blue.sks"; sourceTree = "<group>"; };
 		9347C8BD2431E2220099AE53 /* BallTrail-Red.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = "BallTrail-Red.sks"; sourceTree = "<group>"; };
-		9347C8C02431E8D00099AE53 /* CollectorProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectorProtocol.swift; sourceTree = "<group>"; };
 		9347C8C22431EB7D0099AE53 /* SnapshotManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotManager.swift; sourceTree = "<group>"; };
 		934A5F2F2433221700A3D232 /* MultiplayerNetworking+Messages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MultiplayerNetworking+Messages.swift"; sourceTree = "<group>"; };
 		937911202439E4A500CEC9C6 /* AliasComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AliasComponent.swift; sourceTree = "<group>"; };
@@ -119,14 +111,10 @@
 		93A55F0B24308A630027E83E /* CGSize+AspectFill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGSize+AspectFill.swift"; sourceTree = "<group>"; };
 		93A55F0E24308AEE0027E83E /* GameScene+PhysicsContact.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GameScene+PhysicsContact.swift"; sourceTree = "<group>"; };
 		93A55F0F24308AEE0027E83E /* GameScene+TouchEvents.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GameScene+TouchEvents.swift"; sourceTree = "<group>"; };
-		93A55F1624308C230027E83E /* GameSceneViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameSceneViewModel.swift; sourceTree = "<group>"; };
-		93A55F1724308C230027E83E /* Hero.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Hero.swift; sourceTree = "<group>"; };
-		93A55F1824308C230027E83E /* Captain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Captain.swift; sourceTree = "<group>"; };
-		93A55F1924308C230027E83E /* Wall.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Wall.swift; sourceTree = "<group>"; };
-		93A55F1B24308C230027E83E /* BeamableProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BeamableProtocol.swift; sourceTree = "<group>"; };
-		93A55F1C24308C230027E83E /* ImpactableProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImpactableProtocol.swift; sourceTree = "<group>"; };
-		93A55F1D24308C230027E83E /* ImpulsableProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImpulsableProtocol.swift; sourceTree = "<group>"; };
 		93A55F2524308D1E0027E83E /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		93F3DCB4244309960058B288 /* ImpulsableProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImpulsableProtocol.swift; sourceTree = "<group>"; };
+		93F3DCB6244309A80058B288 /* ImpactableProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImpactableProtocol.swift; sourceTree = "<group>"; };
+		93F3DCB8244309B80058B288 /* LaunchableProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchableProtocol.swift; sourceTree = "<group>"; };
 		93FEBDA7242EE0CF006CCBFB /* ZeroG BattleRoom.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ZeroG BattleRoom.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		93FEBDAA242EE0CF006CCBFB /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		93FEBDAC242EE0CF006CCBFB /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
@@ -176,16 +164,6 @@
 			path = Particles;
 			sourceTree = "<group>";
 		};
-		9347C8B72431DFA70099AE53 /* Player Models */ = {
-			isa = PBXGroup;
-			children = (
-				93A55F1824308C230027E83E /* Captain.swift */,
-				93A55F1724308C230027E83E /* Hero.swift */,
-				9347C8B82431DFD40099AE53 /* BasePlayerNode.swift */,
-			);
-			path = "Player Models";
-			sourceTree = "<group>";
-		};
 		934A5F2E243321CC00A3D232 /* Multiplayer */ = {
 			isa = PBXGroup;
 			children = (
@@ -200,6 +178,7 @@
 		93873A0124389BA000A6E59A /* Entities */ = {
 			isa = PBXGroup;
 			children = (
+				93F3DCB3244309570058B288 /* Protocols */,
 				93873A0524389E1100A6E59A /* Deposit.swift */,
 				93873A0724389F2E00A6E59A /* General.swift */,
 				93873A0F2438ACC000A6E59A /* Package.swift */,
@@ -303,32 +282,12 @@
 			path = Scenes;
 			sourceTree = "<group>";
 		};
-		93A55F1424308C230027E83E /* Models */ = {
+		93F3DCB3244309570058B288 /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
-				93A55F1A24308C230027E83E /* Protocols */,
-				9347C8B72431DFA70099AE53 /* Player Models */,
-				93A55F1524308C230027E83E /* View Models */,
-				93A55F1924308C230027E83E /* Wall.swift */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		93A55F1524308C230027E83E /* View Models */ = {
-			isa = PBXGroup;
-			children = (
-				93A55F1624308C230027E83E /* GameSceneViewModel.swift */,
-			);
-			path = "View Models";
-			sourceTree = "<group>";
-		};
-		93A55F1A24308C230027E83E /* Protocols */ = {
-			isa = PBXGroup;
-			children = (
-				93A55F1B24308C230027E83E /* BeamableProtocol.swift */,
-				93A55F1C24308C230027E83E /* ImpactableProtocol.swift */,
-				93A55F1D24308C230027E83E /* ImpulsableProtocol.swift */,
-				9347C8C02431E8D00099AE53 /* CollectorProtocol.swift */,
+				93F3DCB6244309A80058B288 /* ImpactableProtocol.swift */,
+				93F3DCB4244309960058B288 /* ImpulsableProtocol.swift */,
+				93F3DCB8244309B80058B288 /* LaunchableProtocol.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -356,7 +315,6 @@
 				93873A0224389BBB00A6E59A /* Components */,
 				93873A0124389BA000A6E59A /* Entities */,
 				93A55F03243089840027E83E /* Game States */,
-				93A55F1424308C230027E83E /* Models */,
 				93A55F0D24308AEE0027E83E /* Scenes */,
 				93A55EE824307D280027E83E /* Networking */,
 				93FEBDAA242EE0CF006CCBFB /* AppDelegate.swift */,
@@ -460,7 +418,7 @@
 			files = (
 				93873A0624389E1100A6E59A /* Deposit.swift in Sources */,
 				93A55EFC24307D4F0027E83E /* SKNode+Impulse.swift in Sources */,
-				93A55F2424308C230027E83E /* ImpulsableProtocol.swift in Sources */,
+				93F3DCB7244309A80058B288 /* ImpactableProtocol.swift in Sources */,
 				934A5F302433221700A3D232 /* MultiplayerNetworking+Messages.swift in Sources */,
 				93873A102438ACC000A6E59A /* Package.swift in Sources */,
 				93A55EF324307D280027E83E /* MultiplayerNetworkingProtocol.swift in Sources */,
@@ -474,31 +432,25 @@
 				93FEBDB1242EE0CF006CCBFB /* GameScene.swift in Sources */,
 				93FEBDB3242EE0CF006CCBFB /* GameViewController.swift in Sources */,
 				93A55EFB24307D4F0027E83E /* CGVector+Normalize.swift in Sources */,
-				9347C8C12431E8D00099AE53 /* CollectorProtocol.swift in Sources */,
 				93A077A3243C9E8700D52205 /* TractorBeamComponent.swift in Sources */,
 				93A55EF024307D280027E83E /* MultiplayerNetworking.swift in Sources */,
+				93F3DCB5244309960058B288 /* ImpulsableProtocol.swift in Sources */,
 				93A077A9243DC45800D52205 /* LaunchComponent.swift in Sources */,
 				93873A1624394C5D00A6E59A /* ImpulseComponent.swift in Sources */,
 				93FEBDAB242EE0CF006CCBFB /* AppDelegate.swift in Sources */,
 				93A55EFD24307D4F0027E83E /* Data+Archive.swift in Sources */,
 				9347C8C32431EB7D0099AE53 /* SnapshotManager.swift in Sources */,
-				93A55F2324308C230027E83E /* ImpactableProtocol.swift in Sources */,
 				93873A0A24389FEB00A6E59A /* EntityManager.swift in Sources */,
-				9347C8B92431DFD40099AE53 /* BasePlayerNode.swift in Sources */,
 				93873A0824389F2E00A6E59A /* General.swift in Sources */,
 				93A55F08243089850027E83E /* WaitingForTap.swift in Sources */,
 				93873A0E2438A72800A6E59A /* DepositComponent.swift in Sources */,
-				93A55F2224308C230027E83E /* BeamableProtocol.swift in Sources */,
-				93A55F2024308C230027E83E /* Captain.swift in Sources */,
-				93A55F2124308C230027E83E /* Wall.swift in Sources */,
-				93A55F1E24308C230027E83E /* GameSceneViewModel.swift in Sources */,
+				93F3DCB9244309B80058B288 /* LaunchableProtocol.swift in Sources */,
 				93873A0C2438A40000A6E59A /* TeamComponent.swift in Sources */,
 				93A55EF124307D280027E83E /* MultiplayerNetworking+GameKitHelper.swift in Sources */,
 				93A55EF224307D280027E83E /* GameKitHelperProtocol.swift in Sources */,
 				937911212439E4A500CEC9C6 /* AliasComponent.swift in Sources */,
 				93A55F1224308AEE0027E83E /* GameScene+TouchEvents.swift in Sources */,
 				93A55F1124308AEE0027E83E /* GameScene+PhysicsContact.swift in Sources */,
-				93A55F1F24308C230027E83E /* Hero.swift in Sources */,
 				93873A0424389C5C00A6E59A /* SpriteComponent.swift in Sources */,
 				93A55F0A243089850027E83E /* Playing.swift in Sources */,
 				93A55F0C24308A630027E83E /* CGSize+AspectFill.swift in Sources */,

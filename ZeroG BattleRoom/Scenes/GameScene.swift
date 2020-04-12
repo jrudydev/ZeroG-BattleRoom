@@ -28,8 +28,8 @@ class GameScene: SKScene {
     GameOver(scene: self)])
   
   private var lastUpdateTime : TimeInterval = 0
-  
-  private(set) var viewModel: GameSceneViewModel!
+
+  var borderBody: SKPhysicsBody!
   
   var numberOfTouches = 0
   var cam: SKCameraNode?
@@ -62,7 +62,10 @@ class GameScene: SKScene {
   override func sceneDidLoad() {
     self.lastUpdateTime = 0
     
-    self.viewModel = GameSceneViewModel(frame: self.frame)
+    let borderBody = SKPhysicsBody(edgeLoopFrom: self.frame)
+    borderBody.friction = 0
+    self.borderBody = borderBody
+    
     self.entityManager = EntityManager(scene: self)
     
     let _ = SoundManager.shared
@@ -84,13 +87,6 @@ class GameScene: SKScene {
     if self.isGameWon() {
       self.gameWon = true
     }
-  }
-}
-
-extension GameScene {
-  func getWallSegment(number: Int,
-                      orientation: GameSceneViewModel.WallOrientation = .horizontal) -> [Wall] {
-    return self.viewModel.getWallSegment(number: number, orientation: orientation)
   }
 }
 
@@ -236,7 +232,7 @@ extension GameScene: MultiplayerNetworkingProtocol {
   }
   
   func setCurrentPlayerAt(index: Int) {
-    self.viewModel.currentPlayerIndex = index
+    self.entityManager.currentPlayerIndex = index
     self.gameState.enter(Playing.self)
     
     MultiplayerNetworkingSnapshot.shared.isSendingSnapshots = true

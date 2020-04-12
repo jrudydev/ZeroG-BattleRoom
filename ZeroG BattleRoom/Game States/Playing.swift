@@ -39,7 +39,7 @@ class Playing: GKState {
 //    self.loadLevel()
     
 //    self.spawnResources()
-    if self.scene.viewModel.currentPlayerIndex == 0 {
+    if self.scene.entityManager.currentPlayerIndex == 0 {
       for _ in 0..<numberOfSpawnedResources {
         self.scene.entityManager.spawnResource()
       }
@@ -63,18 +63,18 @@ class Playing: GKState {
     guard let scene = SKScene(fileNamed: level.filename) else { return }
     
     scene.enumerateChildNodes(withName: AppConstants.ComponentNames.wallPanelName) { wallNode, _  in
-      if let wall = self.scene.viewModel.wallNodeCopy {
-        wall.position = wallNode.position
-        wall.zRotation = wallNode.zRotation
-        self.scene.addChild(wall)
-      }
+//      if let wall = self.scene.entitityManager.wallNodeCopy {
+//        wall.position = wallNode.position
+//        wall.zRotation = wallNode.zRotation
+//        self.scene.addChild(wall)
+//      }
     }
   }
 }
 
 extension Playing {
   private func setupPhysics() {
-    self.scene.physicsBody = self.scene.viewModel.borderBody
+    self.scene.physicsBody = self.scene.borderBody
     self.scene.physicsWorld.gravity = CGVector(dx: 0.0, dy: 0.0)
     self.scene.physicsWorld.contactDelegate = self.scene
   }

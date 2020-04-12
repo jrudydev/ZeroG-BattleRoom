@@ -25,7 +25,7 @@ extension GameScene {
     launchComponent.launchInfo.lastTouchDown = pos
 //    self.updateLaunchComponents(pos: pos)
     
-    if let n = self.viewModel.spinnyNodeCopy {
+    if let n = self.entityManager.spinnyNodeCopy {
       n.position = pos
       n.strokeColor = SKColor.red
       self.addChild(n)
@@ -54,7 +54,7 @@ extension GameScene {
       }
     case is Playing:
       guard let hero = self.entityManager.hero as? General,
-        self.viewModel.currentPlayerIndex != -1 else { return }
+        self.entityManager.currentPlayerIndex != -1 else { return }
       
       if case .beamed = hero.state {
         hero.launch()

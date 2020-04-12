@@ -27,11 +27,14 @@ class EntityManager {
   var entities = Set<GKEntity>()
   var toRemove = Set<GKEntity>()
   
+  var currentPlayerIndex = 0
+  var resourcesDelivered = 0
+  
   var hero: GKEntity? {
     guard self.playerEntites.count > 0 else { return nil }
-    guard self.scene.viewModel.currentPlayerIndex < self.playerEntites.count else { return nil }
+    guard self.currentPlayerIndex < self.playerEntites.count else { return nil }
     
-    return self.playerEntites[self.scene.viewModel.currentPlayerIndex]
+    return self.playerEntites[self.currentPlayerIndex]
   }
   
   var deposit: GKEntity? {
@@ -59,6 +62,10 @@ class EntityManager {
   }
   
   private var resourceNode : SKShapeNode?
+  private var spinnyNode : SKShapeNode?
+  var spinnyNodeCopy: SKShapeNode? {
+    return self.spinnyNode?.copy() as? SKShapeNode
+  }
   
   private var panelFactory = PanelFactory()
   
@@ -68,6 +75,7 @@ class EntityManager {
     self.scene = scene
     
     self.createResourceNode()
+    self.createSpinnyNode()
   }
   
   func add(_ entity: GKEntity) {
@@ -285,6 +293,23 @@ extension EntityManager {
     
     resourceNode.name = AppConstants.ComponentNames.resourceName
     resourceNode.lineWidth = 2.5
+  }
+  
+  private func createSpinnyNode() {
+    let frame = UIScreen.main.bounds
+    let width = (frame.size.width + frame.size.height) * 0.05
+    self.spinnyNode = SKShapeNode(rectOf: CGSize(width: width, height: width),
+                                  cornerRadius: width * 0.3)
+    
+    
+    guard let spinnyNode = self.spinnyNode else { return }
+    
+    spinnyNode.lineWidth = 2.5
+    
+    spinnyNode.run(SKAction.repeatForever(SKAction.rotate(byAngle: CGFloat(Double.pi), duration: 1)))
+    spinnyNode.run(SKAction.sequence([SKAction.wait(forDuration: 0.5),
+                                      SKAction.fadeOut(withDuration: 0.5),
+                                      SKAction.removeFromParent()]))
   }
 }
 
