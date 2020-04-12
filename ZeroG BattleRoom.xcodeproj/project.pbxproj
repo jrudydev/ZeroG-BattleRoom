@@ -13,7 +13,7 @@
 		9347C8B024314AD60099AE53 /* pongblip.wav in Resources */ = {isa = PBXBuildFile; fileRef = 9347C8AB24314AD50099AE53 /* pongblip.wav */; };
 		9347C8B124314AD60099AE53 /* game-won.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 9347C8AC24314AD50099AE53 /* game-won.mp3 */; };
 		9347C8B524315D030099AE53 /* BallTrail.sks in Resources */ = {isa = PBXBuildFile; fileRef = 9347C8B324315D030099AE53 /* BallTrail.sks */; };
-		9347C8B624315D030099AE53 /* BrokenPlatform.sks in Resources */ = {isa = PBXBuildFile; fileRef = 9347C8B424315D030099AE53 /* BrokenPlatform.sks */; };
+		9347C8B624315D030099AE53 /* Deposit.sks in Resources */ = {isa = PBXBuildFile; fileRef = 9347C8B424315D030099AE53 /* Deposit.sks */; };
 		9347C8B92431DFD40099AE53 /* BasePlayerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9347C8B82431DFD40099AE53 /* BasePlayerNode.swift */; };
 		9347C8BB2431E1970099AE53 /* BallTrail-Silver.sks in Resources */ = {isa = PBXBuildFile; fileRef = 9347C8BA2431E1970099AE53 /* BallTrail-Silver.sks */; };
 		9347C8BE2431E2220099AE53 /* BallTrail-Blue.sks in Resources */ = {isa = PBXBuildFile; fileRef = 9347C8BC2431E2220099AE53 /* BallTrail-Blue.sks */; };
@@ -79,7 +79,7 @@
 		9347C8AB24314AD50099AE53 /* pongblip.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = pongblip.wav; sourceTree = "<group>"; };
 		9347C8AC24314AD50099AE53 /* game-won.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "game-won.mp3"; sourceTree = "<group>"; };
 		9347C8B324315D030099AE53 /* BallTrail.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = BallTrail.sks; sourceTree = "<group>"; };
-		9347C8B424315D030099AE53 /* BrokenPlatform.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = BrokenPlatform.sks; sourceTree = "<group>"; };
+		9347C8B424315D030099AE53 /* Deposit.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Deposit.sks; sourceTree = "<group>"; };
 		9347C8B82431DFD40099AE53 /* BasePlayerNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasePlayerNode.swift; sourceTree = "<group>"; };
 		9347C8BA2431E1970099AE53 /* BallTrail-Silver.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = "BallTrail-Silver.sks"; sourceTree = "<group>"; };
 		9347C8BC2431E2220099AE53 /* BallTrail-Blue.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = "BallTrail-Blue.sks"; sourceTree = "<group>"; };
@@ -171,7 +171,7 @@
 				9347C8BD2431E2220099AE53 /* BallTrail-Red.sks */,
 				9347C8BA2431E1970099AE53 /* BallTrail-Silver.sks */,
 				9347C8B324315D030099AE53 /* BallTrail.sks */,
-				9347C8B424315D030099AE53 /* BrokenPlatform.sks */,
+				9347C8B424315D030099AE53 /* Deposit.sks */,
 			);
 			path = Particles;
 			sourceTree = "<group>";
@@ -440,7 +440,7 @@
 				9347C8B524315D030099AE53 /* BallTrail.sks in Resources */,
 				93FEBDB8242EE0D2006CCBFB /* Assets.xcassets in Resources */,
 				93FEBDBB242EE0D2006CCBFB /* LaunchScreen.storyboard in Resources */,
-				9347C8B624315D030099AE53 /* BrokenPlatform.sks in Resources */,
+				9347C8B624315D030099AE53 /* Deposit.sks in Resources */,
 				9347C8AD24314AD60099AE53 /* game-over.wav in Resources */,
 				9347C8BE2431E2220099AE53 /* BallTrail-Blue.sks in Resources */,
 				9347C8BF2431E2220099AE53 /* BallTrail-Red.sks in Resources */,

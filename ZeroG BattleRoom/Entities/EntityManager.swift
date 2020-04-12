@@ -135,11 +135,14 @@ extension EntityManager {
       self.scene.addChild(shape)
     })
     if let spriteComponent = heroBlue.component(ofType: SpriteComponent.self),
+      let trailComponent = heroBlue.component(ofType: TrailComponent.self),
       let aliasComponent = heroBlue.component(ofType: AliasComponent.self) {
       spriteComponent.node.position = CGPoint(x: 0.0,
                                               y: -AppConstants.Layout.boundarySize.height/2 + 20)
       aliasComponent.node.text = "Player 1 (0/\(resourcesNeededToWin))"
       self.scene.addChild(spriteComponent.node)
+      
+      self.scene.addChild(trailComponent.node)
     }
     self.playerEntites.append(heroBlue)
     self.addToComponentSysetem(entity: heroBlue)
@@ -152,6 +155,7 @@ extension EntityManager {
       self.scene.addChild(shape)
     })
     if let spriteComponent = heroRed.component(ofType: SpriteComponent.self),
+      let trailComponent = heroRed.component(ofType: TrailComponent.self),
       let aliasComponent = heroRed.component(ofType: AliasComponent.self) {
       
       spriteComponent.node.position = CGPoint(x: 0.0,
@@ -159,6 +163,8 @@ extension EntityManager {
       aliasComponent.node.text = "Player 2 (0/\(resourcesNeededToWin))"
       spriteComponent.node.zRotation = CGFloat.pi
       self.scene.addChild(spriteComponent.node)
+      
+      self.scene.addChild(trailComponent.node)
     }
     self.playerEntites.append(heroRed)
     self.addToComponentSysetem(entity: heroRed)
@@ -186,15 +192,13 @@ extension EntityManager {
     resourceNode.strokeColor = SKColor.green
     self.resourcesEntities.append(resource)
   }
-  
-  
+    
   func spawnDeposit(position: CGPoint = .zero) {
     let deposit = Deposit()
     
-    if let shapeComponent = deposit.component(ofType: ShapeComponent.self) {
-      shapeComponent.node.position = position
-    }
+    guard let shapeComponent = deposit.component(ofType: ShapeComponent.self) else { return }
     
+    shapeComponent.node.position = position
     self.add(deposit)
   }
   

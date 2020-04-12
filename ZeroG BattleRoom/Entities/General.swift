@@ -69,9 +69,8 @@ class General: GKEntity {
     }))
     
     let trailComponent = TrailComponent()
+    self.addComponent(trailComponent)
     if let emitter = trailComponent.emitter {
-      self.addComponent(trailComponent)
-      
       spriteComponent.node.addChild(emitter)
     }
     

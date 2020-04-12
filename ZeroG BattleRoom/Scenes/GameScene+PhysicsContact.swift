@@ -153,13 +153,13 @@ extension GameScene: SKPhysicsContactDelegate {
         label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
       }
       
-      if let particles = SKEmitterNode(fileNamed: "Block") {
+      if let particles = SKEmitterNode(fileNamed: "Deposit") {
         particles.position = depositShapeComponent.node.position
         particles.zPosition = 3
         self.addChild(particles)
         particles.run(SKAction.sequence([SKAction.wait(forDuration: 1.0), SKAction.removeFromParent()]))
       }
-    
+      
       self.run(SoundManager.shared.bambooBreakSound)
       print("deposit occured")
     }
