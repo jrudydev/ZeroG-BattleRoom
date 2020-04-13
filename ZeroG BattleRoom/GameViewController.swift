@@ -82,7 +82,7 @@ extension GameViewController {
           
           view.showsFPS = true
           view.showsNodeCount = true
-          view.showsPhysics = true
+//          view.showsPhysics = true
         }
         
         sceneNode.multiplayerNetworking = MultiplayerNetworking()

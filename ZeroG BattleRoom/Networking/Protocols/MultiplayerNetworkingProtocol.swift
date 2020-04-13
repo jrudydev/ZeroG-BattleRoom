@@ -11,6 +11,7 @@ import SpriteKit
 import GameKit
 
 protocol MultiplayerNetworkingProtocol {
+  func matchEnded()
   func movePlayerAt(index: Int, position: CGPoint, direction: CGVector)
   func impactPlayer(player: GKPlayer)
   func syncPlayerAt(index: Int, position: CGPoint, vector: CGVector)

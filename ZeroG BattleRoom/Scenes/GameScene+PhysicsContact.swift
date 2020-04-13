@@ -38,7 +38,7 @@ extension GameScene: SKPhysicsContactDelegate {
       firstHero.impacted()
       secondHero.impacted()
       
-      if self.entityManager.currentPlayerIndex == 0 {
+      if self.isPlayer1 {
         if let leftHand = firstHeroHandsComponent.leftHandSlot,
           let leftHandPhysicsComponent = leftHand.component(ofType: PhysicsComponent.self) {
           
@@ -83,7 +83,7 @@ extension GameScene: SKPhysicsContactDelegate {
       
         hero.impacted()
         
-        if self.entityManager.currentPlayerIndex == 0 {
+        if self.isPlayer1 {
           leftHandPhysicsComponent.randomImpulse()
           rightHandPhysicsComponent.randomImpulse()
         }
@@ -140,8 +140,10 @@ extension GameScene: SKPhysicsContactDelegate {
       self.entityManager.resourcesDelivered += total
       hero.numberOfDeposits += total
       
-      let alias = self.multiplayerNetworking.playerAliases [self.entityManager.currentPlayerIndex]
-      aliasComponent.node.text = "\(alias) (\(hero.numberOfDeposits)/\(resourcesNeededToWin))"
+      if self.entityManager.currentPlayerIndex < self.multiplayerNetworking.playerAliases.count {
+        let alias = self.multiplayerNetworking.playerAliases [self.entityManager.currentPlayerIndex]
+        aliasComponent.node.text = "\(alias) (\(hero.numberOfDeposits)/\(resourcesNeededToWin))"
+      }
       
       switch teamComponent.team {
       case .team1: depositComponent.team1Deposits += total

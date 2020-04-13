@@ -35,6 +35,9 @@ class GameScene: SKScene {
   var cam: SKCameraNode?
   var gameMessage: SKLabelNode?
   
+//  var gameEnded: (() -> Void)?
+//  var gameOver: (() -> Void)?
+  
   var multiplayerNetworking: MultiplayerNetworking! {
     didSet {
       MultiplayerNetworkingSnapshot.shared.publisher
@@ -46,13 +49,12 @@ class GameScene: SKScene {
     }
   }
   
-  private var gameWon: Bool = false {
+  var isPlayer1: Bool {
+    return self.entityManager.currentPlayerIndex == 0
+  }
+  
+  var gameWon: Bool = false {
     didSet {
-      if let label = self.gameMessage {
-        label.text = "\(self.gameWon ? "You Won" : "You Lost")"
-        label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
-      }
-      
       self.gameState.enter(GameOver.self)
     }
   }
@@ -84,7 +86,7 @@ class GameScene: SKScene {
     self.lastUpdateTime = currentTime
     self.gameState.update(deltaTime: currentTime)
 
-    if self.isGameWon() {
+    if self.isPlayer1 && self.isGameWon() {
       self.gameWon = true
     }
   }
@@ -102,6 +104,12 @@ extension GameScene {
 }
 
 extension GameScene: MultiplayerNetworkingProtocol {
+  func matchEnded() {
+    self.gameState.enter(GameOver.self)
+    GameKitHelper.shared.match?.disconnect()
+    GameKitHelper.shared.match = nil
+  }
+  
   func setPlayerAliases(playerAliases: [String]) {
     for (idx, alias) in playerAliases.enumerated() {
       let entity = self.entityManager.playerEntites[idx]
@@ -228,7 +236,7 @@ extension GameScene: MultiplayerNetworkingProtocol {
   }
   
   func gameOver(player1Won: Bool) {
-    self.gameWon = player1Won
+    self.gameWon = !player1Won
   }
   
   func setCurrentPlayerAt(index: Int) {
@@ -247,15 +255,15 @@ extension GameScene {
       let teamComponent = hero.component(ofType: TeamComponent.self),
       let winningTeam = self.entityManager.winningTeam {
       
-      var hostDidWin = false
+      var localDidWin = false
       switch winningTeam {
       case .team1:
-        hostDidWin = teamComponent.team == .team1
+        localDidWin = teamComponent.team == .team1
       case .team2:
-        hostDidWin = teamComponent.team == .team2
+        localDidWin = teamComponent.team == .team2
       }
-      print(hostDidWin ? "Won" : "Lost")
-      self.multiplayerNetworking.sendGameEnd(player1Won: hostDidWin)
+      print(localDidWin ? "Won" : "Lost")
+      self.multiplayerNetworking.sendGameEnd(player1Won: localDidWin)
       
       return true
     }

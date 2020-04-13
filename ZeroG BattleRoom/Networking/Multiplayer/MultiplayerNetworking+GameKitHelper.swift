@@ -20,6 +20,7 @@ extension MultiplayerNetworking: GameKitHelperDelegate {
   
   public func matchEnded() {
     print("Match ended")
+    self.delegate?.matchEnded()
   }
   
   func match(_ match: GKMatch, didReceive data: Data, from player: GKPlayer) {
@@ -141,8 +142,7 @@ extension MultiplayerNetworking {
   }
   
   private func handleGameOver(_ snapshot: UnifiedMessage) {
-    let player1Won = snapshot.player1Won!
-    
+    guard let player1Won = snapshot.player1Won else { fatalError("Error: Bool value is missing." ) }
     print("Game over message received - Host \(player1Won ? "Won" : "Lost" )")
     self.delegate?.gameOver(player1Won: player1Won)
   }

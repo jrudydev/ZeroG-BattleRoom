@@ -12,7 +12,7 @@ import GameplayKit
 
 
 let numberOfSpawnedResources = 10
-let resourcesNeededToWin = 6
+let resourcesNeededToWin = 3
 
 
 class EntityManager {
