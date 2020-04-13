@@ -100,6 +100,6 @@ class LaunchComponent: GKComponent {
   func hide() {
     self.directionNode.alpha = 0.0
     self.rotationNode.alpha = 0.0
-    self.launchInfo.clear()
+//    self.launchInfo.clear()
   }
 }
