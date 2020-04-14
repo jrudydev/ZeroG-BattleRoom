@@ -35,7 +35,7 @@ class General: GKEntity {
   
   unowned var tractorBeamComponent: TracktorBeamComponent? = nil
 
-  init(imageName: String, team: Team, addShape: @escaping (SKShapeNode) -> Void) {
+  init(imageName: String, team: Team, resourceReleased: @escaping (SKShapeNode) -> Void) {
     super.init()
     
     let spriteComponent = SpriteComponent(texture: SKTexture(imageNamed: imageName))
@@ -53,7 +53,7 @@ class General: GKEntity {
     self.addComponent(HandsComponent(didSetResource: { shapeNode in
       spriteComponent.node.addChild(shapeNode)
     }, didRemoveResourece: { shapeNode in
-      addShape(shapeNode)
+      resourceReleased(shapeNode)
     }))
     
     let trailComponent = TrailComponent()

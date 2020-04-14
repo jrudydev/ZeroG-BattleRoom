@@ -159,7 +159,7 @@ class EntityManager {
 
 extension EntityManager {
   func spawnHeros() {
-    let heroBlue = General(imageName: "blue_spaceguy", team: .team1, addShape: {
+    let heroBlue = General(imageName: "blue_spaceguy", team: .team1, resourceReleased: {
       [weak self] shape in
       
       guard let self = self else { return }
@@ -179,7 +179,7 @@ extension EntityManager {
     self.playerEntites.append(heroBlue)
     self.addToComponentSysetem(entity: heroBlue)
     
-    let heroRed = General(imageName: "red_spaceguy", team: .team2, addShape: {
+    let heroRed = General(imageName: "red_spaceguy", team: .team2, resourceReleased: {
       [weak self] shape in
       
       guard let self = self else { return }
