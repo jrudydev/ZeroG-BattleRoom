@@ -60,9 +60,13 @@ extension GameScene {
       }
       
       guard let hero = self.entityManager.hero as? General,
+        let heroLaunchComponent = hero.component(ofType: LaunchComponent.self),
         self.entityManager.currentPlayerIndex != -1 else { return }
       
       if case .beamed = hero.state {
+        if heroLaunchComponent.launchInfo.direction ==  nil {
+          self.updateLaunchComponents(pos: pos)
+        }
         hero.launch()
       } else  {
         hero.impulseTo(location: pos) { sprite, vector in
