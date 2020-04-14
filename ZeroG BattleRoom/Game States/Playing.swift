@@ -61,7 +61,10 @@ class Playing: GKState {
     self.scene.cam!.addChild(backButton)
   }
   
-  override func willExit(to nextState: GKState) { }
+  override func willExit(to nextState: GKState) {
+    let backButton = self.scene.cam!.childNode(withName: AppConstants.ComponentNames.backButtonName)!
+    backButton.removeFromParent()
+  }
   
   override func isValidNextState(_ stateClass: AnyClass) -> Bool {
     return stateClass is GameOver.Type

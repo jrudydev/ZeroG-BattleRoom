@@ -158,7 +158,9 @@ extension MultiplayerNetworking {
     
     let playerGroup = elements[MultiplayerNetworkingSnapshot.GroupIndecies.players.rawValue]
     guard playerGroup.count > 0 else {
-      fatalError("Error: Missing players: \(playerGroup)")
+      // TODO: Add some error handling
+      print("Error: Missing players: \(playerGroup)")
+      return
     }
     
     for (idx, player) in playerGroup.enumerated() {

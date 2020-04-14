@@ -105,6 +105,7 @@ extension GameScene {
 
 extension GameScene: MultiplayerNetworkingProtocol {
   func matchEnded() {
+    // TODO: Handle end game from disconnect
     self.gameState.enter(GameOver.self)
     GameKitHelper.shared.match?.disconnect()
     GameKitHelper.shared.match = nil

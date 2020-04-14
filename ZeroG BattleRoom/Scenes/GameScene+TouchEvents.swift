@@ -55,6 +55,7 @@ extension GameScene {
     case is Playing:
       let touchedNode = self.atPoint(pos)
       if let name = touchedNode.name, name == AppConstants.ComponentNames.backButtonName {
+        self.matchEnded()
         NotificationCenter.default.post(name: .restartGame, object: nil)
         return
       }
