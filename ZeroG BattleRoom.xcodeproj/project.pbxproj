@@ -52,6 +52,7 @@
 		93A55F1124308AEE0027E83E /* GameScene+PhysicsContact.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55F0E24308AEE0027E83E /* GameScene+PhysicsContact.swift */; };
 		93A55F1224308AEE0027E83E /* GameScene+TouchEvents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55F0F24308AEE0027E83E /* GameScene+TouchEvents.swift */; };
 		93A55F2624308D1E0027E83E /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93A55F2524308D1E0027E83E /* Constants.swift */; };
+		93EFD9802445F311005D68A2 /* Disconnected.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93EFD97F2445F311005D68A2 /* Disconnected.swift */; };
 		93F3DCB5244309960058B288 /* ImpulsableProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F3DCB4244309960058B288 /* ImpulsableProtocol.swift */; };
 		93F3DCB7244309A80058B288 /* ImpactableProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F3DCB6244309A80058B288 /* ImpactableProtocol.swift */; };
 		93F3DCB9244309B80058B288 /* LaunchableProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F3DCB8244309B80058B288 /* LaunchableProtocol.swift */; };
@@ -112,6 +113,7 @@
 		93A55F0E24308AEE0027E83E /* GameScene+PhysicsContact.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GameScene+PhysicsContact.swift"; sourceTree = "<group>"; };
 		93A55F0F24308AEE0027E83E /* GameScene+TouchEvents.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GameScene+TouchEvents.swift"; sourceTree = "<group>"; };
 		93A55F2524308D1E0027E83E /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		93EFD97F2445F311005D68A2 /* Disconnected.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Disconnected.swift; sourceTree = "<group>"; };
 		93F3DCB4244309960058B288 /* ImpulsableProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImpulsableProtocol.swift; sourceTree = "<group>"; };
 		93F3DCB6244309A80058B288 /* ImpactableProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImpactableProtocol.swift; sourceTree = "<group>"; };
 		93F3DCB8244309B80058B288 /* LaunchableProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchableProtocol.swift; sourceTree = "<group>"; };
@@ -268,6 +270,7 @@
 				93A55F05243089840027E83E /* GameOver.swift */,
 				93A55F06243089840027E83E /* Playing.swift */,
 				93A55F04243089840027E83E /* WaitingForTap.swift */,
+				93EFD97F2445F311005D68A2 /* Disconnected.swift */,
 			);
 			path = "Game States";
 			sourceTree = "<group>";
@@ -454,6 +457,7 @@
 				93873A0424389C5C00A6E59A /* SpriteComponent.swift in Sources */,
 				93A55F0A243089850027E83E /* Playing.swift in Sources */,
 				93A55F0C24308A630027E83E /* CGSize+AspectFill.swift in Sources */,
+				93EFD9802445F311005D68A2 /* Disconnected.swift in Sources */,
 				93A55EFA24307D4F0027E83E /* SoundManager.swift in Sources */,
 				93A55F09243089850027E83E /* GameOver.swift in Sources */,
 				93A55F2624308D1E0027E83E /* Constants.swift in Sources */,

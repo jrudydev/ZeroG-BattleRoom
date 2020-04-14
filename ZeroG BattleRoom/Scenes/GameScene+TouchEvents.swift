@@ -78,6 +78,12 @@ extension GameScene {
       self.numberOfTouches -= 1
     case is GameOver:
       NotificationCenter.default.post(name: .restartGame, object: nil)
+    case is Disconnected:
+      let touchedNode = self.atPoint(pos)
+      if let name = touchedNode.name, name == AppConstants.ComponentNames.backButtonName {
+        NotificationCenter.default.post(name: .restartGame, object: nil)
+        return
+      }
     default: break
     }
   }

@@ -1,15 +1,15 @@
 //
-//  GameOver.swift
-//  SpaceMonkies
+//  Disconnected.swift
+//  ZeroG BattleRoom
 //
-//  Created by Rudy Gomez on 3/26/20.
+//  Created by Rudy Gomez on 4/14/20.
 //  Copyright © 2020 JRudy Gaming. All rights reserved.
 //
 
 import Foundation
 import GameplayKit
 
-class GameOver: GKState {
+class Disconnected: GKState {
   
   unowned let scene: GameScene
   
@@ -17,7 +17,7 @@ class GameOver: GKState {
     self.scene = scene as! GameScene
     super.init()
   }
-  
+ 
   override func didEnter(from previousState: GKState?) {
     self.scene.physicsWorld.speed = 0.0
     MultiplayerNetworkingSnapshot.shared.isSendingSnapshots = false
@@ -28,18 +28,13 @@ class GameOver: GKState {
     background.zPosition = 100
     self.scene.cam!.addChild(background)
     
-    let textureName = self.scene.gameWon ? "YouWon" : "GameOver"
-    let gameOver = SKSpriteNode(imageNamed: textureName)
-    gameOver.zPosition = 101
-    // TODO: Fix this animation
-//    let textureName = self.scene.gameWon ? "YouWon" : "GameOver"
-    let texture = SKTexture(imageNamed: textureName)
-    let actionSequence = SKAction.sequence([
-      SKAction.setTexture(texture),
-      SKAction.scale(to: 1.0, duration: 0.25)])
-
-    self.scene.cam!.addChild(gameOver)
-    gameOver.run(actionSequence)
+    
+    let disconnectedLabel = SKLabelNode(text: "Disconnected")
+    disconnectedLabel.name = AppConstants.ComponentNames.disconnectedLabel
+    disconnectedLabel.fontSize = 50.0
+    disconnectedLabel.zPosition = 101
+    
+    self.scene.cam!.addChild(disconnectedLabel)
     
     let mainMenuButton = SKLabelNode(text: "Main Menu")
     mainMenuButton.name = AppConstants.ComponentNames.backButtonName
@@ -51,6 +46,8 @@ class GameOver: GKState {
     self.scene.cam!.addChild(mainMenuButton)
   }
   
-  override func willExit(to nextState: GKState) { }
+  override func willExit(to nextState: GKState) {
 
+  }
+  
 }

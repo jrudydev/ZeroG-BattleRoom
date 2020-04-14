@@ -53,7 +53,7 @@ class Playing: GKState {
     backButton.fontSize = 30.0
     backButton.position = CGPoint(x: backButton.frame.width / 2, y: -backButton.frame.height / 2)
     let newPosX = backButton.position.x + -UIScreen.main.bounds.width / 2 + 20.0
-    let newPosY = backButton.position.y + UIScreen.main.bounds.height / 2 - 40.0
+    let newPosY = backButton.position.y + UIScreen.main.bounds.height / 2 - 30.0
     backButton.position = CGPoint(x: newPosX, y: newPosY)
     backButton.zPosition = 100
     backButton.isUserInteractionEnabled = false
@@ -67,7 +67,7 @@ class Playing: GKState {
   }
   
   override func isValidNextState(_ stateClass: AnyClass) -> Bool {
-    return stateClass is GameOver.Type
+    return stateClass is GameOver.Type || stateClass is Disconnected.Type
   }
 
   override func update(deltaTime seconds: TimeInterval) {

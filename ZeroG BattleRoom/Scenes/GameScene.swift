@@ -25,7 +25,8 @@ class GameScene: SKScene {
   lazy var gameState: GKStateMachine = GKStateMachine(states: [
     WaitingForTap(scene: self),
     Playing(scene: self),
-    GameOver(scene: self)])
+    GameOver(scene: self),
+    Disconnected(scene: self)])
   
   private var lastUpdateTime : TimeInterval = 0
 
@@ -105,8 +106,7 @@ extension GameScene {
 
 extension GameScene: MultiplayerNetworkingProtocol {
   func matchEnded() {
-    // TODO: Handle end game from disconnect
-    self.gameState.enter(GameOver.self)
+    self.gameState.enter(Disconnected.self)
     GameKitHelper.shared.match?.disconnect()
     GameKitHelper.shared.match = nil
   }
