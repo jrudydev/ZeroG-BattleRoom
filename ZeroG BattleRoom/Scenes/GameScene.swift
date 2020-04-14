@@ -128,16 +128,6 @@ extension GameScene: MultiplayerNetworkingProtocol {
     }
   }
   
-  func impactPlayer(player: GKPlayer) {
-    let heroEntity = self.entityManager.playerEntites.first(where: { entity -> Bool in
-      return entity == player
-    })
-    
-    if let hero = heroEntity as? General {
-      hero.impacted()
-    }
-  }
-  
   func syncResources(resources: MultiplayerNetworking.SnapshotElementGroup) {
     for x in self.entityManager.resourcesEntities.count..<resources.count {
       self.entityManager.spawnResource(position: resources[x].position,
@@ -175,53 +165,59 @@ extension GameScene: MultiplayerNetworkingProtocol {
     }
   }
   
-  func grabResourceAt(index: Int, playerIndex: Int, player: GKPlayer) {
-    guard let senderEntity = self.entityManager.playerEntites.first(where: { entity -> Bool in
-      return entity == player
-    }) else { return }
+  func impactPlayer(player: GKPlayer) {
+    let indecies = self.multiplayerNetworking.indicesForPlayers
+    let senderIndex = player == GKLocalPlayer.local ? indecies.local : indecies.remote
     
+    let heroEntity = self.entityManager.playerEntites[senderIndex]
+    
+    if let hero = heroEntity as? General,
+      let heroHandsComponent = hero.component(ofType: HandsComponent.self),
+      !heroHandsComponent.isImpacted {
+      
+      hero.impacted()
+    }
+  }
+  
+  func grabResourceAt(index: Int, playerIndex: Int, player: GKPlayer) {
+    let indecies = self.multiplayerNetworking.indicesForPlayers
+    let senderIndex = player == GKLocalPlayer.local ? indecies.local : indecies.remote
+    
+    let senderEntity = self.entityManager.playerEntites[senderIndex]
     let playerEntity = self.entityManager.playerEntites[playerIndex]
     
-    guard let sendersHandsComponent = playerEntity.component(ofType: HandsComponent.self),
+    guard let playerHandsComponent = playerEntity.component(ofType: HandsComponent.self),
       let resource = self.entityManager.resourcesEntities[index] as? Package,
       let resourceShapeComponent = resource.component(ofType: ShapeComponent.self),
-      !sendersHandsComponent.isHolding(shapeComponent: resourceShapeComponent) else { return }
-
-    // Check if sender was the host
-    if senderEntity === self.entityManager.playerEntites[0] {
-      
-      // Check if there are any other players holding the resource
+      !playerHandsComponent.isHolding(shapeComponent: resourceShapeComponent) else { return }
+    
+    if senderEntity == self.entityManager.playerEntites[0] {
       for player in self.entityManager.playerEntites {
-        guard player !== playerEntity else { continue }
+        guard player != playerEntity else { continue }
         guard let handsComponent = player.component(ofType: HandsComponent.self) else { continue }
-        
+
+        if handsComponent.isHolding(shapeComponent: resourceShapeComponent) {
+          // If so release and send correction back to client
+          handsComponent.release(resource: resource)
+
+          self.multiplayerNetworking.sendAssignResource(index: index, playerIndex: playerIndex)
+
+          return
+        }
+      }
+    } else {
+      for player in self.entityManager.playerEntites {
+        guard player != playerEntity else { continue }
+        guard let handsComponent = player.component(ofType: HandsComponent.self) else { continue }
+
         if handsComponent.isHolding(shapeComponent: resourceShapeComponent) {
           handsComponent.release(resource: resource)
           break
         }
       }
-    
-      sendersHandsComponent.grab(resource: resource)
-    } else {
-      
-      // Check if there are any other players holding the resource
-      for player in self.entityManager.playerEntites {
-        guard player !== playerEntity else { continue }
-        guard let handsComponent = player.component(ofType: HandsComponent.self) else { continue }
-        
-        if handsComponent.isHolding(shapeComponent: resourceShapeComponent) {
-          // If so cancel and send correction back to client
-          sendersHandsComponent.release(resource: resource)
-          handsComponent.grab(resource: resource)
-          
-          self.multiplayerNetworking.sendAssignResource(index: index, playerIndex: playerIndex)
-          
-          return
-        }
-      }
-    
-      sendersHandsComponent.grab(resource: resource)
+
     }
+    playerHandsComponent.grab(resource: resource)
   }
   
   func assignResourceAt(index: Int, playerIndex: Int) {

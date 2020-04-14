@@ -80,7 +80,7 @@ class MultiplayerNetworkingSnapshot {
         let elements = self.includeResources ?
           [self.playerysInfo, self.resourcesInfo] : [self.playerysInfo, []]
         
-        print("Sending snapshot: \(elements)")
+//        print("Sending snapshot: \(elements)")
         subject.send(elements)
       }
       .store(in: &subscriptions)

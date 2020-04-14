@@ -20,21 +20,26 @@ class HandsComponent: GKComponent {
         guard let shapeComponent = resource.component(ofType: ShapeComponent.self) else { return }
         
         shapeComponent.node.removeFromParent()
+        resource.disableCollisionDetection()
       } else {
-        guard let resource = self.leftHandSlot else { return }
-        guard let shapeComponent = resource.component(ofType: ShapeComponent.self) else { return }
+        guard let resource = self.leftHandSlot,
+          let shapeComponent = resource.component(ofType: ShapeComponent.self) else { return }
         
         shapeComponent.node.removeFromParent()
-        self.didRemoveResourece(shapeComponent.node)
+        resource.enableCollisionDetections()
+        
+        self.didRemoveResource(resource)
       }
     }
     
     didSet {
-      guard let resource = self.leftHandSlot else { return }
-      guard let shapeComponent = resource.component(ofType: ShapeComponent.self) else { return }
+      guard let entity = self.entity as? General,
+        let entitySpriteComponent = entity.component(ofType: SpriteComponent.self),
+        let resource = self.leftHandSlot,
+        let resourceShapeComponent = resource.component(ofType: ShapeComponent.self) else { return }
       
-      shapeComponent.node.position = CGPoint(x: 10.0, y: 10.0)
-      self.didSetResource(shapeComponent.node)
+      resourceShapeComponent.node.position = CGPoint(x: 10.0, y: 10.0)
+      entitySpriteComponent.node.addChild(resourceShapeComponent.node)
     }
   }
   
@@ -45,21 +50,26 @@ class HandsComponent: GKComponent {
         guard let shapeComponent = resource.component(ofType: ShapeComponent.self) else { return }
         
         shapeComponent.node.removeFromParent()
+        resource.disableCollisionDetection()
       } else {
         guard let resource = self.rightHandSlot else { return }
         guard let shapeComponent = resource.component(ofType: ShapeComponent.self) else { return }
         
         shapeComponent.node.removeFromParent()
-        self.didRemoveResourece(shapeComponent.node)
+        resource.enableCollisionDetections()
+        
+        self.didRemoveResource(resource)
       }
     }
     
     didSet {
-      guard let resource = self.rightHandSlot else { return }
-      guard let shapeComponent = resource.component(ofType: ShapeComponent.self) else { return }
+      guard let entity = self.entity as? General,
+        let entitySpriteComponent = entity.component(ofType: SpriteComponent.self),
+        let resource = self.rightHandSlot,
+        let resourceShapeComponent = resource.component(ofType: ShapeComponent.self) else { return }
       
-      shapeComponent.node.position = CGPoint(x: -10.0, y: 10.0)
-      self.didSetResource(shapeComponent.node)
+      resourceShapeComponent.node.position = CGPoint(x: -10.0, y: 10.0)
+      entitySpriteComponent.node.addChild(resourceShapeComponent.node)
     }
   }
   
@@ -89,13 +99,11 @@ class HandsComponent: GKComponent {
     return packages
   }
   
-  private let didSetResource: (SKShapeNode) -> Void
-  private let didRemoveResourece: (SKShapeNode) -> Void
+  private var isOffHandEnabled = true
+  private let didRemoveResource: (Package) -> Void
   
-  init(didSetResource: @escaping (SKShapeNode) -> Void,
-       didRemoveResourece: @escaping (SKShapeNode) -> Void) {
-    self.didSetResource = didSetResource
-    self.didRemoveResourece = didRemoveResourece
+  init(didRemoveResource: @escaping (Package) -> Void) {
+    self.didRemoveResource = didRemoveResource
     
     super.init()
   }
@@ -114,13 +122,17 @@ class HandsComponent: GKComponent {
     }
     return false
   }
+  
+  func hasFreeHand() -> Bool {
+    return self.leftHandSlot == nil || (self.rightHandSlot == nil && self.isOffHandEnabled)
+  }
 }
 
 extension HandsComponent {
   func grab(resource: Package) {
     if self.leftHandSlot == nil {
       self.leftHandSlot = resource
-    } else if self.rightHandSlot == nil {
+    } else if self.rightHandSlot == nil && self.isOffHandEnabled {
       self.rightHandSlot = resource
     }
   }

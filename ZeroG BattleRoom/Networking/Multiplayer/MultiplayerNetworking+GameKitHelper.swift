@@ -56,8 +56,8 @@ extension MultiplayerNetworking {
   
   // MARK: - Handler Methods
   
-  private func handleRandomNumber(_ snapshot: UnifiedMessage, player: GKPlayer) {
-    let randomNumber = snapshot.randomNumber!
+  private func handleRandomNumber(_ message: UnifiedMessage, player: GKPlayer) {
+    let randomNumber = message.randomNumber!
         
     print("Recieved random number: \(randomNumber)")
     
@@ -85,7 +85,7 @@ extension MultiplayerNetworking {
     }
   }
   
-  private func handleGameBegin(_ snapshot: UnifiedMessage) {
+  private func handleGameBegin(_ message: UnifiedMessage) {
     print("Begin game message received")
     self.gameState = .active
     
@@ -93,8 +93,8 @@ extension MultiplayerNetworking {
     self.processPlayerAliases()
   }
   
-  private func handleMove(_ snapshot: UnifiedMessage) {
-    let elements = snapshot.elements!
+  private func handleMove(_ message: UnifiedMessage) {
+    let elements = message.elements!
     
     guard elements.count > 0 else { fatalError("Error: Elements array is empty.") }
     
@@ -107,17 +107,17 @@ extension MultiplayerNetworking {
                                 direction: playerGroup[0].vector)
   }
   
-  private func handleImpacted(_ snapshot: UnifiedMessage, player: GKPlayer) {
+  private func handleImpacted(_ message: UnifiedMessage, player: GKPlayer) {
     print("Impacted message received")
     self.delegate?.impactPlayer(player: player)
   }
   
-  private func handleMoveResource(_ snapshot: UnifiedMessage) {
-    guard let elements = snapshot.elements,
+  private func handleMoveResource(_ message: UnifiedMessage) {
+    guard let elements = message.elements,
       elements.count > 0,
       let resoureceGroup = elements.first,
       resoureceGroup.count > 0 else { fatalError("Error: Element group array is empty.")}
-    guard let index = snapshot.resourceIndex else { fatalError("Error: Resource index is missing.") }
+    guard let index = message.resourceIndex else { fatalError("Error: Resource index is missing.") }
     
     print("Resource move message received")
     self.delegate?.moveResourceAt(index: index,
@@ -125,30 +125,30 @@ extension MultiplayerNetworking {
                                   vector: resoureceGroup[0].vector)
   }
   
-  private func handleGrabResource(_ snapshot: UnifiedMessage, player: GKPlayer) {
-    guard let index = snapshot.resourceIndex else { fatalError("Error: Resource index is missing.") }
-    guard let playerIndex = snapshot.playerIndex else { fatalError("Error: Player index is missing.") }
+  private func handleGrabResource(_ message: UnifiedMessage, player: GKPlayer) {
+    guard let index = message.resourceIndex else { fatalError("Error: Resource index is missing.") }
+    guard let playerIndex = message.playerIndex else { fatalError("Error: Player index is missing.") }
     
     print("Grab message received")
     self.delegate?.grabResourceAt(index: index, playerIndex: playerIndex, player: player)
   }
   
-  private func handleAssignResource(_ snapshot: UnifiedMessage) {
-    guard let index = snapshot.resourceIndex else { fatalError("Error: Resource index is missing.") }
-    guard let playerIndex = snapshot.playerIndex else { fatalError("Error: Player index is missing.") }
+  private func handleAssignResource(_ message: UnifiedMessage) {
+    guard let index = message.resourceIndex else { fatalError("Error: Resource index is missing.") }
+    guard let playerIndex = message.playerIndex else { fatalError("Error: Player index is missing.") }
     
     print("Grab message received")
     self.delegate?.assignResourceAt(index: index, playerIndex: playerIndex)
   }
   
-  private func handleGameOver(_ snapshot: UnifiedMessage) {
-    guard let player1Won = snapshot.player1Won else { fatalError("Error: Bool value is missing." ) }
+  private func handleGameOver(_ message: UnifiedMessage) {
+    guard let player1Won = message.player1Won else { fatalError("Error: Bool value is missing." ) }
     print("Game over message received - Host \(player1Won ? "Won" : "Lost" )")
     self.delegate?.gameOver(player1Won: player1Won)
   }
   
-  private func handleSnapshot(_ snapshot: UnifiedMessage) {
-    let elements = snapshot.elements!
+  private func handleSnapshot(_ message: UnifiedMessage) {
+    let elements = message.elements!
     let expectdNumberOfElements = MultiplayerNetworkingSnapshot.GroupIndecies.allCases.count
     guard elements.count == expectdNumberOfElements else {
       fatalError("Error: Missing Elements: \(elements)")

@@ -50,10 +50,17 @@ class General: GKEntity {
 
     self.addComponent(ImpulseComponent())
     
-    self.addComponent(HandsComponent(didSetResource: { shapeNode in
-      spriteComponent.node.addChild(shapeNode)
-    }, didRemoveResourece: { shapeNode in
-      resourceReleased(shapeNode)
+    self.addComponent(HandsComponent(didRemoveResource: { resource in
+      guard let heroSpriteComponent = self.component(ofType: SpriteComponent.self),
+        let shapeComponent = resource.component(ofType: ShapeComponent.self),
+        let physicsComponent = resource.component(ofType: PhysicsComponent.self) else { return }
+      
+      DispatchQueue.main.async {
+        shapeComponent.node.position = heroSpriteComponent.node.position
+        physicsComponent.randomImpulse()
+      }
+      
+      resourceReleased(shapeComponent.node)
     }))
     
     let trailComponent = TrailComponent()
@@ -124,22 +131,11 @@ class General: GKEntity {
 
 extension General: ImpactableProtocol {
   func impacted() {
-    guard let heroHandsComponent = self.component(ofType: HandsComponent.self),
-      let heroSpriteComponent = self.component(ofType: SpriteComponent.self) else { return }
+    guard let heroHandsComponent = self.component(ofType: HandsComponent.self) else { return }
     
-    if let leftHandResource = heroHandsComponent.leftHandSlot,
-      let rightHandResource = heroHandsComponent.rightHandSlot,
-      let leftHandResourceShapeComponent = leftHandResource.component(ofType: ShapeComponent.self),
-      let rightHandResourceShapeComponent = rightHandResource.component(ofType: ShapeComponent.self){
-      
-      heroHandsComponent.isImpacted = true
-      heroHandsComponent.leftHandSlot = nil
-      heroHandsComponent.rightHandSlot = nil
-      leftHandResourceShapeComponent.node.position = heroSpriteComponent.node.position
-      rightHandResourceShapeComponent.node.position = heroSpriteComponent.node.position
-      leftHandResource.enableCollisionDetections()
-      rightHandResource.enableCollisionDetections()
-    }
+    heroHandsComponent.isImpacted = true
+    heroHandsComponent.leftHandSlot = nil
+    heroHandsComponent.rightHandSlot = nil
   }
 }
 

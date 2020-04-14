@@ -8,6 +8,7 @@
 
 import Foundation
 import SpriteKit
+import GameKit
 
 extension GameScene: SKPhysicsContactDelegate {
   func didBegin(_ contact: SKPhysicsContact) {
@@ -72,28 +73,21 @@ extension GameScene: SKPhysicsContactDelegate {
       guard let hero = self.entityManager.heroWith(node: heroNode) as? General,
         let impactedResource = self.entityManager.resourceWith(node: resourceNode) as? Package else { return }
       
-      guard let heroHandsComponent = hero.component(ofType: HandsComponent.self),
+      guard let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
+        let heroHandsComponent = hero.component(ofType: HandsComponent.self),
         let resourceShapeComponent = impactedResource.component(ofType: ShapeComponent.self),
         !heroHandsComponent.isImpacted else { return }
       
-      if let heroLeftHand = heroHandsComponent.leftHandSlot,
-        let heroRightHand = heroHandsComponent.rightHandSlot,
-        let leftHandPhysicsComponent = heroLeftHand.component(ofType: PhysicsComponent.self),
-        let rightHandPhysicsComponent = heroRightHand.component(ofType: PhysicsComponent.self) {
-      
-        hero.impacted()
+      if heroHandsComponent.hasFreeHand() {
+        heroHandsComponent.grab(resource: impactedResource)
+        if let resourceIndex = self.entityManager.indexForResource(shape: resourceShapeComponent.node),
+          let heroIndex = self.entityManager.playerEntites.firstIndex(of: hero) {
         
-        if self.isPlayer1 {
-          leftHandPhysicsComponent.randomImpulse()
-          rightHandPhysicsComponent.randomImpulse()
+          self.multiplayerNetworking
+            .sendGrabbedResource(index: resourceIndex, playerIndex: heroIndex)
         }
       } else {
-        impactedResource.disableCollisionDetection()
-        heroHandsComponent.grab(resource: impactedResource)
-        if let index = self.entityManager.indexForResource(shape: resourceShapeComponent.node) {
-          let playerIndex = self.entityManager.currentPlayerIndex
-          self.multiplayerNetworking.sendGrabbedResource(index: index, playerIndex: playerIndex)
-        }
+        hero.impacted()
       }
       
       self.run(SoundManager.shared.blipPaddleSound)
