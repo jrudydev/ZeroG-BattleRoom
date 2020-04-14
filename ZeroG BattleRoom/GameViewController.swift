@@ -12,6 +12,10 @@ import GameplayKit
 import GameKit
 import Combine
 
+extension Notification.Name {
+  static let motionShake = Notification.Name("motionShake")
+}
+
 class GameViewController: UIViewController {
   
   var subscriptions = Set<AnyCancellable>()
@@ -55,6 +59,16 @@ class GameViewController: UIViewController {
     guard let view = self.view as? SKView else { return }
     let resize = view.frame.size.asepctFill(UIScreen.main.bounds.size)
     view.scene?.size = resize
+  }
+  
+  override func becomeFirstResponder() -> Bool {
+      return true
+  }
+  
+  override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+      if motion == .motionShake {
+          NotificationCenter.default.post(name: .motionShake, object: nil)
+      }
   }
 }
 

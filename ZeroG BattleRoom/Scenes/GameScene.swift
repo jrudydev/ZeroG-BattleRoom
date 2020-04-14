@@ -75,6 +75,17 @@ class GameScene: SKScene {
     self.setupGameMessage()
     
     self.gameState.enter(WaitingForTap.self)
+    
+    NotificationCenter.Publisher(center: .default, name: .motionShake, object: nil)
+      .sink(receiveValue: { [weak self] notification in
+        guard let self = self else { return }
+        guard let hero = self.entityManager.hero as? General,
+          let spriteComponent = hero.component(ofType: SpriteComponent.self) else { return }
+        
+        hero.impacted()
+        spriteComponent.node.randomImpulse()
+      })
+      .store(in: &subscriptions)
   }
   
   override func update(_ currentTime: TimeInterval) {
