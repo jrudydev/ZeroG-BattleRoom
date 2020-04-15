@@ -98,8 +98,29 @@ class GameScene: SKScene {
     self.lastUpdateTime = currentTime
     self.gameState.update(deltaTime: currentTime)
 
-    if self.isPlayer1 && self.isGameWon() {
-      self.gameWon = true
+    self.checkForGameOver()
+  }
+  
+  private func checkForGameOver() {
+    if self.isPlayer1 {
+      guard self.entityManager.playerEntites.count > 0 else { return }
+      guard let winningTeam = self.entityManager.winningTeam else { return }
+      
+      if let hero = self.entityManager.hero as? General,
+        let teamComponent = hero.component(ofType: TeamComponent.self) {
+        
+        var localDidWin = false
+        switch winningTeam {
+        case .team1:
+          localDidWin = teamComponent.team == .team1
+        case .team2:
+          localDidWin = teamComponent.team == .team2
+        }
+        print(localDidWin ? "Won" : "Lost")
+        self.multiplayerNetworking.sendGameEnd(player1Won: localDidWin)
+        
+        self.gameWon = localDidWin
+      }
     }
   }
 }
@@ -252,30 +273,5 @@ extension GameScene: MultiplayerNetworkingProtocol {
     self.gameState.enter(Playing.self)
     
     MultiplayerNetworkingSnapshot.shared.isSendingSnapshots = true
-  }
-}
-
-extension GameScene {
-  func isGameWon() -> Bool {
-    guard self.entityManager.playerEntites.count > 0 else { return false }
-        
-    if let hero = self.entityManager.hero as? General,
-      let teamComponent = hero.component(ofType: TeamComponent.self),
-      let winningTeam = self.entityManager.winningTeam {
-      
-      var localDidWin = false
-      switch winningTeam {
-      case .team1:
-        localDidWin = teamComponent.team == .team1
-      case .team2:
-        localDidWin = teamComponent.team == .team2
-      }
-      print(localDidWin ? "Won" : "Lost")
-      self.multiplayerNetworking.sendGameEnd(player1Won: localDidWin)
-      
-      return true
-    }
-    
-    return false 
   }
 }
