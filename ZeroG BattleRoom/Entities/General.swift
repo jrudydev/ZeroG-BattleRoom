@@ -14,7 +14,7 @@ import GameplayKit
 
 class General: GKEntity {
   
-  private let defaultImpulseMagnitude: CGFloat = 3.0
+  private let defaultImpulseMagnitude: CGFloat = 2.0
   private let defaultLaunchRotation: CGFloat = 10.0
   
   enum State {
