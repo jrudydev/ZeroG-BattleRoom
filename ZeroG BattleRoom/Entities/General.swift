@@ -33,8 +33,7 @@ class General: GKEntity {
   }
   var numberOfDeposits = 0
   
-  unowned var panel: Panel? = nil
-//  unowned var tractorBeamComponent: TracktorBeamComponent? = nil
+  unowned var occupiedPanel: Panel? = nil
 
   init(imageName: String, team: Team, resourceReleased: @escaping (SKShapeNode) -> Void) {
     super.init()
@@ -176,11 +175,11 @@ extension General: LaunchableProtocol {
       let rotationPercent = launchComponent.launchInfo.rotationPercent,
       let isLeftRotation = launchComponent.launchInfo.isLeftRotation else { return }
     
-    if let beamComponent = self.panel?.component(ofType: BeamComponent.self) {
+    if let beamComponent = self.occupiedPanel?.component(ofType: BeamComponent.self) {
       physicsComponent.isEffectedByPhysics = true
       beamComponent.isOccupied = false
       
-      vacateWall(self.panel!)
+      vacateWall(self.occupiedPanel!)
     }
     
     let launchMagnitude = self.defaultImpulseMagnitude * 2

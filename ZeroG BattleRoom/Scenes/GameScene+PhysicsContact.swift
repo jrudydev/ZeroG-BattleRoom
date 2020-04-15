@@ -167,7 +167,7 @@ extension GameScene: SKPhysicsContactDelegate {
       
       hero.switchToState(.beamed)
       
-      hero.panel = panel
+      hero.occupiedPanel = panel
       tractorBeamComponent.isOccupied = true
       
       if let index = self.entityManager.indexForWall(panel: panel) {
