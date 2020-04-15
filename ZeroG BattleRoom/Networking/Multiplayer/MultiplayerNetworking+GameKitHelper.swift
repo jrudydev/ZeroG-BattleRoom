@@ -40,7 +40,7 @@ extension MultiplayerNetworking: GameKitHelperDelegate {
     case .moveResource:
       self.handleMoveResource(message)
     case .grabResource:
-      self.handleGrabResource(message, player: player)
+      self.handleGrabResource(message)
     case .assignResource:
       self.handleAssignResource(message)
     case .gameOver:
@@ -107,13 +107,6 @@ extension MultiplayerNetworking {
                                 direction: playerGroup[0].vector)
   }
   
-  private func handleImpacted(_ message: UnifiedMessage) {
-    guard let playerIndex = message.playerIndex else { fatalError("Error: Player index is missing.") }
-    
-    print("Impacted message received")
-    self.delegate?.impactPlayerAt(index: playerIndex)
-  }
-  
   private func handleMoveResource(_ message: UnifiedMessage) {
     guard let elements = message.elements,
       elements.count > 0,
@@ -127,14 +120,24 @@ extension MultiplayerNetworking {
                                   vector: resoureceGroup[0].vector)
   }
   
-  private func handleGrabResource(_ message: UnifiedMessage, player: GKPlayer) {
-    guard let index = message.resourceIndex else { fatalError("Error: Resource index is missing.") }
-    guard let playerIndex = message.playerIndex else { fatalError("Error: Player index is missing.") }
+  private func handleImpacted(_ message: UnifiedMessage) {
+    guard let senderIndex = message.senderIndex else { fatalError("Error: Player index is missing.") }
     
-    print("Grab message received")
-    self.delegate?.grabResourceAt(index: index, playerIndex: playerIndex, player: player)
+    print("Impacted message received")
+    self.delegate?.impactPlayerAt(senderIndex: senderIndex)
   }
   
+  private func handleGrabResource(_ message: UnifiedMessage) {
+    guard let index = message.resourceIndex else { fatalError("Error: Resource index is missing.") }
+    guard let playerIndex = message.playerIndex else { fatalError("Error: Player index is missing.") }
+    guard let senderIndex = message.senderIndex else { fatalError("Error: Sender index is missing.") }
+    
+    print("Grab message received")
+    self.delegate?.grabResourceAt(index: index,
+                                  playerIndex: playerIndex,
+                                  senderIndex: senderIndex)
+  }
+    
   private func handleAssignResource(_ message: UnifiedMessage) {
     guard let index = message.resourceIndex else { fatalError("Error: Resource index is missing.") }
     guard let playerIndex = message.playerIndex else { fatalError("Error: Player index is missing.") }

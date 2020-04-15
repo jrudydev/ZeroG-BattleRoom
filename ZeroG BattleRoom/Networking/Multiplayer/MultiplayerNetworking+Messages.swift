@@ -67,6 +67,7 @@ extension MultiplayerNetworking {
     let player1Won: Bool?
     let resourceIndex: Int?
     let playerIndex: Int?
+    let senderIndex: Int?
     let elements: [SnapshotElementGroup]?
     
     init(type: MessageType,
@@ -74,12 +75,14 @@ extension MultiplayerNetworking {
          player1Won: Bool? = nil,
          resourceIndex: Int? = nil,
          playerIndex: Int? = nil,
+         senderIndex: Int? = nil,
          elements: [SnapshotElementGroup]? = nil) {
       self.type = type
       self.randomNumber = randomNumber
       self.player1Won = player1Won
       self.resourceIndex = resourceIndex
       self.playerIndex = playerIndex
+      self.senderIndex = senderIndex
       self.elements = elements
     }
   }

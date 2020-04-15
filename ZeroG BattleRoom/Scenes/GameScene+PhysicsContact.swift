@@ -84,7 +84,9 @@ extension GameScene: SKPhysicsContactDelegate {
           let heroIndex = self.entityManager.playerEntites.firstIndex(of: hero) {
         
           self.multiplayerNetworking
-            .sendGrabbedResource(index: resourceIndex, playerIndex: heroIndex)
+            .sendGrabbedResource(index: resourceIndex,
+                                 playerIndex: heroIndex,
+                                 senderIndex: self.entityManager.currentPlayerIndex)
         }
       } else {
         hero.impacted()
