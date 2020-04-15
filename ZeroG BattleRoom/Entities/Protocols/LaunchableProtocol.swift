@@ -10,5 +10,5 @@ import Foundation
 
 
 protocol LaunchableProtocol {
-  func launch()
+  func launch(vacateWall: (Panel) -> Void)
 }

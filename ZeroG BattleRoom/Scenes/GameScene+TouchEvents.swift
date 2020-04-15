@@ -68,7 +68,11 @@ extension GameScene {
         if heroLaunchComponent.launchInfo.direction ==  nil {
           self.updateLaunchComponents(pos: pos)
         }
-        hero.launch()
+        hero.launch(vacateWall: { panel in
+          if let index = self.entityManager.indexForWall(panel: panel) {
+            self.multiplayerNetworking.sendWall(index: index, isOccupied: false)
+          }
+        })
       } else  {
         hero.impulseTo(location: pos) { sprite, vector in
           self.multiplayerNetworking.sendMove(start: sprite.position, direction: vector)

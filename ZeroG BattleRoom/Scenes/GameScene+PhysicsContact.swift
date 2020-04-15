@@ -38,6 +38,8 @@ extension GameScene: SKPhysicsContactDelegate {
       
       firstHero.impacted()
       secondHero.impacted()
+      
+      print("heros collided")
     }
     
     if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
@@ -164,8 +166,15 @@ extension GameScene: SKPhysicsContactDelegate {
       }
       
       hero.switchToState(.beamed)
-      hero.tractorBeamComponent = tractorBeamComponent
+      
+      hero.panel = panel
       tractorBeamComponent.isOccupied = true
+      
+      if let index = self.entityManager.indexForWall(panel: panel) {
+        self.multiplayerNetworking.sendWall(index: index, isOccupied: true)
+      }
+      
+      
       impulseComponent.isOnCooldown = false
       
       self.run(SoundManager.shared.blipSound)

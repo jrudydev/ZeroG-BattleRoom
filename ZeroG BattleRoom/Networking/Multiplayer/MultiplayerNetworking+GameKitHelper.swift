@@ -37,6 +37,8 @@ extension MultiplayerNetworking: GameKitHelperDelegate {
       self.handleMove(message)
     case .impacted:
       self.handleImpacted(message)
+    case .wallHit:
+      self.handleWallHit(message)
     case .moveResource:
       self.handleMoveResource(message)
     case .grabResource:
@@ -127,6 +129,14 @@ extension MultiplayerNetworking {
     self.delegate?.impactPlayerAt(senderIndex: senderIndex)
   }
   
+  private func handleWallHit(_ message: UnifiedMessage) {
+    guard let index = message.resourceIndex else { fatalError("Error: Wall index is missing.") }
+    guard let boolValue = message.boolValue else { fatalError("Error: Occupied bool is missing.") }
+    
+    print("Impacted message received")
+    self.delegate?.syncWallAt(index: index, isOccupied: boolValue)
+  }
+  
   private func handleGrabResource(_ message: UnifiedMessage) {
     guard let index = message.resourceIndex else { fatalError("Error: Resource index is missing.") }
     guard let playerIndex = message.playerIndex else { fatalError("Error: Player index is missing.") }
@@ -147,7 +157,8 @@ extension MultiplayerNetworking {
   }
   
   private func handleGameOver(_ message: UnifiedMessage) {
-    guard let player1Won = message.player1Won else { fatalError("Error: Bool value is missing." ) }
+    guard let player1Won = message.boolValue else { fatalError("Error: Bool value is missing." ) }
+    
     print("Game over message received - Host \(player1Won ? "Won" : "Lost" )")
     self.delegate?.gameOver(player1Won: player1Won)
   }

@@ -100,6 +100,13 @@ extension MultiplayerNetworking {
     self.sendData(Data.archiveJSON(object: message))
   }
   
+  func sendWall(index: Int, isOccupied: Bool) {
+    let message = UnifiedMessage(type: .wallHit,
+                                 boolValue: isOccupied,
+                                 resourceIndex: index)
+    self.sendData(Data.archiveJSON(object: message))
+  }
+  
   func sendGrabbedResource(index: Int, playerIndex: Int, senderIndex: Int) {
     let message = UnifiedMessage(type: .grabResource, resourceIndex: index,
                                  playerIndex: playerIndex,
@@ -136,7 +143,7 @@ extension MultiplayerNetworking {
   }
   
   func sendGameEnd(player1Won: Bool) {
-    let message = UnifiedMessage(type: .gameOver, player1Won: player1Won)
+    let message = UnifiedMessage(type: .gameOver, boolValue: player1Won)
     self.sendData(Data.archiveJSON(object: message))
   }
 }

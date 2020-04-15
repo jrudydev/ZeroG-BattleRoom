@@ -24,6 +24,7 @@ class EntityManager {
   
   var playerEntites = [GKEntity]()
   var resourcesEntities = [GKEntity]()
+  var wallEntities = [GKEntity]()
   var entities = Set<GKEntity>()
   var toRemove = Set<GKEntity>()
   
@@ -241,8 +242,9 @@ extension EntityManager {
     let blinderPanels = self.blinderPanels()
     let extraPanels = self.extraPanels()
     
-    for enitity in wallPanels + centerPanels + blinderPanels + extraPanels {
-      self.add(enitity)
+    for entity in wallPanels + centerPanels + blinderPanels + extraPanels {
+      self.add(entity)
+      self.wallEntities.append(entity)
     }
   }
   
@@ -407,6 +409,15 @@ extension EntityManager {
       guard let shapeComponent = package.component(ofType: ShapeComponent.self) else { return  false }
       
       return shapeComponent.node === shape
+    }
+    
+    return index
+  }
+  
+  func indexForWall(panel: Panel) -> Int? {
+    let index = self.wallEntities.firstIndex { entity -> Bool in
+      guard let wall = entity as? Panel else { return false }
+      return wall == panel
     }
     
     return index

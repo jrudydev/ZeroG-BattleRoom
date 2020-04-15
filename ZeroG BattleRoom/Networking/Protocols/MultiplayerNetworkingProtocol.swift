@@ -20,6 +20,7 @@ protocol MultiplayerNetworkingProtocol {
   func impactPlayerAt(senderIndex: Int)
   func grabResourceAt(index: Int, playerIndex: Int, senderIndex: Int)
   func assignResourceAt(index: Int, playerIndex: Int)
+  func syncWallAt(index: Int, isOccupied: Bool)
   func gameOver(player1Won: Bool)
   func setCurrentPlayerAt(index: Int)
   func setPlayerAliases(playerAliases: [String])
