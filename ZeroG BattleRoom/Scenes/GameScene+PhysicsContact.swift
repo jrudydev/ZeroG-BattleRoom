@@ -38,30 +38,6 @@ extension GameScene: SKPhysicsContactDelegate {
       
       firstHero.impacted()
       secondHero.impacted()
-      
-      if self.isPlayer1 {
-        if let leftHand = firstHeroHandsComponent.leftHandSlot,
-          let leftHandPhysicsComponent = leftHand.component(ofType: PhysicsComponent.self) {
-          
-          leftHandPhysicsComponent.randomImpulse()
-        }
-        if let rightHand = firstHeroHandsComponent.rightHandSlot,
-          let rightHandPhysicsComponent = rightHand.component(ofType: PhysicsComponent.self) {
-          
-          rightHandPhysicsComponent.randomImpulse()
-        }
-        
-        if let leftHand = secondHeroHandsComponent.leftHandSlot,
-          let leftHandPhysicsComponent = leftHand.component(ofType: PhysicsComponent.self) {
-          
-          leftHandPhysicsComponent.randomImpulse()
-        }
-        if let rightHand = secondHeroHandsComponent.rightHandSlot,
-          let rightHandPhysicsComponent = rightHand.component(ofType: PhysicsComponent.self) {
-          
-          rightHandPhysicsComponent.randomImpulse()
-        }
-      }
     }
     
     if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
