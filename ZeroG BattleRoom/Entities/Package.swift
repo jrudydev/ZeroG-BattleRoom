@@ -48,32 +48,18 @@ class Package: GKEntity {
 extension Package {
   
   func disableCollisionDetection() {
-    guard let physicsComponent = self.component(ofType: PhysicsComponent.self) else { return }
-  
-    physicsComponent.isEffectedByPhysics = false
-    physicsComponent.physicsBody.contactTestBitMask = 0
-    physicsComponent.physicsBody.collisionBitMask = 0
-  
-    
-    
-//    guard let shapeComponent = self.component(ofType: ShapeComponent.self) else { return }
-//
-//    shapeComponent.node.physicsBody = nil
+    guard let shapeComponent = self.component(ofType: ShapeComponent.self) else { return }
+
+    shapeComponent.node.physicsBody = nil
   }
   
   func enableCollisionDetections() {
-    guard let physicsComponent = self.component(ofType: PhysicsComponent.self) else { return }
-    
-    physicsComponent.isEffectedByPhysics = true
-    physicsComponent.physicsBody.contactTestBitMask = PhysicsCategoryMask.hero
-    physicsComponent.physicsBody.collisionBitMask = PhysicsCategoryMask.hero
-    
-//    guard let shapeComponent = self.component(ofType: ShapeComponent.self),
-//     let physicsComponent = self.component(ofType: PhysicsComponent.self) else { return }
-//
-//    let physicsBody = self.getPhysicsBody()
-//    physicsComponent.physicsBody = physicsBody
-//    shapeComponent.node.physicsBody = physicsBody
+    guard let shapeComponent = self.component(ofType: ShapeComponent.self),
+      let physicsComponent = self.component(ofType: PhysicsComponent.self) else { return }
+
+    let physicsBody = self.getPhysicsBody()
+    physicsComponent.physicsBody = physicsBody
+    shapeComponent.node.physicsBody = physicsBody
   }
   
 }

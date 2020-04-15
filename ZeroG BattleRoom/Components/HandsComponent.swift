@@ -38,7 +38,7 @@ class HandsComponent: GKComponent {
         let resource = self.leftHandSlot,
         let resourceShapeComponent = resource.component(ofType: ShapeComponent.self) else { return }
       
-      resourceShapeComponent.node.position = CGPoint(x: 10.0, y: 10.0)
+      resourceShapeComponent.node.position = CGPoint(x: -10.0, y: 10.0)
       entitySpriteComponent.node.addChild(resourceShapeComponent.node)
     }
   }
@@ -68,7 +68,7 @@ class HandsComponent: GKComponent {
         let resource = self.rightHandSlot,
         let resourceShapeComponent = resource.component(ofType: ShapeComponent.self) else { return }
       
-      resourceShapeComponent.node.position = CGPoint(x: -10.0, y: 10.0)
+      resourceShapeComponent.node.position = CGPoint(x: +10.0, y: 10.0)
       entitySpriteComponent.node.addChild(resourceShapeComponent.node)
     }
   }
