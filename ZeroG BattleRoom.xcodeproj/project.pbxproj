@@ -264,7 +264,7 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
-		93A55F03243089840027E83E /* Game States */ = {
+		93A55F03243089840027E83E /* GameStates */ = {
 			isa = PBXGroup;
 			children = (
 				93A55F05243089840027E83E /* GameOver.swift */,
@@ -272,7 +272,7 @@
 				93A55F04243089840027E83E /* WaitingForTap.swift */,
 				93EFD97F2445F311005D68A2 /* Disconnected.swift */,
 			);
-			path = "Game States";
+			path = GameStates;
 			sourceTree = "<group>";
 		};
 		93A55F0D24308AEE0027E83E /* Scenes */ = {
@@ -317,7 +317,7 @@
 			children = (
 				93873A0224389BBB00A6E59A /* Components */,
 				93873A0124389BA000A6E59A /* Entities */,
-				93A55F03243089840027E83E /* Game States */,
+				93A55F03243089840027E83E /* GameStates */,
 				93A55F0D24308AEE0027E83E /* Scenes */,
 				93A55EE824307D280027E83E /* Networking */,
 				93FEBDAA242EE0CF006CCBFB /* AppDelegate.swift */,
