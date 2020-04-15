@@ -262,7 +262,7 @@ extension GameScene: MultiplayerNetworkingProtocol {
   }
   
   func syncWallAt(index: Int, isOccupied: Bool) {
-    guard let beamComponent = self.entityManager.wallEntities[index].component(ofType: TracktorBeamComponent.self) else { return }
+    guard let beamComponent = self.entityManager.wallEntities[index].component(ofType: BeamComponent.self) else { return }
     
     beamComponent.isOccupied = isOccupied
   }

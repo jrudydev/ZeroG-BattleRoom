@@ -176,7 +176,7 @@ extension General: LaunchableProtocol {
       let rotationPercent = launchComponent.launchInfo.rotationPercent,
       let isLeftRotation = launchComponent.launchInfo.isLeftRotation else { return }
     
-    if let beamComponent = self.panel?.component(ofType: TracktorBeamComponent.self) {
+    if let beamComponent = self.panel?.component(ofType: BeamComponent.self) {
       physicsComponent.isEffectedByPhysics = true
       beamComponent.isOccupied = false
       

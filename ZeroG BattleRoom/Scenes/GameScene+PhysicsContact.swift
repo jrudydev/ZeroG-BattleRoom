@@ -151,7 +151,7 @@ extension GameScene: SKPhysicsContactDelegate {
         let impulseComponent = hero.component(ofType: ImpulseComponent.self),
         let panel = self.entityManager.panelWith(node: beam) as? Panel,
         let panelShapeComponent = panel.component(ofType: ShapeComponent.self),
-        let tractorBeamComponent = panel.component(ofType: TracktorBeamComponent.self),
+        let tractorBeamComponent = panel.component(ofType: BeamComponent.self),
         !hero.isBeamed && !tractorBeamComponent.isOccupied else { return }
 
       physicsComponent.isEffectedByPhysics = false

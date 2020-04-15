@@ -365,7 +365,7 @@ extension EntityManager {
   func panelWith(node: SKShapeNode) -> GKEntity? {
     let panel = self.entities.first { entity -> Bool in
       guard let panelEntity = entity as? Panel,
-        let beamComponent = panelEntity.component(ofType: TracktorBeamComponent.self) else { return false }
+        let beamComponent = panelEntity.component(ofType: BeamComponent.self) else { return false }
       
       let beam = beamComponent.beams.first { beam -> Bool in
         return beam === node

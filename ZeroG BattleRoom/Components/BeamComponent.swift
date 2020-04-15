@@ -11,7 +11,7 @@ import SpriteKit
 import GameplayKit
 
 
-class TracktorBeamComponent: GKComponent {
+class BeamComponent: GKComponent {
   
   let beams: [SKShapeNode]
   var isOccupied = false

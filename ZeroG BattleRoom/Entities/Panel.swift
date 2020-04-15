@@ -61,7 +61,7 @@ class Panel: GKEntity {
       tractorBeams.append(tractorBeam)
     }
     
-    self.addComponent(TracktorBeamComponent(nodes: tractorBeams))
+    self.addComponent(BeamComponent(nodes: tractorBeams))
   }
   
   required init?(coder: NSCoder) {
