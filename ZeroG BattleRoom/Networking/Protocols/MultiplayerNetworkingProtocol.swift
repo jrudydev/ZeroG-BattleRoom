@@ -13,7 +13,7 @@ import GameKit
 protocol MultiplayerNetworkingProtocol {
   func matchEnded()
   func movePlayerAt(index: Int, position: CGPoint, direction: CGVector)
-  func syncPlayerAt(index: Int, position: CGPoint, vector: CGVector)
+  func syncPlayerAt(index: Int, position: CGPoint, vector: CGVector, rotation: CGFloat)
   func moveResourceAt(index: Int, position: CGPoint, vector: CGVector)
   func syncResources(resources: MultiplayerNetworking.SnapshotElementGroup)
   func syncResourceAt(index: Int, position: CGPoint, vector: CGVector)

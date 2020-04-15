@@ -171,12 +171,13 @@ extension GameScene: MultiplayerNetworkingProtocol {
     }
   }
   
-  func syncPlayerAt(index: Int, position: CGPoint, vector: CGVector) {
+  func syncPlayerAt(index: Int, position: CGPoint, vector: CGVector, rotation: CGFloat) {
     if let player = self.entityManager.playerEntites[index] as? General,
       let spriteComponent = player.component(ofType: SpriteComponent.self),
       let physicsComponent = player.component(ofType: PhysicsComponent.self) {
       
       spriteComponent.node.position = position
+      spriteComponent.node.zRotation = rotation
       physicsComponent.physicsBody.velocity = vector
     }
   }

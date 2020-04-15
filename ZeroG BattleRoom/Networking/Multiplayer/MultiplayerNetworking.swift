@@ -89,7 +89,8 @@ class MultiplayerNetworking {
 
 extension MultiplayerNetworking {
   func sendMove(start pos: CGPoint, direction: CGVector) {
-    let playerElement = MessageSnapshotElement(position: pos, vector: direction)
+    let playerElement = MessageSnapshotElement(position: pos,
+                                               vector: direction)
     let message = UnifiedMessage(type: .move, elements: [[playerElement]])
     self.sendData(Data.archiveJSON(object: message))
   }

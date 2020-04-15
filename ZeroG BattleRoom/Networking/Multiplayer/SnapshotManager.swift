@@ -30,12 +30,10 @@ class MultiplayerNetworkingSnapshot {
         let vector = physicsComponent.physicsBody.velocity
         let snapshot = MultiplayerNetworking.MessageSnapshotElement(
           position: spriteComponent.node .position,
-          vector: vector)
+          vector: vector,
+          rotation: spriteComponent.node.zRotation)
         info.append(snapshot)
       }
-//      let vector = player.physicsBody?.velocity ?? CGVector.zero
-//      info.append(MultiplayerNetworking.MessageSnapshotElement(position: player.position,
-//                                                               vector: vector))
     }
     
     return info

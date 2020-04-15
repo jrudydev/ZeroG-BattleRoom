@@ -176,7 +176,8 @@ extension MultiplayerNetworking {
       
       self.delegate?.syncPlayerAt(index: idx,
                                   position: player.position,
-                                  vector: player.vector)
+                                  vector: player.vector,
+                                  rotation: player.rotation!)
     }
     
     guard !self.isLocalPlayerHost() else {
