@@ -38,7 +38,7 @@ class Package: GKEntity {
     physicsBody.angularDamping = 0.0
     physicsBody.categoryBitMask = PhysicsCategoryMask.package
     physicsBody.contactTestBitMask = PhysicsCategoryMask.hero
-    physicsBody.collisionBitMask = PhysicsCategoryMask.hero
+    physicsBody.collisionBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.package
     
     return physicsBody
   }
