@@ -46,7 +46,6 @@ class Package: GKEntity {
 }
 
 extension Package {
-  
   func disableCollisionDetection() {
     guard let shapeComponent = self.component(ofType: ShapeComponent.self) else { return }
 
@@ -61,5 +60,4 @@ extension Package {
     physicsComponent.physicsBody = physicsBody
     shapeComponent.node.physicsBody = physicsBody
   }
-  
 }
