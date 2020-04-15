@@ -52,5 +52,9 @@ class GameOver: GKState {
   }
   
   override func willExit(to nextState: GKState) { }
+  
+  override func isValidNextState(_ stateClass: AnyClass) -> Bool {
+    return false
+  }
 
 }
