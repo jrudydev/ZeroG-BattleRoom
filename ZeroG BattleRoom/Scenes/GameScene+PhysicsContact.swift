@@ -39,6 +39,9 @@ extension GameScene: SKPhysicsContactDelegate {
       firstHero.impacted()
       secondHero.impacted()
       
+      self.multiplayerNetworking.sendImpacted(senderIndex: 0)
+      self.multiplayerNetworking.sendImpacted(senderIndex: 1)
+      
       print("heros collided")
     }
     
@@ -173,8 +176,6 @@ extension GameScene: SKPhysicsContactDelegate {
       if let index = self.entityManager.indexForWall(panel: panel) {
         self.multiplayerNetworking.sendWall(index: index, isOccupied: true)
       }
-      
-      
       impulseComponent.isOnCooldown = false
       
       self.run(SoundManager.shared.blipSound)
