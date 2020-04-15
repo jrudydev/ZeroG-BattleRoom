@@ -83,6 +83,9 @@ class GameScene: SKScene {
           let spriteComponent = hero.component(ofType: SpriteComponent.self) else { return }
         
         hero.impacted()
+        self.multiplayerNetworking
+          .sendImpacted(playerIndex: self.entityManager.currentPlayerIndex)
+        
         spriteComponent.node.randomImpulse()
       })
       .store(in: &subscriptions)
@@ -198,16 +201,12 @@ extension GameScene: MultiplayerNetworkingProtocol {
     }
   }
   
-  func impactPlayer(player: GKPlayer) {
-    let indecies = self.multiplayerNetworking.indicesForPlayers
-    let senderIndex = player == GKLocalPlayer.local ? indecies.local : indecies.remote
-    
-    let heroEntity = self.entityManager.playerEntites[senderIndex]
-    
-    if let hero = heroEntity as? General,
+  func impactPlayerAt(index: Int) {
+    if let hero = self.entityManager.playerEntites[index] as? General,
       let heroHandsComponent = hero.component(ofType: HandsComponent.self),
       !heroHandsComponent.isImpacted {
-      
+       
+      print("Hero at index: \(index) impacted!!!!")
       hero.impacted()
     }
   }

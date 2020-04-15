@@ -94,8 +94,8 @@ extension MultiplayerNetworking {
     self.sendData(Data.archiveJSON(object: message))
   }
   
-  func sendImpacted() {
-    let message = UnifiedMessage(type: .impacted)
+  func sendImpacted(playerIndex: Int) {
+    let message = UnifiedMessage(type: .impacted, playerIndex: playerIndex)
     self.sendData(Data.archiveJSON(object: message))
   }
   

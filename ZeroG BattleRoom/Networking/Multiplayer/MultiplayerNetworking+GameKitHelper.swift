@@ -36,7 +36,7 @@ extension MultiplayerNetworking: GameKitHelperDelegate {
     case .move:
       self.handleMove(message)
     case .impacted:
-      self.handleImpacted(message, player: player)
+      self.handleImpacted(message)
     case .moveResource:
       self.handleMoveResource(message)
     case .grabResource:
@@ -107,9 +107,11 @@ extension MultiplayerNetworking {
                                 direction: playerGroup[0].vector)
   }
   
-  private func handleImpacted(_ message: UnifiedMessage, player: GKPlayer) {
+  private func handleImpacted(_ message: UnifiedMessage) {
+    guard let playerIndex = message.playerIndex else { fatalError("Error: Player index is missing.") }
+    
     print("Impacted message received")
-    self.delegate?.impactPlayer(player: player)
+    self.delegate?.impactPlayerAt(index: playerIndex)
   }
   
   private func handleMoveResource(_ message: UnifiedMessage) {
