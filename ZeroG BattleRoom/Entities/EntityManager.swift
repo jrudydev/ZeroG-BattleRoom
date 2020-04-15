@@ -249,7 +249,7 @@ extension EntityManager {
   }
   
   private func centerPanels() -> [GKEntity] {
-    let position = CGPoint(x: 80.0, y: 120.0)
+    let position = CGPoint(x: 75.0, y: 130.0)
     let topLeftPosition = CGPoint(x: -position.x, y: position.y)
     let topLeftWall = self.panelFactory.panelSegment(beamConfig: .both,
                                                      number: 2,

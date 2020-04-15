@@ -12,7 +12,7 @@ import SpriteKit
 struct AppConstants {
   struct Layout {
     static var mapSize = CGSize(width: 2000, height: 3000)
-    static var boundarySize = CGSize(width:  1000, height: 1500)
+    static var boundarySize = CGSize(width:  1000, height: 1600)
     static var wallSize = CGSize(width: 100, height: 20)
     static var wallCornerRadius: CGFloat {
       return wallSize.width * 0.1
