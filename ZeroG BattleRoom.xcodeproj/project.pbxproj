@@ -298,7 +298,7 @@
 		93FEBD9E242EE0CF006CCBFB = {
 			isa = PBXGroup;
 			children = (
-				93FEBDA9242EE0CF006CCBFB /* ZeroG BattleRoom */,
+				93FEBDA9242EE0CF006CCBFB /* ZeroGBattleRoom */,
 				93FEBDA8242EE0CF006CCBFB /* Products */,
 				93FEBDC2242EE181006CCBFB /* Frameworks */,
 			);
@@ -312,7 +312,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		93FEBDA9242EE0CF006CCBFB /* ZeroG BattleRoom */ = {
+		93FEBDA9242EE0CF006CCBFB /* ZeroGBattleRoom */ = {
 			isa = PBXGroup;
 			children = (
 				93873A0224389BBB00A6E59A /* Components */,
@@ -325,7 +325,7 @@
 				93A55EF424307D4F0027E83E /* Utilities */,
 				93A55EE4243077830027E83E /* Resources */,
 			);
-			path = "ZeroG BattleRoom";
+			path = ZeroGBattleRoom;
 			sourceTree = "<group>";
 		};
 		93FEBDC2242EE181006CCBFB /* Frameworks */ = {
@@ -606,7 +606,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = ZRTG86ZKHQ;
-				INFOPLIST_FILE = "ZeroG BattleRoom/Info.plist";
+				INFOPLIST_FILE = ZeroGBattleRoom/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -625,7 +625,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = ZRTG86ZKHQ;
-				INFOPLIST_FILE = "ZeroG BattleRoom/Info.plist";
+				INFOPLIST_FILE = ZeroGBattleRoom/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

@@ -36,9 +36,6 @@ class GameScene: SKScene {
   var cam: SKCameraNode?
   var gameMessage: SKLabelNode?
   
-//  var gameEnded: (() -> Void)?
-//  var gameOver: (() -> Void)?
-  
   var multiplayerNetworking: MultiplayerNetworking! {
     didSet {
       MultiplayerNetworkingSnapshot.shared.publisher
