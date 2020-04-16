@@ -12,7 +12,7 @@ import GameKit
 
 extension GameScene {
   func touchDown(atPoint pos : CGPoint) {
-    defer { self.numberOfTouches += 1 }
+    self.numberOfTouches += 1
     
     guard let hero = self.entityManager.hero as? General,
       let launchComponent = hero.component(ofType: LaunchComponent.self) else { return }
@@ -23,7 +23,7 @@ extension GameScene {
     }
     
     launchComponent.launchInfo.lastTouchDown = pos
-//    self.updateLaunchComponents(pos: pos)
+    self.updateLaunchComponents(pos: pos)
     
     if let n = self.entityManager.spinnyNodeCopy {
       n.position = pos
@@ -33,7 +33,11 @@ extension GameScene {
   }
   
   func touchMoved(toPoint pos : CGPoint) {
-    self.updateLaunchComponents(pos: pos)
+    switch self.gameState.currentState {
+    case is Playing:
+      self.updateLaunchComponents(pos: pos)
+    default: break
+    }
     
 //    if let n = self.entityManager.spinnyNodeCopy {
 //      n.position = pos
@@ -65,9 +69,6 @@ extension GameScene {
         self.entityManager.currentPlayerIndex != -1 else { return }
       
       if case .beamed = hero.state {
-        if heroLaunchComponent.launchInfo.direction ==  nil {
-          self.updateLaunchComponents(pos: pos)
-        }
         hero.launch(vacateWall: { panel in
           if let index = self.entityManager.indexForWall(panel: panel) {
             self.multiplayerNetworking.sendWall(index: index, isOccupied: false)
@@ -78,8 +79,6 @@ extension GameScene {
           self.multiplayerNetworking.sendMove(start: sprite.position, direction: vector)
         }
       }
-      
-      self.numberOfTouches -= 1
     case is GameOver:
       NotificationCenter.default.post(name: .restartGame, object: nil)
     case is Disconnected:
@@ -107,6 +106,8 @@ extension GameScene {
   }
   
   override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+    self.numberOfTouches = 0
+    
     for t in touches { self.touchUp(atPoint: t.location(in: self)) }
   }
   
