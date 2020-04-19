@@ -160,7 +160,7 @@ class EntityManager {
 
 extension EntityManager {
   func spawnHeros() {
-    let heroBlue = General(imageName: "blue_spaceguy", team: .team1, resourceReleased: {
+    let heroBlue = General(imageName: "spaceman-idle-0", team: .team1, resourceReleased: {
       [weak self] shape in
       
       guard let self = self else { return }

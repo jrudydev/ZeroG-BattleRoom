@@ -69,6 +69,7 @@ extension GameScene: SKPhysicsContactDelegate {
                                  playerIndex: heroIndex,
                                  senderIndex: self.entityManager.currentPlayerIndex)
         }
+        hero.updateResourcePositions()
       } else {
         hero.impacted()
       }
@@ -155,7 +156,7 @@ extension GameScene: SKPhysicsContactDelegate {
         let panel = self.entityManager.panelWith(node: beam) as? Panel,
         let panelShapeComponent = panel.component(ofType: ShapeComponent.self),
         let tractorBeamComponent = panel.component(ofType: BeamComponent.self),
-        !hero.isBeamed && !tractorBeamComponent.isOccupied else { return }
+        hero.isBeamable && !tractorBeamComponent.isOccupied else { return }
 
       physicsComponent.isEffectedByPhysics = false
       

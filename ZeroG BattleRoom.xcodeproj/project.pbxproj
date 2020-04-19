@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		930D65E4244C8C93009F05A0 /* BeamableProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 930D65E3244C8C93009F05A0 /* BeamableProtocol.swift */; };
 		9347C8AD24314AD60099AE53 /* game-over.wav in Resources */ = {isa = PBXBuildFile; fileRef = 9347C8A824314AD50099AE53 /* game-over.wav */; };
 		9347C8AE24314AD60099AE53 /* paddleBlip.wav in Resources */ = {isa = PBXBuildFile; fileRef = 9347C8A924314AD50099AE53 /* paddleBlip.wav */; };
 		9347C8AF24314AD60099AE53 /* BambooBreak.wav in Resources */ = {isa = PBXBuildFile; fileRef = 9347C8AA24314AD50099AE53 /* BambooBreak.wav */; };
@@ -68,6 +69,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		930D65E3244C8C93009F05A0 /* BeamableProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeamableProtocol.swift; sourceTree = "<group>"; };
 		9347C8A824314AD50099AE53 /* game-over.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "game-over.wav"; sourceTree = "<group>"; };
 		9347C8A924314AD50099AE53 /* paddleBlip.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = paddleBlip.wav; sourceTree = "<group>"; };
 		9347C8AA24314AD50099AE53 /* BambooBreak.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = BambooBreak.wav; sourceTree = "<group>"; };
@@ -288,6 +290,7 @@
 		93F3DCB3244309570058B288 /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
+				930D65E3244C8C93009F05A0 /* BeamableProtocol.swift */,
 				93F3DCB6244309A80058B288 /* ImpactableProtocol.swift */,
 				93F3DCB4244309960058B288 /* ImpulsableProtocol.swift */,
 				93F3DCB8244309B80058B288 /* LaunchableProtocol.swift */,
@@ -457,6 +460,7 @@
 				93873A0424389C5C00A6E59A /* SpriteComponent.swift in Sources */,
 				93A55F0A243089850027E83E /* Playing.swift in Sources */,
 				93A55F0C24308A630027E83E /* CGSize+AspectFill.swift in Sources */,
+				930D65E4244C8C93009F05A0 /* BeamableProtocol.swift in Sources */,
 				93EFD9802445F311005D68A2 /* Disconnected.swift in Sources */,
 				93A55EFA24307D4F0027E83E /* SoundManager.swift in Sources */,
 				93A55F09243089850027E83E /* GameOver.swift in Sources */,
