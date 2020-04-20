@@ -12,13 +12,24 @@ import GameplayKit
 import GameKit
 import Combine
 
+
 extension Notification.Name {
   static let motionShake = Notification.Name("motionShake")
 }
 
+
+protocol GameSceneProtocol {
+  func viewResized(size: CGSize)
+}
+
+
 class GameViewController: UIViewController {
   
-  var subscriptions = Set<AnyCancellable>()
+  private var viewportSize: CGSize = UIScreen.main.bounds.size
+  
+  private var sceneDelegate: GameSceneProtocol?
+  
+  private var subscriptions = Set<AnyCancellable>()
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -37,9 +48,30 @@ class GameViewController: UIViewController {
 //      let reveal = SKTransition.flipVertical(withDuration: 0.5)
 //      self.view?.presentScene(newScene, transition: reveal)
             
+        self.viewportSize = UIScreen.main.bounds.size
         self.loadScene()
       })
       .store(in: &subscriptions)
+
+    NotificationCenter.Publisher(center: .default, name: .resizeView, object: nil)
+    .sink(receiveValue: { [weak self] notification in
+      guard let self = self else { return }
+      guard let dt = notification.object as? CGFloat else { return }
+ 
+      let percent = dt * dt * dt / 100.0
+      let widthUnit = (AppConstants.Layout.boundarySize.width - UIScreen.main.bounds.width) * percent
+      let heightUnit = (AppConstants.Layout.boundarySize.height - UIScreen.main.bounds.height) * percent
+      
+      var width = self.viewportSize.width  + widthUnit
+      width = min(max(width, UIScreen.main.bounds.width), AppConstants.Layout.boundarySize.width)
+      var height = self.viewportSize.height  + heightUnit
+      height = min(max(height, UIScreen.main.bounds.height), AppConstants.Layout.boundarySize.height)
+      
+      self.viewportSize = CGSize(width: width, height: height)
+      self.viewDidLayoutSubviews()
+      self.sceneDelegate?.viewResized(size: self.viewportSize)
+    })
+    .store(in: &subscriptions)
   }
   
   override var shouldAutorotate: Bool {
@@ -57,7 +89,7 @@ class GameViewController: UIViewController {
   override func viewDidLayoutSubviews() {
     super.viewDidLayoutSubviews()
     guard let view = self.view as? SKView else { return }
-    let resize = view.frame.size.asepctFill(UIScreen.main.bounds.size)
+    let resize = view.frame.size.asepctFill(self.viewportSize)
     view.scene?.size = resize
   }
   
@@ -87,6 +119,7 @@ extension GameViewController {
         
         // Set the scale mode to scale to fit the window
         sceneNode.scaleMode = .aspectFill
+//        sceneNode.viewportSize = viewportSize
         
         // Present the scene
         if let view = self.view as! SKView? {
@@ -98,6 +131,8 @@ extension GameViewController {
           view.showsNodeCount = true
           view.showsPhysics = true
         }
+        
+        self.sceneDelegate = sceneNode
         
         sceneNode.multiplayerNetworking = MultiplayerNetworking()
         self.setupNetworkingNotifcations(delegate: sceneNode)

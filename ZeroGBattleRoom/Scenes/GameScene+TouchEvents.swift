@@ -66,6 +66,7 @@ extension GameScene {
       
       guard let hero = self.entityManager.hero as? General,
         let heroLaunchComponent = hero.component(ofType: LaunchComponent.self),
+        heroLaunchComponent.launchInfo.lastTouchDown != nil,
         self.entityManager.currentPlayerIndex != -1 else { return }
       
       if case .beamed = hero.state {
@@ -97,11 +98,37 @@ extension GameScene {
 //    if let label = self.gameMessage, label.alpha == 1.0 {
 //      label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
 //    }
+    self.lastPinchMagnitude = nil
     
     for t in touches { self.touchDown(atPoint: t.location(in: self)) }
   }
   
   override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+    if touches.count == 2 {
+      switch self.gameState.currentState {
+      case is Playing:
+        var touchesArray = [UITouch]()
+        for (_, touch) in touches.enumerated() {
+          touchesArray.append(touch)
+        }
+        let view = UIView(frame: UIScreen.main.bounds)
+        let firstTouch = touchesArray[0].location(in: view)
+        let secondTouch = touchesArray[1].location(in: view)
+        
+        let magnitude = sqrt(abs(secondTouch.x - firstTouch.x) + abs(secondTouch.y - firstTouch.y))
+        
+        if let pinchMagnitude = self.lastPinchMagnitude {
+          let dt = pinchMagnitude - magnitude
+          NotificationCenter.default.post(name: .resizeView, object: dt)
+        } else {
+          NotificationCenter.default.post(name: .resizeView, object: 0.0)
+        }
+        
+        self.lastPinchMagnitude = magnitude
+      default: break
+      }
+    }
+    
     for t in touches { self.touchMoved(toPoint: t.location(in: self)) }
   }
   
@@ -184,7 +211,6 @@ extension GameScene {
   private func fullRotation(rotation: CGFloat, isNegitive: Bool) -> CGFloat {
     guard !isNegitive else {
       let multiplyer: CGFloat = rotation < 0.0 ? -1.0 : 1.0
-      print(rotation)
       return (CGFloat.pi - abs(rotation)) * multiplyer
     }
     

@@ -70,7 +70,7 @@ class General: GKEntity, BeamableProtocol {
     let trailComponent = TrailComponent()
     self.addComponent(trailComponent)
     if let emitter = trailComponent.emitter {
-      spriteComponent.node.addChild(emitter)
+//      spriteComponent.node.addChild(emitter)
     }
     
     let nameComponent = AliasComponent()

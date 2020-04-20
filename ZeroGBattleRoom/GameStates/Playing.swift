@@ -111,12 +111,18 @@ extension Playing {
     let frameSideEdge = self.scene.frame.size.width / 2
     if sideEdge - abs(spriteComponent.node.position.x) > frameSideEdge {
       camera.position.x = spriteComponent.node.position.x
+    } else {
+      let cameraPosX = sideEdge - frameSideEdge
+      camera.position.x = spriteComponent.node.position.x < 0 ? -cameraPosX : cameraPosX
     }
     
     let topEdge = AppConstants.Layout.mapSize.height / 2
     let frameTopEdge = self.scene.frame.size.height / 2
     if topEdge - abs(spriteComponent.node.position.y) > frameTopEdge {
       camera.position.y = spriteComponent.node.position.y
+    } else {
+      let cameraPosY = topEdge - frameTopEdge
+      camera.position.y = spriteComponent.node.position.y < 0 ? -cameraPosY : cameraPosY
     }
   }
 }

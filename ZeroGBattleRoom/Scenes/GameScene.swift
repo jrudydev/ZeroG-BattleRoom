@@ -14,6 +14,7 @@ import Combine
 
 extension Notification.Name {
   static let restartGame = Notification.Name("restartGame")
+  static let resizeView = Notification.Name("resizeView")
 }
 
 
@@ -28,7 +29,10 @@ class GameScene: SKScene {
     GameOver(scene: self),
     Disconnected(scene: self)])
   
-  private var lastUpdateTime : TimeInterval = 0
+  private var lastUpdateTime: TimeInterval = 0
+  var lastPinchMagnitude: CGFloat? = nil
+  var viewResized: ((CGSize) -> Void)?
+  var viewportSize: CGSize!
 
   var borderBody: SKPhysicsBody!
   
@@ -273,5 +277,11 @@ extension GameScene: MultiplayerNetworkingProtocol {
     self.gameState.enter(Playing.self)
     
     MultiplayerNetworkingSnapshot.shared.isSendingSnapshots = true
+  }
+}
+
+extension GameScene: GameSceneProtocol {
+  func viewResized(size: CGSize) {
+    self.viewportSize = size
   }
 }
