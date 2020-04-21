@@ -35,9 +35,9 @@ class AliasComponent: GKComponent {
     super.update(deltaTime: seconds)
     
     guard let spriteComponent = self.entity?.component(ofType: SpriteComponent.self) else { return }
-    
+
     self.node.position = CGPoint(
       x: spriteComponent.node.position.x,
-      y: spriteComponent.node.position.y - spriteComponent.node.frame.size.height/2)
+      y: spriteComponent.node.position.y - spriteComponent.node.size.height/2)
   }
 }
