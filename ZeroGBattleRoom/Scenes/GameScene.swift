@@ -32,7 +32,7 @@ class GameScene: SKScene {
   private var lastUpdateTime: TimeInterval = 0
   var lastPinchMagnitude: CGFloat? = nil
   var viewResized: ((CGSize) -> Void)?
-  var viewportSize: CGSize!
+  var viewportSize: CGSize = UIScreen.main.bounds.size
 
   var borderBody: SKPhysicsBody!
   

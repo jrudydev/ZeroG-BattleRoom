@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		930D65E4244C8C93009F05A0 /* BeamableProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 930D65E3244C8C93009F05A0 /* BeamableProtocol.swift */; };
+		930D65E6244EA717009F05A0 /* InGameUIComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 930D65E5244EA717009F05A0 /* InGameUIComponent.swift */; };
+		930D65E8244EADE8009F05A0 /* ButtonLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 930D65E7244EADE8009F05A0 /* ButtonLabel.swift */; };
 		9347C8AD24314AD60099AE53 /* game-over.wav in Resources */ = {isa = PBXBuildFile; fileRef = 9347C8A824314AD50099AE53 /* game-over.wav */; };
 		9347C8AE24314AD60099AE53 /* paddleBlip.wav in Resources */ = {isa = PBXBuildFile; fileRef = 9347C8A924314AD50099AE53 /* paddleBlip.wav */; };
 		9347C8AF24314AD60099AE53 /* BambooBreak.wav in Resources */ = {isa = PBXBuildFile; fileRef = 9347C8AA24314AD50099AE53 /* BambooBreak.wav */; };
@@ -70,6 +72,8 @@
 
 /* Begin PBXFileReference section */
 		930D65E3244C8C93009F05A0 /* BeamableProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeamableProtocol.swift; sourceTree = "<group>"; };
+		930D65E5244EA717009F05A0 /* InGameUIComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InGameUIComponent.swift; sourceTree = "<group>"; };
+		930D65E7244EADE8009F05A0 /* ButtonLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonLabel.swift; sourceTree = "<group>"; };
 		9347C8A824314AD50099AE53 /* game-over.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "game-over.wav"; sourceTree = "<group>"; };
 		9347C8A924314AD50099AE53 /* paddleBlip.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = paddleBlip.wav; sourceTree = "<group>"; };
 		9347C8AA24314AD50099AE53 /* BambooBreak.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = BambooBreak.wav; sourceTree = "<group>"; };
@@ -189,6 +193,7 @@
 				93A0779C243C982200D52205 /* Panel.swift */,
 				93873A0924389FEB00A6E59A /* EntityManager.swift */,
 				93A077A4243D3CE300D52205 /* PanelFactory.swift */,
+				930D65E7244EADE8009F05A0 /* ButtonLabel.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -207,6 +212,7 @@
 				93873A0B2438A40000A6E59A /* TeamComponent.swift */,
 				93A077A2243C9E8700D52205 /* BeamComponent.swift */,
 				93873A1B2439DC1D00A6E59A /* TrailComponent.swift */,
+				930D65E5244EA717009F05A0 /* InGameUIComponent.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -318,9 +324,9 @@
 		93FEBDA9242EE0CF006CCBFB /* ZeroGBattleRoom */ = {
 			isa = PBXGroup;
 			children = (
-				93873A0224389BBB00A6E59A /* Components */,
-				93873A0124389BA000A6E59A /* Entities */,
 				93A55F03243089840027E83E /* GameStates */,
+				93873A0124389BA000A6E59A /* Entities */,
+				93873A0224389BBB00A6E59A /* Components */,
 				93A55F0D24308AEE0027E83E /* Scenes */,
 				93A55EE824307D280027E83E /* Networking */,
 				93FEBDAA242EE0CF006CCBFB /* AppDelegate.swift */,
@@ -431,6 +437,7 @@
 				93A0779D243C982200D52205 /* Panel.swift in Sources */,
 				93873A122438B82900A6E59A /* ShapeComponents.swift in Sources */,
 				93873A142438B87600A6E59A /* PhysicsComponent.swift in Sources */,
+				930D65E6244EA717009F05A0 /* InGameUIComponent.swift in Sources */,
 				93A55EEF24307D280027E83E /* GameKitHelper.swift in Sources */,
 				93873A1C2439DC1D00A6E59A /* TrailComponent.swift in Sources */,
 				93A077A5243D3CE300D52205 /* PanelFactory.swift in Sources */,
@@ -453,6 +460,7 @@
 				93F3DCB9244309B80058B288 /* LaunchableProtocol.swift in Sources */,
 				93873A0C2438A40000A6E59A /* TeamComponent.swift in Sources */,
 				93A55EF124307D280027E83E /* MultiplayerNetworking+GameKitHelper.swift in Sources */,
+				930D65E8244EADE8009F05A0 /* ButtonLabel.swift in Sources */,
 				93A55EF224307D280027E83E /* GameKitHelperProtocol.swift in Sources */,
 				937911212439E4A500CEC9C6 /* AliasComponent.swift in Sources */,
 				93A55F1224308AEE0027E83E /* GameScene+TouchEvents.swift in Sources */,

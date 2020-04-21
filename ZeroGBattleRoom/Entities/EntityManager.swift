@@ -19,12 +19,14 @@ class EntityManager {
   
   lazy var componentSystems: [GKComponentSystem] = {
     let aliasComponent = GKComponentSystem(componentClass: AliasComponent.self)
-    return [aliasComponent]
+    let uiComponent = GKComponentSystem(componentClass: InGameUIComponent.self)
+    return [aliasComponent, uiComponent]
   }()
   
   var playerEntites = [GKEntity]()
   var resourcesEntities = [GKEntity]()
   var wallEntities = [GKEntity]()
+  var uiEntities = Set<GKEntity>()
   var entities = Set<GKEntity>()
   var toRemove = Set<GKEntity>()
   
@@ -115,6 +117,13 @@ class EntityManager {
   }
   
   func update(_ deltaTime: CFTimeInterval) {
+    for entity in uiEntities {
+      if entity is ButtonLabel {
+        let buttonLabel = entity as! ButtonLabel
+        buttonLabel.updateViewPort(size: self.scene.viewportSize)
+      }
+    }
+    
     for componentSystem in self.componentSystems {
       componentSystem.update(deltaTime: deltaTime)
     }
@@ -403,6 +412,17 @@ extension EntityManager {
     return entity
   }
   
+  func uiEntityWtih(nodeName: String) -> GKEntity? {
+    let element = self.uiEntities.first { entity -> Bool in
+      guard let uiEntity = entity as? ButtonLabel,
+        let uiComponent = uiEntity.component(ofType: InGameUIComponent.self) else { return false }
+
+      return uiComponent.node.name == nodeName
+    }
+    
+    return element
+  }
+  
   func indexForResource(shape: SKShapeNode) -> Int? {
     let index = self.resourcesEntities.firstIndex { entity -> Bool in
       guard let package = entity as? Package else { return false }
@@ -421,5 +441,25 @@ extension EntityManager {
     }
     
     return index
+  }
+}
+
+extension EntityManager {
+  func addMenuButton() {
+    let menuButton = ButtonLabel(text: "Back", fontSize: 26.0)
+    
+    self.scene.cam!.addChild(menuButton.node)
+    
+    self.uiEntities.insert(menuButton)
+    self.addToComponentSysetem(entity: menuButton)
+  }
+  
+  func removeMenuButton(name: String) {
+    guard let menuButton = self.uiEntityWtih(nodeName: name) as? ButtonLabel else { return }
+    
+    menuButton.node.removeFromParent()
+    
+    self.uiEntities.remove(menuButton)
+    self.toRemove.insert(menuButton)
   }
 }
