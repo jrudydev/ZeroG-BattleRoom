@@ -75,7 +75,7 @@ class General: GKEntity, BeamableProtocol {
     
     let nameComponent = AliasComponent()
     self.addComponent(nameComponent)
-    spriteComponent.node.addChild(nameComponent.node)
+//    spriteComponent.node.addChild(nameComponent.node)
     
     let launchComponent = LaunchComponent()
     spriteComponent.node.addChild(launchComponent.node)

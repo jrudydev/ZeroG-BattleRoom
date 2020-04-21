@@ -189,6 +189,10 @@ extension EntityManager {
     self.playerEntites.append(heroBlue)
     self.addToComponentSysetem(entity: heroBlue)
     
+    if let aliasComponent = heroBlue.component(ofType: AliasComponent.self) {
+      self.scene.addChild(aliasComponent.node)
+    }
+    
     let heroRed = General(imageName: "red_spaceguy", team: .team2, resourceReleased: {
       [weak self] shape in
       
@@ -210,6 +214,10 @@ extension EntityManager {
     }
     self.playerEntites.append(heroRed)
     self.addToComponentSysetem(entity: heroRed)
+    
+    if let aliasComponent = heroRed.component(ofType: AliasComponent.self) {
+      self.scene.addChild(aliasComponent.node)
+    }
   }
   
   func spawnResource(position: CGPoint = AppConstants.Layout.boundarySize.randomPosition,

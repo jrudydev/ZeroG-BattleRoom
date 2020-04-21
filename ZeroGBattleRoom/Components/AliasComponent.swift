@@ -36,17 +36,8 @@ class AliasComponent: GKComponent {
     
     guard let spriteComponent = self.entity?.component(ofType: SpriteComponent.self) else { return }
     
-    let fullRotation = CGFloat.pi * 2
-    self.node.zRotation = fullRotation - spriteComponent.node.zRotation
-    
-    // TODO: Calculate positon based on rotation and distance from node
-//    if spriteComponent.node.zRotation < CGFloat.pi {
-//      let percent = spriteComponent.node.zRotation * (self.labelPositionY * 2) / CGFloat.pi
-//      self.node.position = CGPoint(x: self.node.position.x , y: percent - self.labelPositionY)
-//    } else  {
-//      let startingRadian = spriteComponent.node.zRotation - CGFloat.pi
-//      let percent = startingRadian * (self.labelPositionY * 2) / CGFloat.pi
-//      self.node.position = CGPoint(x: self.node.position.x , y: percent - self.labelPositionY)
-//    }
+    self.node.position = CGPoint(
+      x: spriteComponent.node.position.x,
+      y: spriteComponent.node.position.y - spriteComponent.node.frame.size.height/2)
   }
 }

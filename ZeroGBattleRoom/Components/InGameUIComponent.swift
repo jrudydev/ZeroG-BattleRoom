@@ -43,6 +43,7 @@ class InGameUIComponent: GKComponent {
     super.update(deltaTime: seconds)
     
     self.node.setScale(self.scale)
+    
     let initialScreenSize = UIScreen.main.bounds.size
     let viewportRatio = self.viewport.width / self.viewport.height
     let initialScreenRatio = initialScreenSize.width / initialScreenSize.height
