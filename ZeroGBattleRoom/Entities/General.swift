@@ -56,14 +56,7 @@ class General: GKEntity, BeamableProtocol {
     self.addComponent(ImpulseComponent())
     
     self.addComponent(HandsComponent(didRemoveResource: { resource in
-      guard let heroSpriteComponent = self.component(ofType: SpriteComponent.self),
-        let shapeComponent = resource.component(ofType: ShapeComponent.self),
-        let physicsComponent = resource.component(ofType: PhysicsComponent.self) else { return }
-      
-      DispatchQueue.main.async {
-//        shapeComponent.node.position = heroSpriteComponent.node.position
-//        physicsComponent.randomImpulse()
-      }
+      guard let shapeComponent = resource.component(ofType: ShapeComponent.self) else { return }
       
       resourceReleased(shapeComponent.node)
     }))
@@ -242,15 +235,11 @@ extension General: ImpactableProtocol {
     heroHandsComponent.isImpacted = true
     
     if let resource = heroHandsComponent.leftHandSlot {
-      DispatchQueue.main.async {
-         heroHandsComponent.release(resource: resource, point: point)
-      }
+      heroHandsComponent.release(resource: resource, point: point)
     }
     
     if let resource = heroHandsComponent.rightHandSlot {
-      DispatchQueue.main.async {
-         heroHandsComponent.release(resource: resource, point: point)
-      }
+      heroHandsComponent.release(resource: resource, point: point)
     }
   }
 }

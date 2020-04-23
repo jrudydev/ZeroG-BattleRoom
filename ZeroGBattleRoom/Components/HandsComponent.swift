@@ -13,7 +13,7 @@ import GameplayKit
 
 class HandsComponent: GKComponent {
   
-  var leftHandSlot: Package? = nil {
+  private(set) var leftHandSlot: Package? = nil {
     willSet {
       if newValue != nil {
         guard let resource = newValue else { return }
@@ -43,7 +43,7 @@ class HandsComponent: GKComponent {
     }
   }
   
-  var rightHandSlot: Package? = nil {
+  private(set) var rightHandSlot: Package? = nil {
     willSet {
       if newValue != nil {
         guard let resource = newValue else { return }
@@ -140,18 +140,24 @@ extension HandsComponent {
   func release(resource: Package, point: CGPoint = .zero) {
     guard let resourceShapeComponent = resource.component(ofType: ShapeComponent.self) else { return }
     
-    if let item = self.leftHandSlot,
-      let itemShapeComponent = item.component(ofType: ShapeComponent.self),
-      itemShapeComponent.node === resourceShapeComponent.node {
+    if let package = self.leftHandSlot,
+      let shapeComponent = package.component(ofType: ShapeComponent.self),
+      shapeComponent.node === resourceShapeComponent.node {
     
       self.leftHandSlot = nil
-      itemShapeComponent.node.position = point
-    } else if let item = self.rightHandSlot,
-      let itemShapeComponent = item.component(ofType: ShapeComponent.self),
-      itemShapeComponent.node === resourceShapeComponent.node {
+
+      DispatchQueue.main.async {
+        shapeComponent.node.position = point
+      }
+    } else if let package = self.rightHandSlot,
+      let shapeComponent = package.component(ofType: ShapeComponent.self),
+      shapeComponent.node === resourceShapeComponent.node {
     
       self.rightHandSlot = nil
-      itemShapeComponent.node.position = point
+      
+      DispatchQueue.main.async {
+        shapeComponent.node.position = point
+      }
     }
   }
 }

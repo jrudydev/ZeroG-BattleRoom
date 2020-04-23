@@ -89,29 +89,26 @@ extension GameScene: SKPhysicsContactDelegate {
       
       guard let handsComponent = hero.component(ofType: HandsComponent.self),
         let teamComponent = hero.component(ofType: TeamComponent.self),
-        let spriteComponent = hero.component(ofType: SpriteComponent.self),
         let aliasComponent = hero.component(ofType: AliasComponent.self),
         let depositShapeComponent = deposit.component(ofType: ShapeComponent.self),
         let depositComponent = deposit.component(ofType: DepositComponent.self),
         (handsComponent.leftHandSlot != nil || handsComponent.rightHandSlot != nil) else { return }
         
       var total = 0
-      if let lefthanditem = handsComponent.leftHandSlot {
-        handsComponent.leftHandSlot = nil
+      if let lefthanditem = handsComponent.leftHandSlot,
+        let shapeComponent = lefthanditem.component(ofType: ShapeComponent.self) {
         
-        if let shapeComponent = lefthanditem.component(ofType: ShapeComponent.self) {
-          shapeComponent.node.removeFromParent()
-        }
+        handsComponent.release(resource: lefthanditem)
+        shapeComponent.node.removeFromParent()
         
         total += 1
       }
       
-      if let rightHandItem = handsComponent.rightHandSlot {
-        handsComponent.rightHandSlot = nil
-        
-        if let shapeComponent = rightHandItem.component(ofType: ShapeComponent.self) {
+      if let rightHandItem = handsComponent.rightHandSlot,
+        let shapeComponent = rightHandItem.component(ofType: ShapeComponent.self) {
+          
+       shapeComponent.node.removeFromParent()
           shapeComponent.node.removeFromParent()
-        }
         
         total += 1
       }
