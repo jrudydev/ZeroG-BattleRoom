@@ -23,13 +23,8 @@ class WaitingForTap: GKState {
     menuImage.name = AppConstants.ComponentNames.menuImageName
     menuImage.aspectFillToSize(fillSize: UIScreen.main.bounds.size)
     
-    let texture = SKTexture(imageNamed: "ZGG")
-    let textureSize = texture.size()
-    let screenSize = UIScreen.main.bounds
-    let scaledWidth = screenSize.height / textureSize.height * screenSize.width
-    
-    let diff = (scaledWidth - screenSize.width) / 2
-    menuImage.position = CGPoint(x: -diff, y: 0.0)
+    let widthDiff = (menuImage.size.width - UIScreen.main.bounds.width) / 2
+    menuImage.position = CGPoint(x: menuImage.position.x +  widthDiff, y: menuImage.position.y)
     
     self.scene.addChild(menuImage)
     
@@ -86,7 +81,7 @@ class WaitingForTap: GKState {
 extension SKSpriteNode {
   func aspectFillToSize(fillSize: CGSize) {
     if self.texture != nil {
-      self.size = self.texture!.size()
+//      self.size = self.texture!.size()
       
       let verticalRatio = fillSize.height / self.texture!.size().height
       let horizontalRatio = fillSize.width /  self.texture!.size().width
