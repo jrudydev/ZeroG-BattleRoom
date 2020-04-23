@@ -236,12 +236,22 @@ extension General {
 }
 
 extension General: ImpactableProtocol {
-  func impacted() {
+  func impactedAt(point: CGPoint) {
     guard let heroHandsComponent = self.component(ofType: HandsComponent.self) else { return }
     
     heroHandsComponent.isImpacted = true
-    heroHandsComponent.leftHandSlot = nil
-    heroHandsComponent.rightHandSlot = nil
+    
+    if let resource = heroHandsComponent.leftHandSlot {
+      DispatchQueue.main.async {
+         heroHandsComponent.release(resource: resource, point: point)
+      }
+    }
+    
+    if let resource = heroHandsComponent.rightHandSlot {
+      DispatchQueue.main.async {
+         heroHandsComponent.release(resource: resource, point: point)
+      }
+    }
   }
 }
 

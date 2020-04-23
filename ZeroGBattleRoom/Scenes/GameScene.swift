@@ -83,7 +83,7 @@ class GameScene: SKScene {
         guard let hero = self.entityManager.hero as? General,
           let spriteComponent = hero.component(ofType: SpriteComponent.self) else { return }
         
-        hero.impacted()
+        hero.impactedAt(point: spriteComponent.node.position)
         self.multiplayerNetworking
           .sendImpacted(senderIndex: self.entityManager.currentPlayerIndex)
         
@@ -205,11 +205,12 @@ extension GameScene: MultiplayerNetworkingProtocol {
   
   func impactPlayerAt(senderIndex: Int) {
     if let hero = self.entityManager.playerEntites[senderIndex] as? General,
+      let spriteComponent = hero.component(ofType: SpriteComponent.self),
       let heroHandsComponent = hero.component(ofType: HandsComponent.self),
       !heroHandsComponent.isImpacted {
        
       print("Hero at index: \(senderIndex) impacted!!!!")
-      hero.impacted()
+      hero.impactedAt(point: spriteComponent.node.position)
     }
   }
   

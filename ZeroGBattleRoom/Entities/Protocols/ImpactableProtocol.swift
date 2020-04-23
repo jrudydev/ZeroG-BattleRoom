@@ -7,8 +7,10 @@
 //
 
 import Foundation
+import SpriteKit
+
 
 
 protocol ImpactableProtocol {
-  func impacted()
+  func impactedAt(point: CGPoint)
 }

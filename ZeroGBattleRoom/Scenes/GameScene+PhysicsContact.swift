@@ -31,13 +31,14 @@ extension GameScene: SKPhysicsContactDelegate {
       guard let firstHeroNode = firstBody.node as? SKSpriteNode,
         let secondHeroNode = secondBody.node as? SKSpriteNode else { return }
       guard let firstHero = self.entityManager.heroWith(node: firstHeroNode) as? General,
+        let firstHeroSpriteComponent = firstHero.component(ofType: SpriteComponent.self),
         let firstHeroHandsComponent = firstHero.component(ofType: HandsComponent.self),
         let secondHero = self.entityManager.heroWith(node: secondHeroNode) as? General,
         let secondHeroHandsComponent = secondHero.component(ofType: HandsComponent.self),
         !firstHeroHandsComponent.isImpacted && !secondHeroHandsComponent.isImpacted else { return }
       
-      firstHero.impacted()
-      secondHero.impacted()
+      firstHero.impactedAt(point: firstHeroSpriteComponent.node.position)
+      secondHero.impactedAt(point: firstHeroSpriteComponent.node.position)
       
       self.multiplayerNetworking.sendImpacted(senderIndex: 0)
       self.multiplayerNetworking.sendImpacted(senderIndex: 1)
@@ -71,7 +72,7 @@ extension GameScene: SKPhysicsContactDelegate {
         }
         hero.updateResourcePositions()
       } else {
-        hero.impacted()
+        hero.impactedAt(point: heroSpriteComponent.node.position)
       }
       
       self.run(SoundManager.shared.blipPaddleSound)
