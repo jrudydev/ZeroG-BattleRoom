@@ -184,7 +184,7 @@ extension GameScene: SKPhysicsContactDelegate {
       print("wall hit")
     }
     
-    if firstBody.categoryBitMask == PhysicsCategoryMask.package && secondBody.categoryBitMask == PhysicsCategoryMask.wall {
+    if firstBody.categoryBitMask == PhysicsCategoryMask.wall && secondBody.categoryBitMask == PhysicsCategoryMask.package {
         
       guard let resourceNode = secondBody.node as? SKShapeNode,
         let impactedResource = self.entityManager.resourceWith(node: resourceNode) as? Package else { return }
