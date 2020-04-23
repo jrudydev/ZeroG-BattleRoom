@@ -182,5 +182,14 @@ extension GameScene: SKPhysicsContactDelegate {
       self.run(SoundManager.shared.blipSound)
       print("wall hit")
     }
+    
+    if firstBody.categoryBitMask == PhysicsCategoryMask.package && secondBody.categoryBitMask == PhysicsCategoryMask.wall {
+        
+      guard let resourceNode = secondBody.node as? SKShapeNode,
+        let impactedResource = self.entityManager.resourceWith(node: resourceNode) as? Package else { return }
+      
+      impactedResource.wasThrown = false
+      print("Resource reset")
+    }
   }
 }

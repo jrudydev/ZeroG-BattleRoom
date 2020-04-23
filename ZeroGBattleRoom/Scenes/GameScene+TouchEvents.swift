@@ -76,8 +76,15 @@ extension GameScene {
           }
         })
       } else  {
-        hero.impulseTo(location: pos) { sprite, vector in
-          self.multiplayerNetworking.sendMove(start: sprite.position, direction: vector)
+        if let impulseComponent = hero.component(ofType: ImpulseComponent.self),
+          !impulseComponent.isOnCooldown {
+          
+          hero.impulseTo(location: pos) { sprite, vector in
+            self.multiplayerNetworking.sendMove(start: sprite.position, direction: vector)
+          }
+        } else if let spriteComponent = hero.component(ofType: SpriteComponent.self) {
+          let throwPoint = self.convert(CGPoint(x: 0.0, y: 1.0), from: spriteComponent.node)
+          hero.throwResourceAt(point: throwPoint)
         }
       }
     case is GameOver:

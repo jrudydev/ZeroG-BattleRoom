@@ -16,6 +16,7 @@ class General: GKEntity, BeamableProtocol {
   
   private let defaultImpulseMagnitude: CGFloat = 2.0
   private let defaultLaunchRotation: CGFloat = 10.0
+  private let defaultThrowMagnitude: CGFloat = 5.0
   
   private var idleAction: SKAction!
   private var moveAction: SKAction!
@@ -60,8 +61,8 @@ class General: GKEntity, BeamableProtocol {
         let physicsComponent = resource.component(ofType: PhysicsComponent.self) else { return }
       
       DispatchQueue.main.async {
-        shapeComponent.node.position = heroSpriteComponent.node.position
-        physicsComponent.randomImpulse()
+//        shapeComponent.node.position = heroSpriteComponent.node.position
+//        physicsComponent.randomImpulse()
       }
       
       resourceReleased(shapeComponent.node)
@@ -301,4 +302,44 @@ extension General: LaunchableProtocol {
     
     self.resetBeamTimer()
   }
+}
+
+extension General: ThrowableProtocol {
+  func throwResourceAt(point: CGPoint) {
+    guard let handsComponent = self.component(ofType: HandsComponent.self),
+      let spriteComponent = self.component(ofType: SpriteComponent.self) else { return }
+    
+    let throwVector = spriteComponent.node.position.vectorTo(point: point)
+    
+    if let rightResource = handsComponent.rightHandSlot {
+      handsComponent.isImpacted = true
+      handsComponent.release(resource: rightResource, point: point)
+      
+      if let physicsComponent = self.component(ofType: PhysicsComponent.self),
+        let resourcePhysicsComponent = rightResource.component(ofType: PhysicsComponent.self) {
+        
+        
+        resourcePhysicsComponent.physicsBody.velocity = .zero
+        
+        resourcePhysicsComponent.physicsBody.velocity = physicsComponent.physicsBody.velocity
+        resourcePhysicsComponent.physicsBody.applyImpulse(throwVector * defaultThrowMagnitude)
+        
+        rightResource.wasThrown = true
+      }
+    } else if let leftResource = handsComponent.leftHandSlot {
+        handsComponent.isImpacted = true
+        handsComponent.release(resource: leftResource, point: point)
+        
+        if let physicsComponent = self.component(ofType: PhysicsComponent.self),
+          let resourcePhysicsComponent = leftResource.component(ofType: PhysicsComponent.self) {
+          
+          resourcePhysicsComponent.physicsBody.velocity = .zero
+          
+          resourcePhysicsComponent.physicsBody.velocity = physicsComponent.physicsBody.velocity
+          resourcePhysicsComponent.physicsBody.applyImpulse(throwVector)
+        }
+      
+        leftResource.wasThrown = true
+      }
+    }
 }

@@ -10,6 +10,7 @@
 		930D65E4244C8C93009F05A0 /* BeamableProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 930D65E3244C8C93009F05A0 /* BeamableProtocol.swift */; };
 		930D65E6244EA717009F05A0 /* InGameUIComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 930D65E5244EA717009F05A0 /* InGameUIComponent.swift */; };
 		930D65E8244EADE8009F05A0 /* ButtonLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 930D65E7244EADE8009F05A0 /* ButtonLabel.swift */; };
+		93470D7B244F4C2D0005A807 /* ThrowableProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93470D7A244F4C2D0005A807 /* ThrowableProtocol.swift */; };
 		9347C8AD24314AD60099AE53 /* game-over.wav in Resources */ = {isa = PBXBuildFile; fileRef = 9347C8A824314AD50099AE53 /* game-over.wav */; };
 		9347C8AE24314AD60099AE53 /* paddleBlip.wav in Resources */ = {isa = PBXBuildFile; fileRef = 9347C8A924314AD50099AE53 /* paddleBlip.wav */; };
 		9347C8AF24314AD60099AE53 /* BambooBreak.wav in Resources */ = {isa = PBXBuildFile; fileRef = 9347C8AA24314AD50099AE53 /* BambooBreak.wav */; };
@@ -74,6 +75,7 @@
 		930D65E3244C8C93009F05A0 /* BeamableProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeamableProtocol.swift; sourceTree = "<group>"; };
 		930D65E5244EA717009F05A0 /* InGameUIComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InGameUIComponent.swift; sourceTree = "<group>"; };
 		930D65E7244EADE8009F05A0 /* ButtonLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ButtonLabel.swift; sourceTree = "<group>"; };
+		93470D7A244F4C2D0005A807 /* ThrowableProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThrowableProtocol.swift; sourceTree = "<group>"; };
 		9347C8A824314AD50099AE53 /* game-over.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "game-over.wav"; sourceTree = "<group>"; };
 		9347C8A924314AD50099AE53 /* paddleBlip.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = paddleBlip.wav; sourceTree = "<group>"; };
 		9347C8AA24314AD50099AE53 /* BambooBreak.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = BambooBreak.wav; sourceTree = "<group>"; };
@@ -300,6 +302,7 @@
 				93F3DCB6244309A80058B288 /* ImpactableProtocol.swift */,
 				93F3DCB4244309960058B288 /* ImpulsableProtocol.swift */,
 				93F3DCB8244309B80058B288 /* LaunchableProtocol.swift */,
+				93470D7A244F4C2D0005A807 /* ThrowableProtocol.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -428,6 +431,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				93470D7B244F4C2D0005A807 /* ThrowableProtocol.swift in Sources */,
 				93873A0624389E1100A6E59A /* Deposit.swift in Sources */,
 				93A55EFC24307D4F0027E83E /* SKNode+Impulse.swift in Sources */,
 				93F3DCB7244309A80058B288 /* ImpactableProtocol.swift in Sources */,

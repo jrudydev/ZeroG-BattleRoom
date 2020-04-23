@@ -13,6 +13,8 @@ import GameplayKit
 
 class Package: GKEntity {
   
+  var wasThrown = false
+  
   init(shapeNode: SKShapeNode) {
     super.init()
     
@@ -37,7 +39,7 @@ class Package: GKEntity {
     physicsBody.linearDamping = 0.0
     physicsBody.angularDamping = 0.0
     physicsBody.categoryBitMask = PhysicsCategoryMask.package
-    physicsBody.contactTestBitMask = PhysicsCategoryMask.hero
+    physicsBody.contactTestBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.wall
     physicsBody.collisionBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.package
     
     return physicsBody

@@ -242,7 +242,7 @@ extension GameScene: MultiplayerNetworkingProtocol {
         guard let handsComponent = player.component(ofType: HandsComponent.self) else { continue }
 
         if handsComponent.isHolding(shapeComponent: resourceShapeComponent) {
-          handsComponent.release(resource: resource)
+          handsComponent.release(resource: resource, point: resourceShapeComponent.node.position)
           break
         }
       }

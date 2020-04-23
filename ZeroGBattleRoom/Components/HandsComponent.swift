@@ -137,26 +137,21 @@ extension HandsComponent {
     }
   }
   
-  @discardableResult
-  func release(resource: Package) -> Package? {
-    guard let resourceShapeComponent = resource.component(ofType: ShapeComponent.self) else { return nil }
+  func release(resource: Package, point: CGPoint = .zero) {
+    guard let resourceShapeComponent = resource.component(ofType: ShapeComponent.self) else { return }
     
     if let item = self.leftHandSlot,
       let itemShapeComponent = item.component(ofType: ShapeComponent.self),
       itemShapeComponent.node === resourceShapeComponent.node {
     
       self.leftHandSlot = nil
-      return resource
-    }
-    
-    if let item = self.rightHandSlot,
+      itemShapeComponent.node.position = point
+    } else if let item = self.rightHandSlot,
       let itemShapeComponent = item.component(ofType: ShapeComponent.self),
       itemShapeComponent.node === resourceShapeComponent.node {
     
-      self.leftHandSlot = nil
-      return resource
+      self.rightHandSlot = nil
+      itemShapeComponent.node.position = point
     }
-    
-    return nil
   }
 }

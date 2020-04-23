@@ -147,7 +147,9 @@ class EntityManager {
   private func updateResourceVelocity() {
     let maxSpeed: CGFloat = 400.0
     for resource in self.resourcesEntities {
-      guard let physicsComponent = resource.component(ofType: PhysicsComponent.self) else { return }
+      guard let physicsComponent = resource.component(ofType: PhysicsComponent.self),
+        let package = resource as? Package,
+        !package.wasThrown else { return }
       
       let xSpeed = sqrt(physicsComponent.physicsBody.velocity.dy * physicsComponent.physicsBody.velocity.dx)
       let ySpeed = sqrt(physicsComponent.physicsBody.velocity.dy * physicsComponent.physicsBody.velocity.dy)
