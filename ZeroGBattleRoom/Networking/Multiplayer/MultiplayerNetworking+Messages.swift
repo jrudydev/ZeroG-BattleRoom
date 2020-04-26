@@ -58,12 +58,14 @@ extension MultiplayerNetworking {
   struct MessageSnapshotElement: Codable {
     let position: CGPoint
     let rotation: CGFloat
-    let vector: CGVector
+    let velocity: CGVector
+    let angularVelocity: CGFloat
     
-    init(position: CGPoint, rotation: CGFloat, vector: CGVector) {
+    init(position: CGPoint, rotation: CGFloat, velocity: CGVector, angularVelocity: CGFloat) {
       self.position = position
       self.rotation = rotation
-      self.vector = vector
+      self.velocity = velocity
+      self.angularVelocity = angularVelocity
     }
   }
 }

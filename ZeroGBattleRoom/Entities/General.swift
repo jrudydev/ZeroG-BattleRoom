@@ -28,7 +28,7 @@ class General: GKEntity, BeamableProtocol {
     case beamed
   }
   
-  var state: State = .idle {
+  private(set) var state: State = .idle {
     didSet {
       guard self.state == .moving else { return }
       guard let physicsComponent = self.component(ofType: PhysicsComponent.self) else { return }
@@ -248,35 +248,35 @@ extension General: ImpulsableProtocol {
   func impulse(vector: CGVector, angularVelocity: CGFloat = 0.0) {
     if let physicsComponent = self.component(ofType: PhysicsComponent.self),
       let spriteComponent = self.component(ofType: SpriteComponent.self) {
-  
-      DispatchQueue.main.async {
-        physicsComponent.physicsBody.applyImpulse(vector)
-        physicsComponent.physicsBody.angularVelocity = angularVelocity
-        spriteComponent.node.zRotation = vector.rotation
-      }
+
+      physicsComponent.physicsBody.applyImpulse(vector)
+      physicsComponent.physicsBody.angularVelocity = angularVelocity
+      spriteComponent.node.zRotation = vector.rotation
     }
   }
   
-  func impulseTo(location: CGPoint, completion: (SKSpriteNode, CGVector) -> Void) {
+  func impulseTo(location: CGPoint, completion: (SKSpriteNode, CGVector, CGFloat) -> Void) {
     guard let spriteComponent = self.component(ofType: SpriteComponent.self),
-      let impulseComponent = self.component(ofType: ImpulseComponent.self) else { return }
+      let impulseComponent = self.component(ofType: ImpulseComponent.self),
+      let physicsComponent = self.component(ofType: PhysicsComponent.self) else { return }
     
     guard !impulseComponent.isOnCooldown else { return }
     
-    let moveVector = CGVector(dx: location.x - spriteComponent.node.position.x,
-                             dy: location.y - spriteComponent.node.position.y)
-    
-    self.impulse(vector: moveVector.normalized() * self.defaultImpulseMagnitude)
     impulseComponent.isOnCooldown = true
-    
     self.switchToState(.moving)
     
-    completion(spriteComponent.node, moveVector)
+    let moveVector = CGVector(dx: location.x - spriteComponent.node.position.x,
+                             dy: location.y - spriteComponent.node.position.y)
+    self.impulse(vector: moveVector.normalized() * self.defaultImpulseMagnitude)
+  
+    completion(spriteComponent.node,
+               physicsComponent.physicsBody.velocity,
+               physicsComponent.physicsBody.angularVelocity)
   }
 }
 
 extension General: LaunchableProtocol {
-  func launch(completion: (SKSpriteNode, CGVector, Panel) -> Void) {
+  func launch(completion: (SKSpriteNode, CGVector, CGFloat, Panel) -> Void) {
     guard let spriteComponent = self.component(ofType: SpriteComponent.self),
       let physicsComponent = self.component(ofType: PhysicsComponent.self),
       let launchComponent = self.component(ofType: LaunchComponent.self),
@@ -284,9 +284,10 @@ extension General: LaunchableProtocol {
       let movePercent = launchComponent.launchInfo.directionPercent,
       let rotationPercent = launchComponent.launchInfo.rotationPercent,
       let isLeftRotation = launchComponent.launchInfo.isLeftRotation,
-      let beamComponent = self.occupiedPanel?.component(ofType: BeamComponent.self) else { return }
+      let beamComponent = self.occupiedPanel?.component(ofType: BeamComponent.self),
+      let occupiedPanel = self.occupiedPanel else { return }
     
-    physicsComponent.isEffectedByPhysics = true
+    self.switchToState(.moving)
     beamComponent.isOccupied = false
       
     let launchMagnitude = self.defaultImpulseMagnitude * 2
@@ -297,10 +298,11 @@ extension General: LaunchableProtocol {
     
     launchComponent.hide()
     
-    self.switchToState(.moving)
-    
     self.resetBeamTimer()
-    completion(spriteComponent.node, impulseVector, self.occupiedPanel!)
+    completion(spriteComponent.node,
+               physicsComponent.physicsBody.velocity,
+               physicsComponent.physicsBody.angularVelocity,
+               occupiedPanel)
   }
 }
 

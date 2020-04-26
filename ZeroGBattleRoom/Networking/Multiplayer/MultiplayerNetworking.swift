@@ -88,11 +88,12 @@ class MultiplayerNetworking {
 }
 
 extension MultiplayerNetworking {
-  func sendMove(start pos: CGPoint, direction: CGVector, rotation: CGFloat) {
+  func sendMove(start pos: CGPoint, rotation: CGFloat, velocity: CGVector, angularVelocity: CGFloat, wasLaunch: Bool) {
     let playerElement = MessageSnapshotElement(position: pos,
                                                rotation: rotation,
-                                               vector: direction)
-    let message = UnifiedMessage(type: .move, elements: [[playerElement]])
+                                               velocity: velocity,
+                                               angularVelocity: angularVelocity)
+    let message = UnifiedMessage(type: .move, boolValue: wasLaunch, elements: [[playerElement]])
     self.sendData(Data.archiveJSON(object: message))
   }
   
@@ -122,15 +123,14 @@ extension MultiplayerNetworking {
   }
   
   func sendResourceMoveAt(index: Int, start pos: CGPoint, direction: CGVector) {
-    let resourceElement = MessageSnapshotElement(position: pos, rotation: .zero, vector: direction)
-    let message = UnifiedMessage(type: .moveResource, resourceIndex: index,
-                                 elements: [[resourceElement]])
+//    let resourceElement = MessageSnapshotElement(position: pos, rotation: .zero, velocity: direction)
+//    let message = UnifiedMessage(type: .moveResource, resourceIndex: index, elements: [[resourceElement]])
 //    self.sendData(Data.archiveJSON(object: message))
   }
   
   func sendSnapshot(_ elements: [SnapshotElementGroup]) {
     let message = UnifiedMessage(type: .snapshot, elements: elements)
-    self.sendData(Data.archiveJSON(object: message), mode: .unreliable)
+//    self.sendData(Data.archiveJSON(object: message), mode: .unreliable)
   }
   
   func sendRandomNumber() {

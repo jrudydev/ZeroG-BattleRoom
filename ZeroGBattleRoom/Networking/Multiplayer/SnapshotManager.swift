@@ -30,7 +30,8 @@ class MultiplayerNetworkingSnapshot {
         let snapshot = MultiplayerNetworking.MessageSnapshotElement(
           position: spriteComponent.node .position,
           rotation: spriteComponent.node.zRotation,
-          vector: physicsComponent.physicsBody.velocity)
+          velocity: physicsComponent.physicsBody.velocity,
+          angularVelocity: physicsComponent.physicsBody.angularVelocity)
         info.append(snapshot)
       }
     }
@@ -49,7 +50,8 @@ class MultiplayerNetworkingSnapshot {
         let snapshot = MultiplayerNetworking.MessageSnapshotElement(
           position: shapeComponent.node.position,
           rotation: shapeComponent.node.zRotation,
-          vector: physicsComponent.physicsBody.velocity)
+          velocity: physicsComponent.physicsBody.velocity,
+          angularVelocity: physicsComponent.physicsBody.angularVelocity)
         info.append(snapshot)
       }
     }

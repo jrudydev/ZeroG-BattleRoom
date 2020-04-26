@@ -11,5 +11,5 @@ import SpriteKit
 
 
 protocol ImpulsableProtocol {
-  func impulseTo(location: CGPoint, completion: (SKSpriteNode, CGVector) -> Void)
+  func impulseTo(location: CGPoint, completion: (SKSpriteNode, CGVector, CGFloat) -> Void)
 }

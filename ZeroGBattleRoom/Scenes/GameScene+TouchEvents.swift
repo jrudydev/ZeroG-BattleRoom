@@ -87,10 +87,12 @@ extension GameScene {
       if let impulseComponent = hero.component(ofType: ImpulseComponent.self),
         !impulseComponent.isOnCooldown {
         
-        hero.impulseTo(location: pos) { sprite, vector in
+        hero.impulseTo(location: pos) { sprite, velocity, angularVelocity in
           self.multiplayerNetworking.sendMove(start: sprite.position,
-                                              direction: vector,
-                                              rotation: sprite.zRotation)
+                                              rotation: sprite.zRotation,
+                                              velocity: velocity,
+                                              angularVelocity: angularVelocity,
+                                              wasLaunch: false)
         }
       } else if let spriteComponent = hero.component(ofType: SpriteComponent.self) {
         let throwPoint = self.convert(CGPoint(x: 0.0, y: 1.0), from: spriteComponent.node)
@@ -104,11 +106,13 @@ extension GameScene {
       let heroLaunchComponent = hero.component(ofType: LaunchComponent.self),
       heroLaunchComponent.launchInfo.lastTouchDown != nil else { return }
     
-    hero.launch(){ sprite, vector, panel in
+    hero.launch(){ sprite, velocity, angularVelocity, vacatedPanel in
       self.multiplayerNetworking.sendMove(start: sprite.position,
-                                          direction: vector,
-                                          rotation: sprite.zRotation)
-      if let index = self.entityManager.indexForWall(panel: panel) {
+                                          rotation: sprite.zRotation,
+                                          velocity: velocity,
+                                          angularVelocity: angularVelocity,
+                                          wasLaunch: true)
+      if let index = self.entityManager.indexForWall(panel: vacatedPanel) {
         self.multiplayerNetworking.sendWall(index: index, isOccupied: false)
       }
     }

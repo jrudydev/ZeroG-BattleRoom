@@ -156,20 +156,39 @@ extension GameScene: MultiplayerNetworkingProtocol {
     }
   }
   
-  func movePlayerAt(index: Int, position: CGPoint, direction: CGVector, rotation: CGFloat) {
+  func movePlayerAt(index: Int, position: CGPoint, rotation: CGFloat, velocity: CGVector, angularVelocity: CGFloat, wasLaunch: Bool) {
     if let player = self.entityManager.playerEntites[index] as? General,
-      let playerComponent = player.component(ofType: SpriteComponent.self) {
+      let spriteComponent = player.component(ofType: SpriteComponent.self),
+      let physicsComponent = player.component(ofType: PhysicsComponent.self),
+      let impulseComponent = player.component(ofType: ImpulseComponent.self) {
+       
+      spriteComponent.node.zRotation = rotation
+      spriteComponent.node.position = position
+
+      player.switchToState(.moving)
+      if wasLaunch,
+        let beamComponent = player.occupiedPanel?.component(ofType: BeamComponent.self) {
+        
+        beamComponent.isOccupied = false
+        player.resetBeamTimer()
+      } else {
+        guard !impulseComponent.isOnCooldown else { return }
+  
+        impulseComponent.isOnCooldown = true
+      }
       
-      playerComponent.node.zRotation = rotation
-      playerComponent.node.position = position
-      player.impulse(vector: direction)
+      
+      DispatchQueue.main.async {
+        physicsComponent.physicsBody.velocity = velocity
+        physicsComponent.physicsBody.angularVelocity = angularVelocity
+      }
     }
   }
   
   func syncResources(resources: MultiplayerNetworking.SnapshotElementGroup) {
     for x in self.entityManager.resourcesEntities.count..<resources.count {
       self.entityManager.spawnResource(position: resources[x].position,
-                                       vector: resources[x].vector)
+                                       velocity: resources[x].velocity)
     }
   }
   

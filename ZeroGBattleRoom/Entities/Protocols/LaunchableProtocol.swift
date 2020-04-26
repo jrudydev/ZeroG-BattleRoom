@@ -11,5 +11,5 @@ import SpriteKit
 
 
 protocol LaunchableProtocol {
-  func launch(completion: (SKSpriteNode, CGVector, Panel) -> Void) 
+  func launch(completion: (SKSpriteNode, CGVector, CGFloat, Panel) -> Void)
 }

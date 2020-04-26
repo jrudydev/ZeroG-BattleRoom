@@ -181,6 +181,7 @@ extension EntityManager {
     if let spriteComponent = heroBlue.component(ofType: SpriteComponent.self),
       let trailComponent = heroBlue.component(ofType: TrailComponent.self),
       let aliasComponent = heroBlue.component(ofType: AliasComponent.self) {
+      
       spriteComponent.node.position = CGPoint(x: 0.0,
                                               y: -AppConstants.Layout.boundarySize.height/2 + 20)
       aliasComponent.node.text = "Player 1 (0/\(resourcesNeededToWin))"
@@ -223,7 +224,7 @@ extension EntityManager {
   }
   
   func spawnResource(position: CGPoint = AppConstants.Layout.boundarySize.randomPosition,
-                     vector: CGVector? = nil) {
+                     velocity: CGVector? = nil) {
     guard let resourceNode = self.resourceNode?.copy() as? SKShapeNode else { return }
     
     let resource = Package(shapeNode: resourceNode)
@@ -233,7 +234,7 @@ extension EntityManager {
       self.scene.addChild(shapeComponent.node)
       shapeComponent.node.position = position
       DispatchQueue.main.async {
-        if let vector = vector {
+        if let vector = velocity {
           physicsComponent.physicsBody.velocity = vector
         } else {
           physicsComponent.randomImpulse()

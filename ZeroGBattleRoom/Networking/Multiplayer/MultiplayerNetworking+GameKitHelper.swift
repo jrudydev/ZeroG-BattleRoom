@@ -97,17 +97,21 @@ extension MultiplayerNetworking {
   
   private func handleMove(_ message: UnifiedMessage) throws {
     guard let elements = message.elements else {
-      throw(NetworkError.missingElements(message: "Missing elements")) }
+      throw(NetworkError.missingElements(message: "Missing elements\(message)")) }
     guard let playerGroup = elements.first else {
       throw(NetworkError.missingGroup(message: "Missing players group: \(elements)")) }
     guard let playerSnap = playerGroup.first else {
-      throw(NetworkError.playerNotFound(message: "Player not found: \(elements)")) }
+      throw(NetworkError.playerNotFound(message: "Player not found: \(playerGroup)")) }
+    guard let wasLaunch = message.boolValue else {
+      throw(NetworkError.playerNotFound(message: "Launch info missing: \(message)")) }
     
     print("Move message received")
     self.delegate?.movePlayerAt(index: self.indicesForPlayers.remote,
                                 position: playerSnap.position,
-                                direction: playerSnap.vector,
-                                rotation: playerSnap.rotation)
+                                rotation: playerSnap.rotation,
+                                velocity: playerSnap.velocity,
+                                angularVelocity: playerSnap.angularVelocity,
+                                wasLaunch: wasLaunch)
   }
   
   private func handleMoveResource(_ message: UnifiedMessage) {
@@ -120,7 +124,7 @@ extension MultiplayerNetworking {
     print("Resource move message received")
     self.delegate?.moveResourceAt(index: index,
                                   position: resoureceGroup[0].position,
-                                  vector: resoureceGroup[0].vector)
+                                  vector: resoureceGroup[0].velocity)
   }
   
   private func handleImpacted(_ message: UnifiedMessage) {
