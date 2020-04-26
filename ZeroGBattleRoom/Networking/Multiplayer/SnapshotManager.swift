@@ -26,12 +26,11 @@ class MultiplayerNetworkingSnapshot {
     for entity in entities {
       if let spriteComponent = entity.component(ofType: SpriteComponent.self),
         let physicsComponent = entity.component(ofType: PhysicsComponent.self) {
-        
-        let vector = physicsComponent.physicsBody.velocity
+      
         let snapshot = MultiplayerNetworking.MessageSnapshotElement(
           position: spriteComponent.node .position,
-          vector: vector,
-          rotation: spriteComponent.node.zRotation)
+          rotation: spriteComponent.node.zRotation,
+          vector: physicsComponent.physicsBody.velocity)
         info.append(snapshot)
       }
     }
@@ -47,10 +46,10 @@ class MultiplayerNetworkingSnapshot {
       if let shapeComponent = entity.component(ofType: ShapeComponent.self),
         let physicsComponent = entity.component(ofType: PhysicsComponent.self) {
         
-        let vector = physicsComponent.physicsBody.velocity
         let snapshot = MultiplayerNetworking.MessageSnapshotElement(
           position: shapeComponent.node.position,
-          vector: vector)
+          rotation: shapeComponent.node.zRotation,
+          vector: physicsComponent.physicsBody.velocity)
         info.append(snapshot)
       }
     }

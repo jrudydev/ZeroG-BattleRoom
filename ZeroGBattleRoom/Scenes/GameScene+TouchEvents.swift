@@ -57,36 +57,7 @@ extension GameScene {
         NotificationCenter.default.post(name: .startMatchmaking, object: nil)
       }
     case is Playing:
-      let touchedNode = self.atPoint(pos)
-      if let name = touchedNode.name, name == AppConstants.ComponentNames.backButtonName {
-        self.matchEnded()
-        NotificationCenter.default.post(name: .restartGame, object: nil)
-        return
-      }
-      
-      guard let hero = self.entityManager.hero as? General,
-        let heroLaunchComponent = hero.component(ofType: LaunchComponent.self),
-        heroLaunchComponent.launchInfo.lastTouchDown != nil,
-        self.entityManager.currentPlayerIndex != -1 else { return }
-      
-      if case .beamed = hero.state {
-        hero.launch(vacateWall: { panel in
-          if let index = self.entityManager.indexForWall(panel: panel) {
-            self.multiplayerNetworking.sendWall(index: index, isOccupied: false)
-          }
-        })
-      } else  {
-        if let impulseComponent = hero.component(ofType: ImpulseComponent.self),
-          !impulseComponent.isOnCooldown {
-          
-          hero.impulseTo(location: pos) { sprite, vector in
-            self.multiplayerNetworking.sendMove(start: sprite.position, direction: vector)
-          }
-        } else if let spriteComponent = hero.component(ofType: SpriteComponent.self) {
-          let throwPoint = self.convert(CGPoint(x: 0.0, y: 1.0), from: spriteComponent.node)
-          hero.throwResourceAt(point: throwPoint)
-        }
-      }
+      self.handlePlaying(pos: pos)
     case is GameOver:
       NotificationCenter.default.post(name: .restartGame, object: nil)
     case is Disconnected:
@@ -96,6 +67,50 @@ extension GameScene {
         return
       }
     default: break
+    }
+  }
+  
+  private func handlePlaying(pos: CGPoint) {
+    let touchedNode = self.atPoint(pos)
+    if let name = touchedNode.name, name == AppConstants.ComponentNames.backButtonName {
+      self.matchEnded()
+      NotificationCenter.default.post(name: .restartGame, object: nil)
+      return
+    }
+    
+    guard self.entityManager.currentPlayerIndex != -1,
+      let hero = self.entityManager.hero as? General else { return }
+    
+    if case .beamed = hero.state {
+      self.launchPlayer()
+    } else  {
+      if let impulseComponent = hero.component(ofType: ImpulseComponent.self),
+        !impulseComponent.isOnCooldown {
+        
+        hero.impulseTo(location: pos) { sprite, vector in
+          self.multiplayerNetworking.sendMove(start: sprite.position,
+                                              direction: vector,
+                                              rotation: sprite.zRotation)
+        }
+      } else if let spriteComponent = hero.component(ofType: SpriteComponent.self) {
+        let throwPoint = self.convert(CGPoint(x: 0.0, y: 1.0), from: spriteComponent.node)
+        hero.throwResourceAt(point: throwPoint)
+      }
+    }
+  }
+  
+  private func launchPlayer() {
+    guard let hero = self.entityManager.hero as? General,
+      let heroLaunchComponent = hero.component(ofType: LaunchComponent.self),
+      heroLaunchComponent.launchInfo.lastTouchDown != nil else { return }
+    
+    hero.launch(){ sprite, vector, panel in
+      self.multiplayerNetworking.sendMove(start: sprite.position,
+                                          direction: vector,
+                                          rotation: sprite.zRotation)
+      if let index = self.entityManager.indexForWall(panel: panel) {
+        self.multiplayerNetworking.sendWall(index: index, isOccupied: false)
+      }
     }
   }
 }

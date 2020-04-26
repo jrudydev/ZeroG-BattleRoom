@@ -34,7 +34,7 @@ extension MultiplayerNetworking: GameKitHelperDelegate {
     case .gameBegin:
       self.handleGameBegin(message)
     case .move:
-      self.handleMove(message)
+      try? self.handleMove(message)
     case .impacted:
       self.handleImpacted(message)
     case .wallHit:
@@ -48,7 +48,7 @@ extension MultiplayerNetworking: GameKitHelperDelegate {
     case .gameOver:
       self.handleGameOver(message)
     case .snapshot:
-      self.handleSnapshot(message)
+      try? self.handleSnapshot(message)
     }
   }
   
@@ -95,18 +95,19 @@ extension MultiplayerNetworking {
     self.processPlayerAliases()
   }
   
-  private func handleMove(_ message: UnifiedMessage) {
-    let elements = message.elements!
-    
-    guard elements.count > 0 else { fatalError("Error: Elements array is empty.") }
-    
-    let playerGroup = elements[0]
-    guard playerGroup.count > 0 else { fatalError("Error: Player group array is empty.")}
+  private func handleMove(_ message: UnifiedMessage) throws {
+    guard let elements = message.elements else {
+      throw(NetworkError.missingElements(message: "Missing elements")) }
+    guard let playerGroup = elements.first else {
+      throw(NetworkError.missingGroup(message: "Missing players group: \(elements)")) }
+    guard let playerSnap = playerGroup.first else {
+      throw(NetworkError.playerNotFound(message: "Player not found: \(elements)")) }
     
     print("Move message received")
     self.delegate?.movePlayerAt(index: self.indicesForPlayers.remote,
-                                position: playerGroup[0].position,
-                                direction: playerGroup[0].vector)
+                                position: playerSnap.position,
+                                direction: playerSnap.vector,
+                                rotation: playerSnap.rotation)
   }
   
   private func handleMoveResource(_ message: UnifiedMessage) {
@@ -163,52 +164,50 @@ extension MultiplayerNetworking {
     self.delegate?.gameOver(player1Won: player1Won)
   }
   
-  private func handleSnapshot(_ message: UnifiedMessage) {
-    let elements = message.elements!
+  private func handleSnapshot(_ message: UnifiedMessage) throws {
+    guard let elements = message.elements else {
+      throw(NetworkError.missingElements(message: "Missing elements"))
+    }
+    
     let expectdNumberOfElements = MultiplayerNetworkingSnapshot.GroupIndecies.allCases.count
-    guard elements.count == expectdNumberOfElements else {
-      fatalError("Error: Missing Elements: \(elements)")
+    guard  elements.count == expectdNumberOfElements else { throw(NetworkError.missingElements(message: "Incomplete group data: \(elements)"))
+    }
+    
+    let playerGroup = elements[MultiplayerNetworkingSnapshot.GroupIndecies.players.rawValue]
+    guard playerGroup.count > 0 else {
+      throw(NetworkError.playerNotFound(message: "Missing players group: \(playerGroup)"))
     }
     
     print("Snapshot received")
     
-    let playerGroup = elements[MultiplayerNetworkingSnapshot.GroupIndecies.players.rawValue]
-    guard playerGroup.count > 0 else {
-      // TODO: Add some error handling
-      print("Error: Missing players: \(playerGroup)")
-      return
-    }
-    
-    for (idx, player) in playerGroup.enumerated() {
-      guard idx != self.indicesForPlayers.local else {
-        print("Skip remote player sync.")
-        continue
-      }
-      
-      self.delegate?.syncPlayerAt(index: idx,
-                                  position: player.position,
-                                  vector: player.vector,
-                                  rotation: player.rotation!)
-    }
-    
-    guard !self.isLocalPlayerHost() else {
-      print("Only update game elements for client devices.")
-      return
-    }
-    
-    let resourceGroup = elements[MultiplayerNetworkingSnapshot.GroupIndecies.resources.rawValue]
-    guard resourceGroup.count > 0 else {
-      fatalError("Error: Missing resources: \(resourceGroup)")
-    }
-    
-    // Spawn resources as needed
-    self.delegate?.syncResources(resources: resourceGroup)
-    
-    for (idx, resource) in resourceGroup.enumerated() {
-      self.delegate?.syncResourceAt(index: idx,
-                                    position: resource.position,
-                                    vector: resource.vector)
-    }
+//    for (idx, player) in playerGroup.enumerated() {
+//      guard idx != self.indicesForPlayers.local else {
+//        print("Skip remote player sync.")
+//        continue
+//      }
+//
+//      self.delegate?.syncPlayerAt(index: idx, position: player.position,
+//                                  vector: player.vector, rotation: player.rotation!)
+//    }
+//
+//    guard !self.isLocalPlayerHost() else {
+//      print("Only update game elements for client devices.")
+//      return
+//    }
+//
+//    let resourceGroup = elements[MultiplayerNetworkingSnapshot.GroupIndecies.resources.rawValue]
+//    guard resourceGroup.count > 0 else {
+//      fatalError("Error: Missing resources: \(resourceGroup)")
+//    }
+//
+//    // Spawn resources as needed
+//    self.delegate?.syncResources(resources: resourceGroup)
+//
+//    for (idx, resource) in resourceGroup.enumerated() {
+//      self.delegate?.syncResourceAt(index: idx,
+//                                    position: resource.position,
+//                                    vector: resource.vector)
+//    }
   }
   
   private func isLocalPlayerHost() -> Bool {

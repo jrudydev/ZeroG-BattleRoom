@@ -11,7 +11,7 @@ import SpriteKit
 import GameplayKit
 
 
-let numberOfSpawnedResources = 10
+let numberOfSpawnedResources = 0
 let resourcesNeededToWin = 3
 
 
@@ -195,7 +195,7 @@ extension EntityManager {
       self.scene.addChild(aliasComponent.node)
     }
     
-    let heroRed = General(imageName: "red_spaceguy", team: .team2, resourceReleased: {
+    let heroRed = General(imageName: "spaceman-idle-0", team: .team2, resourceReleased: {
       [weak self] shape in
       
       guard let self = self else { return }

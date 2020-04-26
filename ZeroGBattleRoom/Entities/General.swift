@@ -249,9 +249,11 @@ extension General: ImpulsableProtocol {
     if let physicsComponent = self.component(ofType: PhysicsComponent.self),
       let spriteComponent = self.component(ofType: SpriteComponent.self) {
   
-      physicsComponent.physicsBody.applyImpulse(vector)
-      physicsComponent.physicsBody.angularVelocity = angularVelocity
-      spriteComponent.node.zRotation = vector.rotation
+      DispatchQueue.main.async {
+        physicsComponent.physicsBody.applyImpulse(vector)
+        physicsComponent.physicsBody.angularVelocity = angularVelocity
+        spriteComponent.node.zRotation = vector.rotation
+      }
     }
   }
   
@@ -274,21 +276,19 @@ extension General: ImpulsableProtocol {
 }
 
 extension General: LaunchableProtocol {
-  func launch(vacateWall: (Panel) -> Void) {
-    guard let physicsComponent = self.component(ofType: PhysicsComponent.self),
+  func launch(completion: (SKSpriteNode, CGVector, Panel) -> Void) {
+    guard let spriteComponent = self.component(ofType: SpriteComponent.self),
+      let physicsComponent = self.component(ofType: PhysicsComponent.self),
       let launchComponent = self.component(ofType: LaunchComponent.self),
       let moveVector = launchComponent.launchInfo.direction,
       let movePercent = launchComponent.launchInfo.directionPercent,
       let rotationPercent = launchComponent.launchInfo.rotationPercent,
-      let isLeftRotation = launchComponent.launchInfo.isLeftRotation else { return }
+      let isLeftRotation = launchComponent.launchInfo.isLeftRotation,
+      let beamComponent = self.occupiedPanel?.component(ofType: BeamComponent.self) else { return }
     
-    if let beamComponent = self.occupiedPanel?.component(ofType: BeamComponent.self) {
-      physicsComponent.isEffectedByPhysics = true
-      beamComponent.isOccupied = false
+    physicsComponent.isEffectedByPhysics = true
+    beamComponent.isOccupied = false
       
-      vacateWall(self.occupiedPanel!)
-    }
-    
     let launchMagnitude = self.defaultImpulseMagnitude * 2
     let impulseVector = moveVector.normalized() * launchMagnitude * movePercent
     let angularVelocity = self.defaultLaunchRotation * rotationPercent
@@ -300,6 +300,7 @@ extension General: LaunchableProtocol {
     self.switchToState(.moving)
     
     self.resetBeamTimer()
+    completion(spriteComponent.node, impulseVector, self.occupiedPanel!)
   }
 }
 

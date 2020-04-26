@@ -156,10 +156,11 @@ extension GameScene: MultiplayerNetworkingProtocol {
     }
   }
   
-  func movePlayerAt(index: Int, position: CGPoint, direction: CGVector) {
+  func movePlayerAt(index: Int, position: CGPoint, direction: CGVector, rotation: CGFloat) {
     if let player = self.entityManager.playerEntites[index] as? General,
       let playerComponent = player.component(ofType: SpriteComponent.self) {
       
+      playerComponent.node.zRotation = rotation
       playerComponent.node.position = position
       player.impulse(vector: direction)
     }

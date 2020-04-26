@@ -88,8 +88,9 @@ class MultiplayerNetworking {
 }
 
 extension MultiplayerNetworking {
-  func sendMove(start pos: CGPoint, direction: CGVector) {
+  func sendMove(start pos: CGPoint, direction: CGVector, rotation: CGFloat) {
     let playerElement = MessageSnapshotElement(position: pos,
+                                               rotation: rotation,
                                                vector: direction)
     let message = UnifiedMessage(type: .move, elements: [[playerElement]])
     self.sendData(Data.archiveJSON(object: message))
@@ -97,34 +98,34 @@ extension MultiplayerNetworking {
   
   func sendImpacted(senderIndex: Int) {
     let message = UnifiedMessage(type: .impacted, senderIndex: senderIndex)
-    self.sendData(Data.archiveJSON(object: message))
+//    self.sendData(Data.archiveJSON(object: message))
   }
   
   func sendWall(index: Int, isOccupied: Bool) {
     let message = UnifiedMessage(type: .wallHit,
                                  boolValue: isOccupied,
                                  resourceIndex: index)
-    self.sendData(Data.archiveJSON(object: message))
+//    self.sendData(Data.archiveJSON(object: message))
   }
   
   func sendGrabbedResource(index: Int, playerIndex: Int, senderIndex: Int) {
     let message = UnifiedMessage(type: .grabResource, resourceIndex: index,
                                  playerIndex: playerIndex,
                                  senderIndex: senderIndex)
-    self.sendData(Data.archiveJSON(object: message))
+//    self.sendData(Data.archiveJSON(object: message))
   }
   
   func sendAssignResource(index: Int, playerIndex: Int) {
     let message = UnifiedMessage(type: .assignResource, resourceIndex: index,
                                  playerIndex: playerIndex)
-    self.sendData(Data.archiveJSON(object: message))
+//    self.sendData(Data.archiveJSON(object: message))
   }
   
   func sendResourceMoveAt(index: Int, start pos: CGPoint, direction: CGVector) {
-    let resourceElement = MessageSnapshotElement(position: pos, vector: direction)
+    let resourceElement = MessageSnapshotElement(position: pos, rotation: .zero, vector: direction)
     let message = UnifiedMessage(type: .moveResource, resourceIndex: index,
                                  elements: [[resourceElement]])
-    self.sendData(Data.archiveJSON(object: message))
+//    self.sendData(Data.archiveJSON(object: message))
   }
   
   func sendSnapshot(_ elements: [SnapshotElementGroup]) {

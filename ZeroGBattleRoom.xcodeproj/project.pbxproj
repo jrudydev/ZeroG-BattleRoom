@@ -23,6 +23,7 @@
 		9347C8BF2431E2220099AE53 /* BallTrail-Red.sks in Resources */ = {isa = PBXBuildFile; fileRef = 9347C8BD2431E2220099AE53 /* BallTrail-Red.sks */; };
 		9347C8C32431EB7D0099AE53 /* SnapshotManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9347C8C22431EB7D0099AE53 /* SnapshotManager.swift */; };
 		934A5F302433221700A3D232 /* MultiplayerNetworking+Messages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A5F2F2433221700A3D232 /* MultiplayerNetworking+Messages.swift */; };
+		937614C124555F9C004D4CF8 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937614C024555F9C004D4CF8 /* NetworkError.swift */; };
 		937911212439E4A500CEC9C6 /* AliasComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937911202439E4A500CEC9C6 /* AliasComponent.swift */; };
 		93873A0424389C5C00A6E59A /* SpriteComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93873A0324389C5C00A6E59A /* SpriteComponent.swift */; };
 		93873A0624389E1100A6E59A /* Deposit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93873A0524389E1100A6E59A /* Deposit.swift */; };
@@ -88,6 +89,7 @@
 		9347C8BD2431E2220099AE53 /* BallTrail-Red.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = "BallTrail-Red.sks"; sourceTree = "<group>"; };
 		9347C8C22431EB7D0099AE53 /* SnapshotManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotManager.swift; sourceTree = "<group>"; };
 		934A5F2F2433221700A3D232 /* MultiplayerNetworking+Messages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MultiplayerNetworking+Messages.swift"; sourceTree = "<group>"; };
+		937614C024555F9C004D4CF8 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
 		937911202439E4A500CEC9C6 /* AliasComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AliasComponent.swift; sourceTree = "<group>"; };
 		93873A0324389C5C00A6E59A /* SpriteComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteComponent.swift; sourceTree = "<group>"; };
 		93873A0524389E1100A6E59A /* Deposit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Deposit.swift; sourceTree = "<group>"; };
@@ -180,6 +182,7 @@
 				93A55EEA24307D280027E83E /* MultiplayerNetworking.swift */,
 				93A55EEB24307D280027E83E /* MultiplayerNetworking+GameKitHelper.swift */,
 				934A5F2F2433221700A3D232 /* MultiplayerNetworking+Messages.swift */,
+				937614C024555F9C004D4CF8 /* NetworkError.swift */,
 				9347C8C22431EB7D0099AE53 /* SnapshotManager.swift */,
 			);
 			path = Multiplayer;
@@ -473,6 +476,7 @@
 				93A55F0A243089850027E83E /* Playing.swift in Sources */,
 				93A55F0C24308A630027E83E /* CGSize+AspectFill.swift in Sources */,
 				930D65E4244C8C93009F05A0 /* BeamableProtocol.swift in Sources */,
+				937614C124555F9C004D4CF8 /* NetworkError.swift in Sources */,
 				93EFD9802445F311005D68A2 /* Disconnected.swift in Sources */,
 				93A55EFA24307D4F0027E83E /* SoundManager.swift in Sources */,
 				93A55F09243089850027E83E /* GameOver.swift in Sources */,

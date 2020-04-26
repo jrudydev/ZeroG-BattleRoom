@@ -7,8 +7,9 @@
 //
 
 import Foundation
+import SpriteKit
 
 
 protocol LaunchableProtocol {
-  func launch(vacateWall: (Panel) -> Void)
+  func launch(completion: (SKSpriteNode, CGVector, Panel) -> Void) 
 }
