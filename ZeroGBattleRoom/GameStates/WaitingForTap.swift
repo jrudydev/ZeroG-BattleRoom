@@ -56,7 +56,6 @@ class WaitingForTap: GKState {
     customizeLabel.zPosition = 100
     customizeLabel.isUserInteractionEnabled = false
     self.scene.addChild(customizeLabel)
-    
   }
   
   override func willExit(to nextState: GKState) {

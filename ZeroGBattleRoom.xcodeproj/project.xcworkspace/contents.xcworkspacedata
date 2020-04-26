@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:ZeroG BattleRoom.xcodeproj">
+      location = "self:/Users/rudy/workspace/ZeroG-BattleRoom/ZeroGBattleRoom.xcodeproj">
    </FileRef>
 </Workspace>

@@ -383,7 +383,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 93FEBDA2242EE0CF006CCBFB /* Build configuration list for PBXProject "ZeroG BattleRoom" */;
+			buildConfigurationList = 93FEBDA2242EE0CF006CCBFB /* Build configuration list for PBXProject "ZeroGBattleRoom" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -657,7 +657,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		93FEBDA2242EE0CF006CCBFB /* Build configuration list for PBXProject "ZeroG BattleRoom" */ = {
+		93FEBDA2242EE0CF006CCBFB /* Build configuration list for PBXProject "ZeroGBattleRoom" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				93FEBDBD242EE0D2006CCBFB /* Debug */,
