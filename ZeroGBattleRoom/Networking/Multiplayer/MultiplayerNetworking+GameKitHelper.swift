@@ -173,45 +173,45 @@ extension MultiplayerNetworking {
       throw(NetworkError.missingElements(message: "Missing elements"))
     }
     
-    let expectdNumberOfElements = MultiplayerNetworkingSnapshot.GroupIndecies.allCases.count
-    guard  elements.count == expectdNumberOfElements else { throw(NetworkError.missingElements(message: "Incomplete group data: \(elements)"))
+    let expectdElementGroups = SnapshotManager.GroupIndecies.allCases.count
+    guard  elements.count == expectdElementGroups else {
+      throw(NetworkError.missingElements(message: "Incomplete group data: \(elements)"))
     }
     
-    let playerGroup = elements[MultiplayerNetworkingSnapshot.GroupIndecies.players.rawValue]
+    let playerGroup = elements[SnapshotManager.GroupIndecies.players.rawValue]
     guard playerGroup.count > 0 else {
       throw(NetworkError.playerNotFound(message: "Missing players group: \(playerGroup)"))
     }
     
+    let resourceGroup = elements[SnapshotManager.GroupIndecies.resources.rawValue]
+    guard resourceGroup.count > 0 else {
+      throw(NetworkError.playerNotFound(message: "Missing resources group: \(resourceGroup)"))
+    }
+    
     print("Snapshot received")
     
-//    for (idx, player) in playerGroup.enumerated() {
-//      guard idx != self.indicesForPlayers.local else {
-//        print("Skip remote player sync.")
-//        continue
-//      }
-//
-//      self.delegate?.syncPlayerAt(index: idx, position: player.position,
-//                                  vector: player.vector, rotation: player.rotation!)
-//    }
-//
-//    guard !self.isLocalPlayerHost() else {
-//      print("Only update game elements for client devices.")
-//      return
-//    }
-//
-//    let resourceGroup = elements[MultiplayerNetworkingSnapshot.GroupIndecies.resources.rawValue]
-//    guard resourceGroup.count > 0 else {
-//      fatalError("Error: Missing resources: \(resourceGroup)")
-//    }
-//
-//    // Spawn resources as needed
-//    self.delegate?.syncResources(resources: resourceGroup)
-//
-//    for (idx, resource) in resourceGroup.enumerated() {
-//      self.delegate?.syncResourceAt(index: idx,
-//                                    position: resource.position,
-//                                    vector: resource.vector)
-//    }
+    for (idx, playerSnap) in playerGroup.enumerated() {
+      guard idx != self.indicesForPlayers.local else {
+        print("Skip remote player sync.")
+        continue
+      }
+
+      self.delegate?.syncPlayerAt(index: idx,
+                                  position: playerSnap.position,
+                                  rotation: playerSnap.rotation,
+                                  velocity: playerSnap.velocity,
+                                  angularVelocity: playerSnap.angularVelocity,
+                                  resourceIndecies: playerSnap.resourceIndecies)
+    }
+
+    // Spawn resources as needed
+    self.delegate?.syncResources(resources: resourceGroup)
+
+    for (idx, resource) in resourceGroup.enumerated() {
+      self.delegate?.syncResourceAt(index: idx,
+                                    position: resource.position,
+                                    vector: resource.velocity)
+    }
   }
   
   private func isLocalPlayerHost() -> Bool {
@@ -233,7 +233,7 @@ extension MultiplayerNetworking {
       self.delegate?.setCurrentPlayerAt(index: 0)
       self.processPlayerAliases()
       
-      MultiplayerNetworkingSnapshot.shared.includeResources = true
+      SnapshotManager.shared.includeResources = true
     }
   }
 }

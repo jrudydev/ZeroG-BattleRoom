@@ -130,7 +130,7 @@ extension MultiplayerNetworking {
   
   func sendSnapshot(_ elements: [SnapshotElementGroup]) {
     let message = UnifiedMessage(type: .snapshot, elements: elements)
-//    self.sendData(Data.archiveJSON(object: message), mode: .unreliable)
+    self.sendData(Data.archiveJSON(object: message), mode: .unreliable)
   }
   
   func sendRandomNumber() {

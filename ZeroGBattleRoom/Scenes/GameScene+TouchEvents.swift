@@ -95,8 +95,8 @@ extension GameScene {
                                               wasLaunch: false)
         }
       } else if let spriteComponent = hero.component(ofType: SpriteComponent.self) {
-        let throwPoint = self.convert(CGPoint(x: 0.0, y: 1.0), from: spriteComponent.node)
-        hero.throwResourceAt(point: throwPoint)
+//        let throwPoint = self.convert(CGPoint(x: 0.0, y: 1.0), from: spriteComponent.node)
+//        hero.throwResourceAt(point: throwPoint)
       }
     }
   }

@@ -20,7 +20,7 @@ class Disconnected: GKState {
  
   override func didEnter(from previousState: GKState?) {
     self.scene.physicsWorld.speed = 0.0
-    MultiplayerNetworkingSnapshot.shared.isSendingSnapshots = false
+    SnapshotManager.shared.isSendingSnapshots = false
     
     let background = SKShapeNode(rectOf: UIScreen.main.bounds.size)
     background.fillColor = UIColor.black.withAlphaComponent(20.0)

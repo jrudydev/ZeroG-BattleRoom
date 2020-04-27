@@ -11,7 +11,7 @@ import SpriteKit
 import GameplayKit
 
 
-let numberOfSpawnedResources = 0
+let numberOfSpawnedResources = 200
 let resourcesNeededToWin = 3
 
 
@@ -182,8 +182,7 @@ extension EntityManager {
       let trailComponent = heroBlue.component(ofType: TrailComponent.self),
       let aliasComponent = heroBlue.component(ofType: AliasComponent.self) {
       
-      spriteComponent.node.position = CGPoint(x: 0.0,
-                                              y: -AppConstants.Layout.boundarySize.height/2 + 20)
+      spriteComponent.node.position = CGPoint(x: 0.0, y: -AppConstants.Layout.boundarySize.height/2 + 20)
       aliasComponent.node.text = "Player 1 (0/\(resourcesNeededToWin))"
       self.scene.addChild(spriteComponent.node)
       
@@ -207,8 +206,7 @@ extension EntityManager {
       let trailComponent = heroRed.component(ofType: TrailComponent.self),
       let aliasComponent = heroRed.component(ofType: AliasComponent.self) {
       
-      spriteComponent.node.position = CGPoint(x: 0.0,
-                                              y: AppConstants.Layout.boundarySize.height/2 - 20)
+      spriteComponent.node.position = CGPoint(x: 0.0, y: AppConstants.Layout.boundarySize.height/2 - 20)
       aliasComponent.node.text = "Player 2 (0/\(resourcesNeededToWin))"
       spriteComponent.node.zRotation = CGFloat.pi
       self.scene.addChild(spriteComponent.node)

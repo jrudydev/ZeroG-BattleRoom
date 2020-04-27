@@ -11,7 +11,7 @@ import Combine
 import SpriteKit
 
 
-class MultiplayerNetworkingSnapshot {
+class SnapshotManager {
 
   static private let frequency = 1.0 / 30.0
   
@@ -25,13 +25,29 @@ class MultiplayerNetworkingSnapshot {
     var info = MultiplayerNetworking.SnapshotElementGroup()
     for entity in entities {
       if let spriteComponent = entity.component(ofType: SpriteComponent.self),
-        let physicsComponent = entity.component(ofType: PhysicsComponent.self) {
+        let physicsComponent = entity.component(ofType: PhysicsComponent.self),
+        let handsComponent = entity.component(ofType: HandsComponent.self) {
+        
+        var resourceIndecies = [Int]()
+        if let leftHandResource = handsComponent.leftHandSlot,
+          let resourceShapeComponent = leftHandResource.component(ofType: ShapeComponent.self),
+          let resourceIndex = self.scene?.entityManager.indexForResource(shape: resourceShapeComponent.node) {
+          
+          resourceIndecies.append(resourceIndex)
+        }
+        if let rightHandResource = handsComponent.rightHandSlot,
+          let resourceShapeComponent = rightHandResource.component(ofType: ShapeComponent.self),
+          let resourceIndex = self.scene?.entityManager.indexForResource(shape: resourceShapeComponent.node) {
+          
+          resourceIndecies.append(resourceIndex)
+        }
       
         let snapshot = MultiplayerNetworking.MessageSnapshotElement(
           position: spriteComponent.node .position,
           rotation: spriteComponent.node.zRotation,
           velocity: physicsComponent.physicsBody.velocity,
-          angularVelocity: physicsComponent.physicsBody.angularVelocity)
+          angularVelocity: physicsComponent.physicsBody.angularVelocity,
+          resourceIndecies: resourceIndecies)
         info.append(snapshot)
       }
     }
@@ -59,14 +75,14 @@ class MultiplayerNetworkingSnapshot {
     return info
   }
 
-  private let timer = Timer.publish(every: MultiplayerNetworkingSnapshot.frequency,
+  private let timer = Timer.publish(every: SnapshotManager.frequency,
                                     on: .main,
                                     in: .common).autoconnect()
   private var subscriptions = Set<AnyCancellable>()
 
   unowned var scene: GameScene?
   
-  static let shared = MultiplayerNetworkingSnapshot()
+  static let shared = SnapshotManager()
   
   private init() {
     let subject = PassthroughSubject<[MultiplayerNetworking.SnapshotElementGroup], Never>()

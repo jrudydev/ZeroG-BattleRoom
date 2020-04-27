@@ -60,12 +60,14 @@ extension MultiplayerNetworking {
     let rotation: CGFloat
     let velocity: CGVector
     let angularVelocity: CGFloat
+    let resourceIndecies: [Int]
     
-    init(position: CGPoint, rotation: CGFloat, velocity: CGVector, angularVelocity: CGFloat) {
+    init(position: CGPoint, rotation: CGFloat, velocity: CGVector, angularVelocity: CGFloat, resourceIndecies: [Int] = []) {
       self.position = position
       self.rotation = rotation
       self.velocity = velocity
       self.angularVelocity = angularVelocity
+      self.resourceIndecies = resourceIndecies
     }
   }
 }
@@ -98,7 +100,7 @@ extension MultiplayerNetworking {
   }
 }
 
-extension MultiplayerNetworkingSnapshot {
+extension SnapshotManager {
   enum GroupIndecies: Int, CaseIterable {
     case players
     case resources

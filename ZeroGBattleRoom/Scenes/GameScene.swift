@@ -42,12 +42,12 @@ class GameScene: SKScene {
   
   var multiplayerNetworking: MultiplayerNetworking! {
     didSet {
-      MultiplayerNetworkingSnapshot.shared.publisher
+      SnapshotManager.shared.publisher
         .sink { elements in
           self.multiplayerNetworking.sendSnapshot(elements)
         }
         .store(in: &subscriptions)
-      MultiplayerNetworkingSnapshot.shared.scene = self
+      SnapshotManager.shared.scene = self
     }
   }
   
@@ -156,7 +156,12 @@ extension GameScene: MultiplayerNetworkingProtocol {
     }
   }
   
-  func movePlayerAt(index: Int, position: CGPoint, rotation: CGFloat, velocity: CGVector, angularVelocity: CGFloat, wasLaunch: Bool) {
+  func movePlayerAt(index: Int,
+                    position: CGPoint,
+                    rotation: CGFloat,
+                    velocity: CGVector,
+                    angularVelocity: CGFloat,
+                    wasLaunch: Bool) {
     if let player = self.entityManager.playerEntites[index] as? General,
       let spriteComponent = player.component(ofType: SpriteComponent.self),
       let physicsComponent = player.component(ofType: PhysicsComponent.self),
@@ -185,21 +190,20 @@ extension GameScene: MultiplayerNetworkingProtocol {
     }
   }
   
-  func syncResources(resources: MultiplayerNetworking.SnapshotElementGroup) {
-    for x in self.entityManager.resourcesEntities.count..<resources.count {
-      self.entityManager.spawnResource(position: resources[x].position,
-                                       velocity: resources[x].velocity)
-    }
-  }
-  
-  func syncPlayerAt(index: Int, position: CGPoint, vector: CGVector, rotation: CGFloat) {
+  func syncPlayerAt(index: Int,
+                    position: CGPoint,
+                    rotation: CGFloat,
+                    velocity: CGVector,
+                    angularVelocity: CGFloat,
+                    resourceIndecies: [Int]) {
     if let player = self.entityManager.playerEntites[index] as? General,
       let spriteComponent = player.component(ofType: SpriteComponent.self),
       let physicsComponent = player.component(ofType: PhysicsComponent.self) {
       
       spriteComponent.node.position = position
       spriteComponent.node.zRotation = rotation
-      physicsComponent.physicsBody.velocity = vector
+      physicsComponent.physicsBody.velocity = velocity
+      physicsComponent.physicsBody.angularVelocity = angularVelocity
     }
   }
   
@@ -220,6 +224,13 @@ extension GameScene: MultiplayerNetworkingProtocol {
       
       shapeComponent.node.position = position
       physicsComponent.physicsBody.velocity = vector
+    }
+  }
+  
+  func syncResources(resources: MultiplayerNetworking.SnapshotElementGroup) {
+    for x in self.entityManager.resourcesEntities.count..<resources.count {
+      self.entityManager.spawnResource(position: resources[x].position,
+                                       velocity: resources[x].velocity)
     }
   }
   
@@ -296,8 +307,8 @@ extension GameScene: MultiplayerNetworkingProtocol {
   func setCurrentPlayerAt(index: Int) {
     self.entityManager.currentPlayerIndex = index
     self.gameState.enter(Playing.self)
-    
-    MultiplayerNetworkingSnapshot.shared.isSendingSnapshots = true
+  
+    SnapshotManager.shared.isSendingSnapshots = true
   }
 }
 
