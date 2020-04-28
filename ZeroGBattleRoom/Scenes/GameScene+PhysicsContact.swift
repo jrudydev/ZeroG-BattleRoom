@@ -42,8 +42,6 @@ extension GameScene: SKPhysicsContactDelegate {
       
       self.multiplayerNetworking.sendImpacted(senderIndex: 0)
       self.multiplayerNetworking.sendImpacted(senderIndex: 1)
-      
-      print("heros collided")
     }
     
     if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
@@ -76,7 +74,6 @@ extension GameScene: SKPhysicsContactDelegate {
       }
       
       self.run(SoundManager.shared.blipPaddleSound)
-      print("collition occured")
     }
     
     if firstBody.categoryBitMask == PhysicsCategoryMask.hero && secondBody.categoryBitMask == PhysicsCategoryMask.deposit {
@@ -139,7 +136,6 @@ extension GameScene: SKPhysicsContactDelegate {
       }
       
       self.run(SoundManager.shared.bambooBreakSound)
-      print("deposit occured")
     }
     
     if firstBody.categoryBitMask == PhysicsCategoryMask.hero && secondBody.categoryBitMask == PhysicsCategoryMask.wall {
@@ -178,7 +174,6 @@ extension GameScene: SKPhysicsContactDelegate {
       impulseComponent.isOnCooldown = false
       
       self.run(SoundManager.shared.blipSound)
-      print("wall hit")
     }
     
     if firstBody.categoryBitMask == PhysicsCategoryMask.wall && secondBody.categoryBitMask == PhysicsCategoryMask.package {
@@ -187,7 +182,6 @@ extension GameScene: SKPhysicsContactDelegate {
         let impactedResource = self.entityManager.resourceWith(node: resourceNode) as? Package else { return }
       
       impactedResource.wasThrown = false
-      print("Resource reset")
     }
   }
 }

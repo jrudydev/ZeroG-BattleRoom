@@ -16,7 +16,7 @@ class InterfaceComponent: GKComponent {
   
   let node: SKNode
   let elements: [SKNode]
-  var startingPositions = [CGPoint]()
+  private var startingPositions = [CGPoint]()
   
   var viewport: CGSize
   
@@ -42,11 +42,16 @@ class InterfaceComponent: GKComponent {
     super.update(deltaTime: seconds)
     
     for (idx, element) in elements.enumerated() {
-      let newScale = self.viewport.height / InterfaceComponent.screenSize.height
-      let newHeight = self.startingPositions[idx].y * newScale
-      let newWidth = self.startingPositions[idx].x * newScale
+      let widthScale = self.viewport.width / InterfaceComponent.screenSize.width
+      let heightScale = self.viewport.height / InterfaceComponent.screenSize.height
+      let boundryRatio = AppConstants.Layout.boundarySize.width / AppConstants.Layout.boundarySize.height
+      let screenRatio = InterfaceComponent.screenSize.width / InterfaceComponent.screenSize.height
+ =
+      let scale = boundryRatio < screenRatio ? heightScale : widthScale
+      let newHeight = self.startingPositions[idx].y * scale
+      let newWidth = self.startingPositions[idx].x * scale
       element.position = CGPoint(x: newWidth, y: newHeight)
-      element.setScale(newScale)
+      element.setScale(scale)
     }
   }
 }
