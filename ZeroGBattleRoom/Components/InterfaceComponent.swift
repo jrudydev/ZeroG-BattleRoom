@@ -46,7 +46,7 @@ class InterfaceComponent: GKComponent {
       let heightScale = self.viewport.height / InterfaceComponent.screenSize.height
       let boundryRatio = AppConstants.Layout.boundarySize.width / AppConstants.Layout.boundarySize.height
       let screenRatio = InterfaceComponent.screenSize.width / InterfaceComponent.screenSize.height
- =
+ 
       let scale = boundryRatio < screenRatio ? heightScale : widthScale
       let newHeight = self.startingPositions[idx].y * scale
       let newWidth = self.startingPositions[idx].x * scale
