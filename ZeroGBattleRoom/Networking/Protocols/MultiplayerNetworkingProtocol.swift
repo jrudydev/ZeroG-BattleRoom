@@ -24,9 +24,18 @@ protocol MultiplayerNetworkingProtocol {
                    velocity: CGVector,
                    angularVelocity: CGFloat,
                    resourceIndecies: [Int])
-  func moveResourceAt(index: Int, position: CGPoint, vector: CGVector)
+  func moveResourceAt(index: Int,
+                      position: CGPoint,
+                      rotation: CGFloat,
+                      velocity: CGVector,
+                      angularVelocity: CGFloat)
+  func syncResourceAt(index: Int,
+                      position: CGPoint,
+                      rotation: CGFloat,
+                      velocity: CGVector,
+                      angularVelocity: CGFloat)
+  func syncPlayerResources(players: MultiplayerNetworking.SnapshotElementGroup)
   func syncResources(resources: MultiplayerNetworking.SnapshotElementGroup)
-  func syncResourceAt(index: Int, position: CGPoint, vector: CGVector)
   func impactPlayerAt(senderIndex: Int)
   func grabResourceAt(index: Int, playerIndex: Int, senderIndex: Int)
   func assignResourceAt(index: Int, playerIndex: Int)

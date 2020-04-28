@@ -11,7 +11,7 @@ import SpriteKit
 import GameplayKit
 
 
-let numberOfSpawnedResources = 200
+let numberOfSpawnedResources = 10
 let resourcesNeededToWin = 3
 
 
@@ -225,7 +225,8 @@ extension EntityManager {
                      velocity: CGVector? = nil) {
     guard let resourceNode = self.resourceNode?.copy() as? SKShapeNode else { return }
     
-    let resource = Package(shapeNode: resourceNode)
+    let resource = Package(shapeNode: resourceNode,
+                           physicsBody: self.resourcePhysicsBody(frame: resourceNode.frame))
     if let shapeComponent = resource.component(ofType: ShapeComponent.self),
       let physicsComponent = resource.component(ofType: PhysicsComponent.self) {
       
@@ -242,6 +243,28 @@ extension EntityManager {
     
     resourceNode.strokeColor = SKColor.green
     self.resourcesEntities.append(resource)
+  }
+  
+  private func resourcePhysicsBody(frame: CGRect) -> SKPhysicsBody {
+    let radius = frame.size.height / 2.0
+    
+    let physicsBody = SKPhysicsBody(circleOfRadius: radius)
+    physicsBody.friction = 0.0
+    physicsBody.restitution = 1.0
+    physicsBody.linearDamping = 0.0
+    physicsBody.angularDamping = 0.0
+    physicsBody.categoryBitMask = PhysicsCategoryMask.package
+  
+    // Make sure resources are only colliding on the designated host device
+    if self.scene.entityManager.currentPlayerIndex == 0 {
+      physicsBody.contactTestBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.wall
+      physicsBody.collisionBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.package
+    } else {
+      physicsBody.contactTestBitMask = 0
+      physicsBody.collisionBitMask = 0
+    }
+    
+    return physicsBody
   }
     
   func spawnDeposit(position: CGPoint = .zero) {

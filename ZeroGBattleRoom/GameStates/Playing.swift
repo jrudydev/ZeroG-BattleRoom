@@ -39,7 +39,7 @@ class Playing: GKState {
 //    self.loadLevel()
     
 //    self.spawnResources()
-    if self.scene.isPlayer1 {
+    if self.scene.entityManager.currentPlayerIndex == 0 {
       for _ in 0..<numberOfSpawnedResources {
         self.scene.entityManager.spawnResource()
       }

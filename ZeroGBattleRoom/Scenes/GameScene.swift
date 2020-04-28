@@ -51,10 +51,6 @@ class GameScene: SKScene {
     }
   }
   
-  var isPlayer1: Bool {
-    return self.entityManager.currentPlayerIndex == 0
-  }
-  
   var gameWon: Bool = false {
     didSet {
       self.gameState.enter(GameOver.self)
@@ -106,7 +102,7 @@ class GameScene: SKScene {
   }
   
   private func checkForGameOver() {
-    if self.isPlayer1 {
+    if self.entityManager.currentPlayerIndex == 0 {
       guard self.entityManager.playerEntites.count > 0 else { return }
       guard let winningTeam = self.entityManager.winningTeam else { return }
       
@@ -207,23 +203,79 @@ extension GameScene: MultiplayerNetworkingProtocol {
     }
   }
   
-  func moveResourceAt(index: Int, position: CGPoint, vector: CGVector) {
-    if let package = self.entityManager.resourcesEntities[index] as? Package,
-      let spriteComponent = package.component(ofType: SpriteComponent.self),
-      let physicsComponent = package.component(ofType: PhysicsComponent.self) {
-      
-      spriteComponent.node.position = position
-      physicsComponent.physicsBody.velocity = vector
-    }
-  }
-  
-  func syncResourceAt(index: Int, position: CGPoint, vector: CGVector) {
+  func moveResourceAt(index: Int,
+                      position: CGPoint,
+                      rotation: CGFloat,
+                      velocity: CGVector,
+                      angularVelocity: CGFloat) {
     if let package = self.entityManager.resourcesEntities[index] as? Package,
       let shapeComponent = package.component(ofType: ShapeComponent.self),
       let physicsComponent = package.component(ofType: PhysicsComponent.self) {
       
       shapeComponent.node.position = position
-      physicsComponent.physicsBody.velocity = vector
+      shapeComponent.node.zRotation = rotation
+      physicsComponent.physicsBody.velocity = velocity
+      physicsComponent.physicsBody.angularVelocity = angularVelocity
+    }
+  }
+  
+  func syncResourceAt(index: Int,
+                      position: CGPoint,
+                      rotation: CGFloat,
+                      velocity: CGVector,
+                      angularVelocity: CGFloat) {
+    if let package = self.entityManager.resourcesEntities[index] as? Package,
+      let shapeComponent = package.component(ofType: ShapeComponent.self),
+      let physicsComponent = package.component(ofType: PhysicsComponent.self) {
+      
+      shapeComponent.node.position = position
+      shapeComponent.node.zRotation = rotation
+      physicsComponent.physicsBody.velocity = velocity
+      physicsComponent.physicsBody.angularVelocity = angularVelocity
+    }
+  }
+  
+  func syncPlayerResources(players: MultiplayerNetworking.SnapshotElementGroup) {
+    for (idx, playerSnap) in players.enumerated() {
+      if let player = self.entityManager.playerEntites[idx] as? General,
+        let spriteComponent = player.component(ofType: SpriteComponent.self),
+        let handsComponent = player.component(ofType: HandsComponent.self) {
+
+        print("Indecies: \(playerSnap.resourceIndecies)")
+        // Check the left hand
+        if playerSnap.resourceIndecies.count >= 1 {
+          let index = playerSnap.resourceIndecies[0]
+          let heldResource = self.entityManager.resourcesEntities[index] as! Package
+          
+          if let leftHandSlot = handsComponent.leftHandSlot {
+            if heldResource != leftHandSlot {
+              handsComponent.release(resource: leftHandSlot)
+              handsComponent.grab(resource: heldResource)
+            }
+          } else {
+            handsComponent.grab(resource: heldResource)
+          }
+        } else if let leftHandSlot = handsComponent.leftHandSlot {
+          handsComponent.release(resource: leftHandSlot)
+        }
+        
+        // Check the right hand
+        if playerSnap.resourceIndecies.count >= 2 {
+          let index = playerSnap.resourceIndecies[1]
+          let heldResource = self.entityManager.resourcesEntities[index] as! Package
+          
+          if let rightHandSlot = handsComponent.rightHandSlot {
+            if heldResource != rightHandSlot {
+              handsComponent.release(resource: rightHandSlot)
+              handsComponent.grab(resource: heldResource)
+            }
+          } else {
+            handsComponent.grab(resource: heldResource)
+          }
+        } else if let rightHandSlot = handsComponent.rightHandSlot {
+          handsComponent.release(resource: rightHandSlot)
+        }
+      }
     }
   }
   

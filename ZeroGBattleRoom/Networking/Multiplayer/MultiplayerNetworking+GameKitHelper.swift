@@ -124,7 +124,9 @@ extension MultiplayerNetworking {
     print("Resource move message received")
     self.delegate?.moveResourceAt(index: index,
                                   position: resoureceGroup[0].position,
-                                  vector: resoureceGroup[0].velocity)
+                                  rotation: resoureceGroup[0].rotation,
+                                  velocity: resoureceGroup[0].velocity,
+                                  angularVelocity: resoureceGroup[0].angularVelocity)
   }
   
   private func handleImpacted(_ message: UnifiedMessage) {
@@ -183,16 +185,12 @@ extension MultiplayerNetworking {
       throw(NetworkError.playerNotFound(message: "Missing players group: \(playerGroup)"))
     }
     
-    let resourceGroup = elements[SnapshotManager.GroupIndecies.resources.rawValue]
-    guard resourceGroup.count > 0 else {
-      throw(NetworkError.playerNotFound(message: "Missing resources group: \(resourceGroup)"))
-    }
-    
     print("Snapshot received")
     
+    // NOTE: Update remote players only
     for (idx, playerSnap) in playerGroup.enumerated() {
       guard idx != self.indicesForPlayers.local else {
-        print("Skip remote player sync.")
+        print("Skip local player sync.")
         continue
       }
 
@@ -203,14 +201,23 @@ extension MultiplayerNetworking {
                                   angularVelocity: playerSnap.angularVelocity,
                                   resourceIndecies: playerSnap.resourceIndecies)
     }
+    
+    // NOTE: Only the host is expected to send the resource data
+    let resourceGroup = elements[SnapshotManager.GroupIndecies.resources.rawValue]
+    if resourceGroup.count > 0 {
+      // Spawn resources as needed
+      self.delegate?.syncResources(resources: resourceGroup)
+      
+      // Recovery mechanizm that will re-sync all player resource ownership with the host
+      self.delegate?.syncPlayerResources(players: playerGroup)
 
-    // Spawn resources as needed
-    self.delegate?.syncResources(resources: resourceGroup)
-
-    for (idx, resource) in resourceGroup.enumerated() {
-      self.delegate?.syncResourceAt(index: idx,
-                                    position: resource.position,
-                                    vector: resource.velocity)
+      for (idx, resourceSnap) in resourceGroup.enumerated() {
+        self.delegate?.syncResourceAt(index: idx,
+                                      position: resourceSnap.position,
+                                      rotation: resourceSnap.rotation,
+                                      velocity: resourceSnap.velocity,
+                                      angularVelocity: resourceSnap.angularVelocity)
+      }
     }
   }
   

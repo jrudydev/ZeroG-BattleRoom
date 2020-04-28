@@ -13,36 +13,23 @@ import GameplayKit
 
 class Package: GKEntity {
   
+  let physicsBody: SKPhysicsBody
+  
   var wasThrown = false
   
-  init(shapeNode: SKShapeNode) {
+  init(shapeNode: SKShapeNode, physicsBody: SKPhysicsBody) {
+    self.physicsBody = physicsBody
+    
     super.init()
     
     self.addComponent(ShapeComponent(node: shapeNode))
-    let physicsBody = self.getPhysicsBody()
-    self.addComponent(PhysicsComponent(physicsBody: physicsBody))
+    self.addComponent(PhysicsComponent(physicsBody: self.physicsBody))
     
-    shapeNode.physicsBody = physicsBody
+    shapeNode.physicsBody = self.physicsBody
   }
   
   required init?(coder: NSCoder) {
     fatalError("init(coder:) has not been implemented")
-  }
-  
-  private func getPhysicsBody() -> SKPhysicsBody {
-    let shapeComponent = self.component(ofType: ShapeComponent.self)!
-    let radius = shapeComponent.node.frame.size.height / 2.0
-    
-    let physicsBody = SKPhysicsBody(circleOfRadius: radius)
-    physicsBody.friction = 0.0
-    physicsBody.restitution = 1.0
-    physicsBody.linearDamping = 0.0
-    physicsBody.angularDamping = 0.0
-    physicsBody.categoryBitMask = PhysicsCategoryMask.package
-    physicsBody.contactTestBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.wall
-    physicsBody.collisionBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.package
-    
-    return physicsBody
   }
 
 }
@@ -57,9 +44,8 @@ extension Package {
   func enableCollisionDetections() {
     guard let shapeComponent = self.component(ofType: ShapeComponent.self),
       let physicsComponent = self.component(ofType: PhysicsComponent.self) else { return }
-
-    let physicsBody = self.getPhysicsBody()
-    physicsComponent.physicsBody = physicsBody
-    shapeComponent.node.physicsBody = physicsBody
+    
+    physicsComponent.physicsBody = self.physicsBody
+    shapeComponent.node.physicsBody = self.physicsBody
   }
 }
