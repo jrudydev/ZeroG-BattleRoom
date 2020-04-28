@@ -221,6 +221,14 @@ extension EntityManager {
     }
   }
   
+  func spawnResources() {
+    if self.currentPlayerIndex == 0 {
+      for _ in 0..<numberOfSpawnedResources {
+        self.spawnResource()
+      }
+    }
+  }
+  
   func spawnResource(position: CGPoint = AppConstants.Layout.boundarySize.randomPosition,
                      velocity: CGVector? = nil) {
     guard let resourceNode = self.resourceNode?.copy() as? SKShapeNode else { return }

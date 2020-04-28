@@ -38,13 +38,7 @@ class Playing: GKState {
     
 //    self.loadLevel()
     
-//    self.spawnResources()
-    if self.scene.entityManager.currentPlayerIndex == 0 {
-      for _ in 0..<numberOfSpawnedResources {
-        self.scene.entityManager.spawnResource()
-      }
-    }
-    
+    self.scene.entityManager.spawnResources()
     self.scene.entityManager.spawnHeros()
     self.scene.entityManager.spawnDeposit()
     
