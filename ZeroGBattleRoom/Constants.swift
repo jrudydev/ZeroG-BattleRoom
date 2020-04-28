@@ -33,6 +33,7 @@ struct AppConstants {
     static let resourceName = "resource-name"
     static let directionNode = "direciton-node"
     static let angleNode = "angle-node"
+    static let uiView = "ui-view"
   }
   
   struct Touch {

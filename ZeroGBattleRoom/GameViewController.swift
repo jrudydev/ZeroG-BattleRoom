@@ -127,9 +127,9 @@ extension GameViewController {
           
           view.ignoresSiblingOrder = true
           
-          view.showsFPS = true
-          view.showsNodeCount = true
-          view.showsPhysics = true
+//          view.showsFPS = true
+//          view.showsNodeCount = true
+//          view.showsPhysics = true
         }
         
         self.sceneDelegate = sceneNode

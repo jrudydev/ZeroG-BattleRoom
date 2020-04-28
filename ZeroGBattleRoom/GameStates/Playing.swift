@@ -41,28 +41,24 @@ class Playing: GKState {
     self.scene.entityManager.spawnResources()
     self.scene.entityManager.spawnHeros()
     self.scene.entityManager.spawnDeposit()
-    
-//    self.setupBackButton()
-    
-//    let backButton = SKLabelNode(text: "Back")
-//    backButton.name = AppConstants.ComponentNames.backButtonName
-//    backButton.fontSize = 30.0
-//    backButton.position = CGPoint(x: backButton.frame.width / 2, y: -backButton.frame.height / 2)
-//    let newPosX = backButton.position.x + -UIScreen.main.bounds.width / 2 + 20.0
-//    let newPosY = backButton.position.y + UIScreen.main.bounds.height / 2 - 30.0
-//    backButton.position = CGPoint(x: newPosX, y: newPosY)
-//    backButton.zPosition = 100
-//    backButton.isUserInteractionEnabled = false
-//
-//    self.scene.cam!.addChild(backButton)
-    
-    self.scene.entityManager.addMenuButton()
+
+    let backButton = SKLabelNode(text: "Back")
+    backButton.name = AppConstants.ComponentNames.backButtonName
+    backButton.fontSize = 30.0
+    backButton.position = CGPoint(x: backButton.frame.width / 2, y: -backButton.frame.height / 2)
+    let newPosX = backButton.position.x + -UIScreen.main.bounds.width / 2 + 20.0
+    let newPosY = backButton.position.y + UIScreen.main.bounds.height / 2 - 30.0
+    backButton.position = CGPoint(x: newPosX, y: newPosY)
+    backButton.zPosition = 100
+    backButton.isUserInteractionEnabled = false
+
+    self.scene.entityManager.addInGameUIView(elements: [backButton])
   }
   
   override func willExit(to nextState: GKState) {
-//    let backButton = self.scene.cam!.childNode(withName: AppConstants.ComponentNames.backButtonName)!
-//    backButton.removeFromParent()
-    self.scene.entityManager.removeMenuButton(name: AppConstants.ComponentNames.backButtonName)
+    // TODO: This is not resetting the intrerface as intended
+    self.scene.entityManager.resetInterface()
+    self.scene.entityManager.removeInGameUIView()
   }
   
   override func isValidNextState(_ stateClass: AnyClass) -> Bool {

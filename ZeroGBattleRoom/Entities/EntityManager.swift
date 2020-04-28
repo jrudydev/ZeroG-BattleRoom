@@ -19,8 +19,8 @@ class EntityManager {
   
   lazy var componentSystems: [GKComponentSystem] = {
     let aliasComponent = GKComponentSystem(componentClass: AliasComponent.self)
-    let uiComponent = GKComponentSystem(componentClass: InGameUIComponent.self)
-    return [aliasComponent, uiComponent]
+    let interfaceComponent = GKComponentSystem(componentClass: InterfaceComponent.self)
+    return [aliasComponent, interfaceComponent]
   }()
   
   var playerEntites = [GKEntity]()
@@ -118,9 +118,8 @@ class EntityManager {
   
   func update(_ deltaTime: CFTimeInterval) {
     for entity in uiEntities {
-      if entity is ButtonLabel {
-        let buttonLabel = entity as! ButtonLabel
-        buttonLabel.updateViewPort(size: self.scene.viewportSize)
+      if let userInterface = entity as? InGameInterface {
+        userInterface.updateViewPort(size: self.scene.viewportSize)
       }
     }
     
@@ -136,6 +135,14 @@ class EntityManager {
     self.toRemove.removeAll()
     
     self.updateResourceVelocity()
+  }
+  
+  func resetInterface() {
+    for entity in self.uiEntities {
+      if let userInterface = entity as? InGameInterface {
+        userInterface.updateViewPort(size: UIScreen.main.bounds.size)
+      }
+    }
   }
   
   private func addToComponentSysetem(entity: GKEntity) {
@@ -452,10 +459,10 @@ extension EntityManager {
     return entity
   }
   
-  func uiEntityWtih(nodeName: String) -> GKEntity? {
+  func uiEntityWith(nodeName: String) -> GKEntity? {
     let element = self.uiEntities.first { entity -> Bool in
-      guard let uiEntity = entity as? ButtonLabel,
-        let uiComponent = uiEntity.component(ofType: InGameUIComponent.self) else { return false }
+      guard let uiEntity = entity as? InGameInterface,
+        let uiComponent = uiEntity.component(ofType: InterfaceComponent.self) else { return false }
 
       return uiComponent.node.name == nodeName
     }
@@ -485,21 +492,26 @@ extension EntityManager {
 }
 
 extension EntityManager {
-  func addMenuButton() {
-    let menuButton = ButtonLabel(text: "Back", fontSize: 26.0)
+  func addInGameUIView(elements: [SKNode]) {
+    let inGameInterface = InGameInterface(elements: elements)
     
-    self.scene.cam!.addChild(menuButton.node)
+    if let interfaceComponent = inGameInterface.component(ofType: InterfaceComponent.self) {
+      self.scene.cam!.addChild(interfaceComponent.node)
+    }
     
-    self.uiEntities.insert(menuButton)
-    self.addToComponentSysetem(entity: menuButton)
+    self.uiEntities.insert(inGameInterface)
+    self.addToComponentSysetem(entity: inGameInterface)
   }
   
-  func removeMenuButton(name: String) {
-    guard let menuButton = self.uiEntityWtih(nodeName: name) as? ButtonLabel else { return }
+  func removeInGameUIView() {
+    guard let inGameInterface = self.uiEntityWith(nodeName: AppConstants.ComponentNames.uiView) as? InGameInterface,
+      let interfaceComponent = inGameInterface.component(ofType: InterfaceComponent.self) else { return }
     
-    menuButton.node.removeFromParent()
+    for element in interfaceComponent.elements {
+      element.removeFromParent()
+    }
     
-    self.uiEntities.remove(menuButton)
-    self.toRemove.insert(menuButton)
+    self.uiEntities.remove(inGameInterface)
+    self.toRemove.insert(inGameInterface)
   }
 }
