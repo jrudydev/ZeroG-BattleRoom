@@ -238,10 +238,8 @@ extension GameScene: MultiplayerNetworkingProtocol {
   func syncPlayerResources(players: MultiplayerNetworking.SnapshotElementGroup) {
     for (idx, playerSnap) in players.enumerated() {
       if let player = self.entityManager.playerEntites[idx] as? General,
-        let spriteComponent = player.component(ofType: SpriteComponent.self),
         let handsComponent = player.component(ofType: HandsComponent.self) {
-
-        print("Indecies: \(playerSnap.resourceIndecies)")
+        
         // Check the left hand
         if playerSnap.resourceIndecies.count >= 1 {
           let index = playerSnap.resourceIndecies[0]
