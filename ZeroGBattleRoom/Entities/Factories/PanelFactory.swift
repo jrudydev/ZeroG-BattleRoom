@@ -23,7 +23,7 @@ struct PanelFactory {
     }
   }
   
-  private func createWallEntity(beamConfig: Panel.BeamArrangment) -> GKEntity {
+  private func createWallEntity(beamConfig: Panel.BeamArrangment, team: Team? = nil) -> GKEntity {
     let shape = SKShapeNode(rectOf: AppConstants.Layout.wallSize,
                             cornerRadius: AppConstants.Layout.wallCornerRadius)
     shape.name = AppConstants.ComponentNames.wallPanelName
@@ -34,10 +34,10 @@ struct PanelFactory {
     let physicsBody = SKPhysicsBody(rectangleOf: shape.frame.size)
     physicsBody.isDynamic = false
 
-    return Panel(shapeNode: shape, physicsBody: physicsBody, config: beamConfig)
+    return Panel(shapeNode: shape, physicsBody: physicsBody, team: team, config: beamConfig)
   }
   
-  private func numberOfSegments(length: CGFloat, wallSize: CGFloat) -> Int {
+  func numberOfSegments(length: CGFloat, wallSize: CGFloat) -> Int {
     var segments = length / wallSize
     
     if length.truncatingRemainder(dividingBy: wallSize) != 0 {
@@ -55,7 +55,6 @@ extension PanelFactory {
     let heightSegments = self.numberOfSegments(length: size.height,
                                                wallSize: AppConstants.Layout.wallSize.width)
       
-    let size = AppConstants.Layout.boundarySize
     let topWall = self.panelSegment(beamConfig: .top,
                                     number: widthSegments,
                                     position: CGPoint(x: 0.0, y: -size.height/2))
@@ -77,14 +76,15 @@ extension PanelFactory {
   func panelSegment(beamConfig: Panel.BeamArrangment,
                     number: Int,
                     position: CGPoint = .zero,
-                    orientation: WallOrientation = .horizontal) -> [GKEntity] {
+                    orientation: WallOrientation = .horizontal,
+                    team: Team? = nil) -> [GKEntity] {
     var segments = [GKEntity]()
       
     var currentPosition = orientation.startingPosition(numberOfWalls: number)
     for _ in 0..<number {
       defer { currentPosition = orientation.nextPosition(position: currentPosition)}
 
-      let panelEntity = self.createWallEntity(beamConfig: beamConfig)
+      let panelEntity = self.createWallEntity(beamConfig: beamConfig, team: team)
       if let shapeComponent = panelEntity.component(ofType: ShapeComponent.self) {
         shapeComponent.node.position = CGPoint(x: currentPosition.x + position.x,
                                                y: currentPosition.y + position.y)

@@ -12,7 +12,8 @@ import GameKit
 
 extension GameScene: SKPhysicsContactDelegate {
   func didBegin(_ contact: SKPhysicsContact) {
-    guard self.gameState.currentState is Playing  else { return }
+    guard self.gameState.currentState is Playing ||
+      self.gameState.currentState is Tutorial else { return }
     
     var firstBody: SKPhysicsBody
     var secondBody: SKPhysicsBody
@@ -37,17 +38,20 @@ extension GameScene: SKPhysicsContactDelegate {
       self.handleHeroPackackageCollision(firstBody: firstBody, secondBody: secondBody)
     }
     
-    if firstBody.categoryBitMask == PhysicsCategoryMask.hero && secondBody.categoryBitMask == PhysicsCategoryMask.deposit {
+    if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
+      secondBody.categoryBitMask == PhysicsCategoryMask.deposit {
       
       self.handleHeroDepositCollision(firstBody: firstBody, secondBody: secondBody)
     }
     
-    if firstBody.categoryBitMask == PhysicsCategoryMask.hero && secondBody.categoryBitMask == PhysicsCategoryMask.wall {
+    if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
+      secondBody.categoryBitMask == PhysicsCategoryMask.wall {
       
       self.handleHeroWallCollision(firstBody: firstBody, secondBody: secondBody)
     }
     
-    if firstBody.categoryBitMask == PhysicsCategoryMask.wall && secondBody.categoryBitMask == PhysicsCategoryMask.package {
+    if firstBody.categoryBitMask == PhysicsCategoryMask.wall &&
+      secondBody.categoryBitMask == PhysicsCategoryMask.package {
         
       guard let resourceNode = secondBody.node as? SKShapeNode,
         let impactedResource = self.entityManager.resourceWith(node: resourceNode) as? Package else { return }
@@ -148,6 +152,7 @@ extension GameScene: SKPhysicsContactDelegate {
     switch teamComponent.team {
     case .team1: depositComponent.team1Deposits += total
     case .team2: depositComponent.team2Deposits += total
+    default: break
     }
     
     if let label = self.gameMessage {
@@ -176,7 +181,19 @@ extension GameScene: SKPhysicsContactDelegate {
       let panel = self.entityManager.panelWith(node: beam) as? Panel,
       let panelShapeComponent = panel.component(ofType: ShapeComponent.self),
       let tractorBeamComponent = panel.component(ofType: BeamComponent.self),
-      hero.isBeamable && !tractorBeamComponent.isOccupied else { return }
+      self.gameState.currentState is Tutorial || !tractorBeamComponent.isOccupied,
+      hero.isBeamable else { return }
+    
+    if let panelTeamComponent = panel.component(ofType: TeamComponent.self),
+      let heroTeamComponent = hero.component(ofType: TeamComponent.self),
+      panelTeamComponent.team != heroTeamComponent.team,
+      self.gameState.currentState is Tutorial,
+      hero != self.entityManager.playerEntites[1],
+      let tutorial = self.entityManager.tutorialEntiies[0] as? TutorialAction {
+      
+      tutorial.setupNextStep()
+      self.gameState.enter(GameOver.self)
+    }
 
     physicsComponent.isEffectedByPhysics = false
     

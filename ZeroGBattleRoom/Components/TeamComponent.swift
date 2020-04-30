@@ -13,14 +13,35 @@ import GameplayKit
 
 enum Team: Int {
   case team1 = 1
-  case team2 = 2
+  case team2
+  case team3
+  case team4
   
   static let allValues = [team1, team2]
+  
+  var color: UIColor {
+    switch self {
+    case .team1:
+      return UIColor.blue
+    case .team2:
+      return UIColor.red
+    case .team3:
+      return UIColor.yellow
+    case .team4:
+      return UIColor.green
+    }
+  }
+  
+  var offColor: UIColor {
+    return self.color.withAlphaComponent(0.5)
+  }
   
   func oppositeTeam() -> Team {
     switch self {
     case .team1: return .team2
     case .team2: return .team1
+    case .team3: return .team4
+    case .team4: return .team3
     }
   }
 }

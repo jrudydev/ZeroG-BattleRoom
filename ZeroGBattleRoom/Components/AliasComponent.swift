@@ -18,6 +18,7 @@ class AliasComponent: GKComponent {
   
   init(label: String = "Player") {
     self.node = SKLabelNode(fontNamed: "Arial")
+    self.node.name = AppConstants.ComponentNames.heroPlayerName
     self.node.fontSize = 40
     self.node.fontColor = SKColor(red: 255.0, green: 255.0, blue: 255.0, alpha: 0.2)
     self.node.position = CGPoint(x: 0.0, y: 0.0)

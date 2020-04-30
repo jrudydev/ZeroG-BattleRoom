@@ -1,23 +1,27 @@
 //
-//  Playing.swift
-//  SpaceMonkies
+//  Tutorial.swift
+//  ZeroG BattleRoom
 //
-//  Created by Rudy Gomez on 3/26/20.
+//  Created by Rudy Gomez on 4/28/20.
 //  Copyright © 2020 JRudy Gaming. All rights reserved.
 //
 
 import Foundation
 import GameplayKit
 
-class Playing: GKState {
-
-  enum Level: Int {
-    case level_1 = 1
-    case level_2
-    case level_3
+class Tutorial: GKState {
+  
+  enum Step: Int {
+    case tapLaunch = 1
+    case swipeLaunch
+    case rotateThrow
     
-    var filename: String {
-      return "Level_\(self.rawValue)"
+    var nextStep: Step? {
+      switch self {
+      case .tapLaunch: return .swipeLaunch
+      case .swipeLaunch: return .rotateThrow
+      case .rotateThrow: return nil
+      }
     }
   }
   
@@ -31,17 +35,30 @@ class Playing: GKState {
   override func didEnter(from previousState: GKState?) {
     self.setupCamera()
     self.setupPhysics()
-  
-    self.scene.entityManager.spawnPanels()
     
-//    self.loadLevel()
+    let mapSize = AppConstants.Layout.mapSize
+    let origin = CGPoint(x: -mapSize.width / 2, y: -mapSize.height / 2)
+    let whiteBackground = SKShapeNode(rect: CGRect(origin: origin, size: mapSize))
+    whiteBackground.fillColor = .white
+    whiteBackground.zPosition = -2
+    self.scene.addChild(whiteBackground)
     
-    self.scene.entityManager.spawnResources()
-    self.scene.entityManager.spawnHeros(mapSize: AppConstants.Layout.boundarySize)
-    self.scene.entityManager.spawnDeposit()
-
+    let gridImage = SKSpriteNode(imageNamed: "tron_grid")
+    gridImage.name = AppConstants.ComponentNames.gridImageName
+    gridImage.aspectFillToSize(fillSize: mapSize)
+    
+    let widthDiff = (gridImage.size.width - UIScreen.main.bounds.width) / 2
+    gridImage.position = CGPoint(x: gridImage.position.x +  widthDiff, y: gridImage.position.y)
+    gridImage.zPosition = -1
+    
+    self.scene.addChild(gridImage)
+    
+    self.scene.entityManager.spawnTutorialPanels()
+    self.scene.entityManager.spawnHeros(mapSize: AppConstants.Layout.tutorialBoundrySize)
+    
     let backButton = SKLabelNode(text: "Back")
     backButton.name = AppConstants.ComponentNames.backButtonName
+    backButton.fontColor = .black
     backButton.fontSize = 30.0
     backButton.position = CGPoint(x: backButton.frame.width / 2, y: -backButton.frame.height / 2)
     let newPosX = backButton.position.x + -UIScreen.main.bounds.width / 2 + 20.0
@@ -51,24 +68,24 @@ class Playing: GKState {
     backButton.isUserInteractionEnabled = false
 
     self.scene.entityManager.addInGameUIView(elements: [backButton])
+    
+    self.setupPlayers()
   }
   
   override func willExit(to nextState: GKState) {
-    // TODO: This is not resetting the intrerface as intended
-    self.scene.entityManager.resetInterface()
-    self.scene.entityManager.removeInGameUIView()
+    
   }
   
   override func isValidNextState(_ stateClass: AnyClass) -> Bool {
-    return stateClass is GameOver.Type || stateClass is Disconnected.Type
+    return stateClass is GameOver.Type
   }
-
+  
   override func update(deltaTime seconds: TimeInterval) {
     self.repositionCamera()
   }
-  
-  private func loadLevel(_ level: Level = .level_1) {
-    guard let scene = SKScene(fileNamed: level.filename) else { return }
+
+  private func loadLevel() {
+    guard let scene = SKScene(fileNamed: "") else { return }
     
     scene.enumerateChildNodes(withName: AppConstants.ComponentNames.wallPanelName) { wallNode, _  in
 //      if let wall = self.scene.entitityManager.wallNodeCopy {
@@ -78,9 +95,26 @@ class Playing: GKState {
 //      }
     }
   }
+  
+  private func setupPlayers() {
+    for entity in self.scene.entityManager.playerEntites {
+      guard let hero = entity as? General,
+        let aliasComponent = hero.component(ofType: AliasComponent.self) else { continue }
+      
+      aliasComponent.node.text = ""
+    }
+    
+    if let ghost = self.scene.entityManager.playerEntites[1] as? General,
+      let ghostPhysicsComponent = ghost.component(ofType: PhysicsComponent.self) {
+      
+      ghostPhysicsComponent.physicsBody.collisionBitMask = PhysicsCategoryMask.package
+      ghost.switchToState(.moving)
+      self.scene.entityManager.setupTutorial(hero: ghost)
+    }
+  }
 }
 
-extension Playing {
+extension Tutorial {
   private func setupPhysics() {
     self.scene.physicsBody = self.scene.borderBody
     self.scene.physicsWorld.gravity = CGVector(dx: 0.0, dy: 0.0)
@@ -94,7 +128,7 @@ extension Playing {
   }
 }
 
-extension Playing {
+extension Tutorial {
   private func repositionCamera() {
     guard let camera = self.scene.cam else { return }
     guard let hero = self.scene.entityManager.hero as? General else { return }

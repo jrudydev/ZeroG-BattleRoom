@@ -25,11 +25,7 @@ extension GameScene {
     launchComponent.launchInfo.lastTouchDown = pos
     self.updateLaunchComponents(pos: pos)
     
-    if let n = self.entityManager.spinnyNodeCopy {
-      n.position = pos
-      n.strokeColor = SKColor.red
-      self.addChild(n)
-    }
+    ShapeFactory.shared.spawnSpinnyNodeAt(pos: pos)
   }
   
   func touchMoved(toPoint pos : CGPoint) {
@@ -49,40 +45,49 @@ extension GameScene {
   func touchUp(atPoint pos : CGPoint) {
     switch self.gameState.currentState {
     case is WaitingForTap:
-      let touchedNode = self.atPoint(pos)
-      if let name = touchedNode.name, name == AppConstants.ComponentNames.localLabelName {
-        self.gameState.enter(Playing.self)
+      self.handleWaitingForTap(pos: pos)
+    case is Tutorial, is Playing:
+      if let tutorialAction = self.entityManager.tutorialEntiies.first as? TutorialAction {
+        tutorialAction.stopAllAnimations()
       }
-      if let name = touchedNode.name, name == AppConstants.ComponentNames.onlineLabelName {
-        NotificationCenter.default.post(name: .startMatchmaking, object: nil)
-      }
-    case is Playing:
-      self.handlePlaying(pos: pos)
+      self.handleRestartTap(pos: pos)
+      self.handlePlayerLaunch(pos: pos)
     case is GameOver:
       NotificationCenter.default.post(name: .restartGame, object: nil)
     case is Disconnected:
-      let touchedNode = self.atPoint(pos)
-      if let name = touchedNode.name, name == AppConstants.ComponentNames.backButtonName {
-        NotificationCenter.default.post(name: .restartGame, object: nil)
-        return
-      }
+      NotificationCenter.default.post(name: .restartGame, object: nil)
     default: break
     }
   }
   
-  private func handlePlaying(pos: CGPoint) {
+  private func handleWaitingForTap(pos: CGPoint) {
+    let touchedNode = self.atPoint(pos)
+    if let name = touchedNode.name, name == AppConstants.ComponentNames.tutorialLabelName {
+      self.gameState.enter(Tutorial.self)
+    }
+    if let name = touchedNode.name, name == AppConstants.ComponentNames.localLabelName {
+      self.gameState.enter(Playing.self)
+    }
+    if let name = touchedNode.name, name == AppConstants.ComponentNames.onlineLabelName {
+      NotificationCenter.default.post(name: .startMatchmaking, object: nil)
+    }
+  }
+  
+  private func handleRestartTap(pos: CGPoint) {
     let touchedNode = self.atPoint(pos)
     if let name = touchedNode.name, name == AppConstants.ComponentNames.backButtonName {
       self.matchEnded()
       NotificationCenter.default.post(name: .restartGame, object: nil)
       return
     }
-    
+  }
+  
+  private func handlePlayerLaunch(pos: CGPoint) {
     guard self.entityManager.currentPlayerIndex != -1,
       let hero = self.entityManager.hero as? General else { return }
     
     if case .beamed = hero.state {
-      self.launchPlayer()
+      self.launch(hero: hero)
     } else  {
       if let impulseComponent = hero.component(ofType: ImpulseComponent.self),
         !impulseComponent.isOnCooldown {
@@ -101,9 +106,8 @@ extension GameScene {
     }
   }
   
-  private func launchPlayer() {
-    guard let hero = self.entityManager.hero as? General,
-      let heroLaunchComponent = hero.component(ofType: LaunchComponent.self),
+  private func launch(hero: General) {
+    guard let heroLaunchComponent = hero.component(ofType: LaunchComponent.self),
       heroLaunchComponent.launchInfo.lastTouchDown != nil else { return }
     
     hero.launch(){ sprite, velocity, angularVelocity, vacatedPanel in
@@ -174,52 +178,72 @@ extension GameScene {
     guard let hero = self.entityManager.hero as? General,
       let spriteComponent = hero.component(ofType: SpriteComponent.self),
       let launchComponent = hero.component(ofType: LaunchComponent.self),
-      let physicsComponent = hero.component(ofType: PhysicsComponent.self),
-      let lastTouchDown = launchComponent.launchInfo.lastTouchDown,
-      (hero.isBeamed && !physicsComponent.isEffectedByPhysics) else { return }
+      let lastTouchDown = launchComponent.launchInfo.lastTouchDown else { return }
     
-    var safeTouchPosition = self.convert(lastTouchDown, to: spriteComponent.node)
-    safeTouchPosition.y = abs(safeTouchPosition.y)
-    safeTouchPosition = self.convert(safeTouchPosition, from: spriteComponent.node)
+    let safeLastTouch = self.convert(lastTouchDown, to: spriteComponent.node)
+    let safeMoveTouch = self.convert(pos, to: spriteComponent.node)
     
-    var safeMovePosition = self.convert(pos, to: spriteComponent.node)
-    safeMovePosition.y = abs(safeMovePosition.y)
-    safeMovePosition = self.convert(safeMovePosition, from: spriteComponent.node)
-    
-    let directionVector = spriteComponent.node.position.vectorTo(point: safeTouchPosition)
-    let directionRotation = directionVector.rotation - spriteComponent.node.zRotation
-    
-    let moveVector = spriteComponent.node.position.vectorTo(point: safeMovePosition)
-    let moveRotation = moveVector.rotation - spriteComponent.node.zRotation
+    let safePosition = self.safePosition(point: safeLastTouch, from: spriteComponent.node)
+    let safeMovePosition = self.safePosition(point: safeMoveTouch, from: spriteComponent.node)
+    let touchRotation = spriteComponent.node.fullRotationTo(point: safeLastTouch)
+    let moveRotation = spriteComponent.node.fullRotationTo(point: safeMoveTouch)
 
-    let localDirectionPosition = self.convert(lastTouchDown, to: spriteComponent.node)
-    let localMovePosition = self.convert(pos, to: spriteComponent.node)
-    let isDirectionNegitive = localDirectionPosition.y < 0
-    let isMovenNegitive = localMovePosition.y < 0
-    let directionFullRotation = self.fullRotation(rotation: directionRotation,
-                                                  isNegitive: isDirectionNegitive)
-    let moveFullRotation = self.fullRotation(rotation: moveRotation,
-                                                  isNegitive: isMovenNegitive)
+    hero.updateLaunchComponents(position: safePosition,
+                                movePosition: safeMovePosition,
+                                rotation: touchRotation,
+                                moveRotation: moveRotation)
     
-    let touchSlope = spriteComponent.node.position.slopeTo(point: safeTouchPosition)
-    let intersect = safeTouchPosition.intersection(m1: touchSlope,
-                                                   P2: safeMovePosition,
-                                                   m2: -1 / touchSlope)
-    
-    let halfMaxSwipeDist = AppConstants.Touch.maxSwipeDistance / 2
-    let adjustmentVector = directionVector.reversed().normalized() * halfMaxSwipeDist
-    let adjustmentPosition = CGPoint(x: safeTouchPosition.x + adjustmentVector.dx,
-                                      y: safeTouchPosition.y + adjustmentVector.dy)
-    
-    let launchVector = intersect.vectorTo(point: adjustmentPosition)
-    let rotationVector = safeMovePosition.vectorTo(point: intersect)
-    
-    
-    launchComponent.update(directionVector: directionVector,
-                           moveVector: launchVector,
-                           rotationVector: rotationVector,
-                           directionRotation: directionRotation,
-                           isLeftRotation: directionFullRotation > moveFullRotation)
+//
+//
+//    guard let hero = self.entityManager.hero as? General,
+//      let spriteComponent = hero.component(ofType: SpriteComponent.self),
+//      let launchComponent = hero.component(ofType: LaunchComponent.self),
+//      let physicsComponent = hero.component(ofType: PhysicsComponent.self),
+//      let lastTouchDown = launchComponent.launchInfo.lastTouchDown,
+//      (hero.isBeamed && !physicsComponent.isEffectedByPhysics) else { return }
+//
+//    var safeTouchPosition = self.convert(lastTouchDown, to: spriteComponent.node)
+//    safeTouchPosition.y = abs(safeTouchPosition.y)
+//    safeTouchPosition = self.convert(safeTouchPosition, from: spriteComponent.node)
+//
+//    var safeMovePosition = self.convert(pos, to: spriteComponent.node)
+//    safeMovePosition.y = abs(safeMovePosition.y)
+//    safeMovePosition = self.convert(safeMovePosition, from: spriteComponent.node)
+//
+//    let directionVector = spriteComponent.node.position.vectorTo(point: safeTouchPosition)
+//    let directionRotation = directionVector.rotation - spriteComponent.node.zRotation
+//
+//    let moveVector = spriteComponent.node.position.vectorTo(point: safeMovePosition)
+//    let moveRotation = moveVector.rotation - spriteComponent.node.zRotation
+//
+//    let localDirectionPosition = self.convert(lastTouchDown, to: spriteComponent.node)
+//    let localMovePosition = self.convert(pos, to: spriteComponent.node)
+//    let isDirectionNegitive = localDirectionPosition.y < 0
+//    let isMovenNegitive = localMovePosition.y < 0
+//    let directionFullRotation = self.fullRotation(rotation: directionRotation,
+//                                                  isNegitive: isDirectionNegitive)
+//    let moveFullRotation = self.fullRotation(rotation: moveRotation,
+//                                                  isNegitive: isMovenNegitive)
+//
+//    let touchSlope = spriteComponent.node.position.slopeTo(point: safeTouchPosition)
+//    let intersect = safeTouchPosition.intersection(m1: touchSlope,
+//                                                   P2: safeMovePosition,
+//                                                   m2: -1 / touchSlope)
+//
+//    let halfMaxSwipeDist = AppConstants.Touch.maxSwipeDistance / 2
+//    let adjustmentVector = directionVector.reversed().normalized() * halfMaxSwipeDist
+//    let adjustmentPosition = CGPoint(x: safeTouchPosition.x + adjustmentVector.dx,
+//                                      y: safeTouchPosition.y + adjustmentVector.dy)
+//
+//    let launchVector = intersect.vectorTo(point: adjustmentPosition)
+//    let rotationVector = safeMovePosition.vectorTo(point: intersect)
+//
+//
+//    launchComponent.update(directionVector: directionVector,
+//                           moveVector: launchVector,
+//                           rotationVector: rotationVector,
+//                           directionRotation: directionRotation,
+//                           isLeftRotation: directionFullRotation > moveFullRotation)
     
 //    if let n = self.entityManager.spinnyNodeCopy {
 //      n.position = intersect
@@ -234,13 +258,19 @@ extension GameScene {
 //    }
   }
   
-  private func fullRotation(rotation: CGFloat, isNegitive: Bool) -> CGFloat {
+  private func safePosition(point: CGPoint, from node: SKSpriteNode) -> CGPoint {
+    return self.convert(CGPoint(x: point.x, y: abs(point.y)), from: node)
+  }
+}
+
+extension CGFloat {
+  func fullRotation(isNegitive: Bool) -> CGFloat {
     guard !isNegitive else {
-      let multiplyer: CGFloat = rotation < 0.0 ? -1.0 : 1.0
-      return (CGFloat.pi - abs(rotation)) * multiplyer
+      let multiplyer: CGFloat = self < 0.0 ? -1.0 : 1.0
+      return (CGFloat.pi - abs(self)) * multiplyer
     }
     
-    return rotation
+    return self
   }
 }
 
@@ -271,5 +301,15 @@ extension CGPoint {
   func slopeTo(point: CGPoint) -> CGFloat {
     // Note: Slope equation: m = (y - Py) / (x - Px)
     return (self.y - point.y) / (self.x - point.x)
+  }
+}
+
+extension SKSpriteNode {
+  func fullRotationTo(point: CGPoint) -> CGFloat {
+    let moveVector = self.position.vectorTo(point: point)
+    let moveRotation = moveVector.rotation - self.zRotation
+    let isMovenNegitive = point.y < 0
+    
+    return moveRotation.fullRotation(isNegitive: isMovenNegitive)
   }
 }

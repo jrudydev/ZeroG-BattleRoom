@@ -25,6 +25,7 @@ class GameScene: SKScene {
   
   lazy var gameState: GKStateMachine = GKStateMachine(states: [
     WaitingForTap(scene: self),
+    Tutorial(scene: self),
     Playing(scene: self),
     GameOver(scene: self),
     Disconnected(scene: self)])
@@ -69,6 +70,7 @@ class GameScene: SKScene {
     self.entityManager = EntityManager(scene: self)
     
     let _ = SoundManager.shared
+    ShapeFactory.shared.gameScene = self
     self.setupGameMessage()
     
     self.gameState.enter(WaitingForTap.self)
@@ -115,6 +117,7 @@ class GameScene: SKScene {
           localDidWin = teamComponent.team == .team1
         case .team2:
           localDidWin = teamComponent.team == .team2
+        default: break
         }
         print(localDidWin ? "Won" : "Lost")
         self.multiplayerNetworking.sendGameEnd(player1Won: localDidWin)

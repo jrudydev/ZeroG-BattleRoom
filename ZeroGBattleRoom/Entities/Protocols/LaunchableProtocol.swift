@@ -11,5 +11,7 @@ import SpriteKit
 
 
 protocol LaunchableProtocol {
-  func launch(completion: (SKSpriteNode, CGVector, CGFloat, Panel) -> Void)
+  typealias LaunchAftermath = (SKSpriteNode, CGVector, CGFloat, Panel) -> Void
+  
+  func launch(completion: LaunchAftermath?)
 }

@@ -13,6 +13,7 @@ struct AppConstants {
   struct Layout {
     static var mapSize = CGSize(width: 2000, height: 3000)
     static var boundarySize = CGSize(width:  1000, height: 1600)
+    static var tutorialBoundrySize = CGSize(width: 100.0, height: 400.0)
     static var wallSize = CGSize(width: 100, height: 20)
     static var wallCornerRadius: CGFloat {
       return wallSize.width * 0.1
@@ -22,7 +23,9 @@ struct AppConstants {
   struct ComponentNames {
     static let heroPlayerName = "hero-player"
     static let menuImageName = "munu-image"
-    static let localLabelName = "local-label"
+    static let gridImageName = "grid-image"
+    static let localLabelName = "tutorial-label"
+    static let tutorialLabelName = "local-label"
     static let onlineLabelName = "online-label"
     static let shopLabelName = "shop-label"
     static let backButtonName = "back-button"

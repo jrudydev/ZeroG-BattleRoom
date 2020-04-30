@@ -11,7 +11,6 @@ import SpriteKit
 import GameplayKit
 
 
-
 class General: GKEntity, BeamableProtocol {
   
   private let defaultImpulseMagnitude: CGFloat = 2.0
@@ -44,7 +43,6 @@ class General: GKEntity, BeamableProtocol {
     super.init()
     
     let spriteComponent = SpriteComponent(texture: SKTexture(imageNamed: imageName))
-    spriteComponent.node.name = AppConstants.ComponentNames.heroPlayerName
     spriteComponent.node.zPosition = 10
     self.addComponent(spriteComponent)
     self.addComponent(TeamComponent(team: team))
@@ -110,8 +108,7 @@ class General: GKEntity, BeamableProtocol {
     // TODO: Send and handle a state parameter here
     let physicsBody = SKPhysicsBody(circleOfRadius: 10)
     physicsBody.categoryBitMask = PhysicsCategoryMask.hero
-    physicsBody.collisionBitMask = PhysicsCategoryMask.package
-    physicsBody.collisionBitMask = PhysicsCategoryMask.hero
+    physicsBody.collisionBitMask = PhysicsCategoryMask.package | PhysicsCategoryMask.hero
     physicsBody.contactTestBitMask = PhysicsCategoryMask.hero
     
     return physicsBody
@@ -276,7 +273,46 @@ extension General: ImpulsableProtocol {
 }
 
 extension General: LaunchableProtocol {
-  func launch(completion: (SKSpriteNode, CGVector, CGFloat, Panel) -> Void) {
+  func updateLaunchComponents(position: CGPoint,
+                              movePosition: CGPoint,
+                              rotation: CGFloat,
+                              moveRotation: CGFloat) {
+    guard let spriteComponent = self.component(ofType: SpriteComponent.self),
+      let launchComponent = self.component(ofType: LaunchComponent.self),
+      let physicsComponent = self.component(ofType: PhysicsComponent.self),
+      (self.isBeamed && !physicsComponent.isEffectedByPhysics) else { return }
+    
+    let directionVector = spriteComponent.node.position.vectorTo(point: position)
+    let directionRotation = directionVector.rotation - spriteComponent.node.zRotation
+    
+    let moveVector = spriteComponent.node.position.vectorTo(point: movePosition)
+    let moveRotation = moveVector.rotation - spriteComponent.node.zRotation
+
+    let intersect: CGPoint
+    if spriteComponent.node.position.x == position.x {
+      // handle vertical slope
+      intersect = position
+    } else {
+      let touchSlope = spriteComponent.node.position.slopeTo(point: position)
+      intersect = position.intersection(m1: touchSlope, P2: movePosition, m2: -1 / touchSlope)
+    }
+    
+    let halfMaxSwipeDist = AppConstants.Touch.maxSwipeDistance / 2
+    let adjustmentVector = directionVector.reversed().normalized() * halfMaxSwipeDist
+    let adjustmentPosition = CGPoint(x: position.x + adjustmentVector.dx,
+                                      y: position.y + adjustmentVector.dy)
+    
+    let launchVector = intersect.vectorTo(point: adjustmentPosition)
+    let rotationVector = movePosition.vectorTo(point: intersect)
+    
+    launchComponent.update(directionVector: directionVector,
+                           moveVector: launchVector,
+                           rotationVector: rotationVector,
+                           directionRotation: directionRotation,
+                           isLeftRotation: rotation > moveRotation)
+  }
+  
+  func launch(completion: LaunchAftermath? = nil) {
     guard let spriteComponent = self.component(ofType: SpriteComponent.self),
       let physicsComponent = self.component(ofType: PhysicsComponent.self),
       let launchComponent = self.component(ofType: LaunchComponent.self),
@@ -299,10 +335,10 @@ extension General: LaunchableProtocol {
     launchComponent.hide()
     
     self.resetBeamTimer()
-    completion(spriteComponent.node,
-               physicsComponent.physicsBody.velocity,
-               physicsComponent.physicsBody.angularVelocity,
-               occupiedPanel)
+    completion?(spriteComponent.node,
+                physicsComponent.physicsBody.velocity,
+                physicsComponent.physicsBody.angularVelocity,
+                occupiedPanel)
   }
 }
 

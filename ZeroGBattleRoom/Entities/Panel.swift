@@ -17,11 +17,15 @@ class Panel: GKEntity {
     case top
     case bottom
     case both
+    case none
   }
   
   var beamColor = UIColor.magenta
   
-  init(shapeNode: SKShapeNode, physicsBody: SKPhysicsBody, config: BeamArrangment = .both) {
+  init(shapeNode: SKShapeNode,
+       physicsBody: SKPhysicsBody,
+       team: Team? = nil,
+       config: BeamArrangment = .both) {
     super.init()
     
     self.addComponent(ShapeComponent(node: shapeNode))
@@ -36,6 +40,13 @@ class Panel: GKEntity {
     beamPhysicsBody.categoryBitMask = PhysicsCategoryMask.wall
     beamPhysicsBody.contactTestBitMask = PhysicsCategoryMask.hero
     beamPhysicsBody.collisionBitMask = PhysicsCategoryMask.hero
+    
+    if let team = team {
+      shapeNode.strokeColor = team.color
+      shapeNode.fillColor = team.offColor
+      let teamComponent = TeamComponent(team: team)
+      self.addComponent(teamComponent)
+    }
     
     var tractorBeams = [SKShapeNode]()
     if config == BeamArrangment.top || config == BeamArrangment.both {

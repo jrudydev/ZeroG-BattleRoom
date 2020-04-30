@@ -11,7 +11,7 @@ import SpriteKit
 import GameplayKit
 
 
-class InGameInterface: GKEntity {
+class ScaledContainer: GKEntity {
 
   init(elements: [SKNode]) {
     super.init()
