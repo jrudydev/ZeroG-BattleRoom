@@ -162,7 +162,7 @@ extension GameScene: SKPhysicsContactDelegate {
     
     if let particles = SKEmitterNode(fileNamed: "Deposit") {
       particles.position = depositShapeComponent.node.position
-      particles.zPosition = 3
+      particles.zPosition = SpriteZPosition.particles.rawValue
       self.addChild(particles)
       particles.run(SKAction.sequence([SKAction.wait(forDuration: 1.0), SKAction.removeFromParent()]))
     }
@@ -191,31 +191,34 @@ extension GameScene: SKPhysicsContactDelegate {
       hero != self.entityManager.playerEntites[1],
       let tutorial = self.entityManager.tutorialEntiies[0] as? TutorialAction {
       
-      tutorial.setupNextStep()
-      self.gameState.enter(GameOver.self)
+      guard let _ = tutorial.setupNextStep() else {
+        self.gameStatus = .tutorialDone
+        self.gameState.enter(GameOver.self)
+        return
+      }
+    } else {
+      physicsComponent.isEffectedByPhysics = false
+      
+      let isTopBeam = beam.position.y == abs(beam.position.y)
+      let convertedPosition = self.convert(beam.position, from: panelShapeComponent.node)
+      let rotation = isTopBeam ? panelShapeComponent.node.zRotation : panelShapeComponent.node.zRotation + CGFloat.pi
+      
+      DispatchQueue.main.async {
+        spriteComponent.node.position = convertedPosition
+        spriteComponent.node.zRotation = rotation
+      }
+      
+      hero.switchToState(.beamed)
+      
+      hero.occupiedPanel = panel
+      tractorBeamComponent.isOccupied = true
+      
+      if let index = self.entityManager.indexForWall(panel: panel) {
+        self.multiplayerNetworking.sendWall(index: index, isOccupied: true)
+      }
+      impulseComponent.isOnCooldown = false
+      
+      self.run(SoundManager.shared.blipSound)
     }
-
-    physicsComponent.isEffectedByPhysics = false
-    
-    let isTopBeam = beam.position.y == abs(beam.position.y)
-    let convertedPosition = self.convert(beam.position, from: panelShapeComponent.node)
-    let rotation = isTopBeam ? panelShapeComponent.node.zRotation : panelShapeComponent.node.zRotation + CGFloat.pi
-    
-    DispatchQueue.main.async {
-      spriteComponent.node.position = convertedPosition
-      spriteComponent.node.zRotation = rotation
-    }
-    
-    hero.switchToState(.beamed)
-    
-    hero.occupiedPanel = panel
-    tractorBeamComponent.isOccupied = true
-    
-    if let index = self.entityManager.indexForWall(panel: panel) {
-      self.multiplayerNetworking.sendWall(index: index, isOccupied: true)
-    }
-    impulseComponent.isOnCooldown = false
-    
-    self.run(SoundManager.shared.blipSound)
   }
 }

@@ -10,6 +10,20 @@ import Foundation
 import SpriteKit
 import GameplayKit
 
+
+enum SpriteZPosition: CGFloat {
+  case deepSpace  = -100
+  case station    = -50
+  case arena      = -30
+  case background = -20
+  case simulation = -19
+  case particles  = 10
+  case hero       = 20
+  case menu       = 100
+  case menuLabel  = 101
+}
+
+
 class SpriteComponent: GKComponent {
   let node: SKSpriteNode
   

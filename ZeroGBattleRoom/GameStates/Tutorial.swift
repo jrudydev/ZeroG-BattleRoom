@@ -13,14 +13,14 @@ class Tutorial: GKState {
   
   enum Step: Int {
     case tapLaunch = 1
-    case swipeLaunch
-    case rotateThrow
+//    case swipeLaunch
+//    case rotateThrow
     
     var nextStep: Step? {
       switch self {
-      case .tapLaunch: return .swipeLaunch
-      case .swipeLaunch: return .rotateThrow
-      case .rotateThrow: return nil
+      case .tapLaunch: return nil // .swipeLaunch
+//      case .swipeLaunch: return .rotateThrow
+//      case .rotateThrow: return nil
       }
     }
   }
@@ -40,7 +40,7 @@ class Tutorial: GKState {
     let origin = CGPoint(x: -mapSize.width / 2, y: -mapSize.height / 2)
     let whiteBackground = SKShapeNode(rect: CGRect(origin: origin, size: mapSize))
     whiteBackground.fillColor = .white
-    whiteBackground.zPosition = -2
+    whiteBackground.zPosition = SpriteZPosition.background.rawValue
     self.scene.addChild(whiteBackground)
     
     let gridImage = SKSpriteNode(imageNamed: "tron_grid")
@@ -49,7 +49,7 @@ class Tutorial: GKState {
     
     let widthDiff = (gridImage.size.width - UIScreen.main.bounds.width) / 2
     gridImage.position = CGPoint(x: gridImage.position.x +  widthDiff, y: gridImage.position.y)
-    gridImage.zPosition = -1
+    gridImage.zPosition = SpriteZPosition.simulation.rawValue
     
     self.scene.addChild(gridImage)
     
@@ -64,7 +64,7 @@ class Tutorial: GKState {
     let newPosX = backButton.position.x + -UIScreen.main.bounds.width / 2 + 20.0
     let newPosY = backButton.position.y + UIScreen.main.bounds.height / 2 - 30.0
     backButton.position = CGPoint(x: newPosX, y: newPosY)
-    backButton.zPosition = 100
+    backButton.zPosition = SpriteZPosition.menu.rawValue
     backButton.isUserInteractionEnabled = false
 
     self.scene.entityManager.addInGameUIView(elements: [backButton])

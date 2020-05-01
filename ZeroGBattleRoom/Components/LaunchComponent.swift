@@ -41,14 +41,14 @@ class LaunchComponent: GKComponent {
     self.directionNode.lineWidth = 2.5
     self.directionNode.strokeColor = .yellow
     self.directionNode.position = CGPoint(x: 0.0, y: 50.0)
-    self.directionNode.zPosition = 100
+    self.directionNode.zPosition = SpriteZPosition.menu.rawValue
     
     self.node.addChild(self.directionNode)
     
     self.rotationNode = SKShapeNode(rectOf: CGSize(width: 50.0, height: 0.2))
     self.rotationNode.name = AppConstants.ComponentNames.angleNode
     self.rotationNode.lineWidth = 2.5
-    self.rotationNode.zPosition = 100
+    self.rotationNode.zPosition = SpriteZPosition.menu.rawValue
     
     self.node.addChild(self.rotationNode)
     

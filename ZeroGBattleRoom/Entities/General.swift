@@ -43,7 +43,7 @@ class General: GKEntity, BeamableProtocol {
     super.init()
     
     let spriteComponent = SpriteComponent(texture: SKTexture(imageNamed: imageName))
-    spriteComponent.node.zPosition = 10
+    spriteComponent.node.zPosition = SpriteZPosition.hero.rawValue
     self.addComponent(spriteComponent)
     self.addComponent(TeamComponent(team: team))
     

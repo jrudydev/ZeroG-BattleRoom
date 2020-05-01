@@ -28,18 +28,33 @@ class GameOver: GKState {
     background.zPosition = 100
     self.scene.cam!.addChild(background)
     
-    let textureName = self.scene.gameWon ? "YouWon" : "GameOver"
-    let gameOver = SKSpriteNode(imageNamed: textureName)
-    gameOver.zPosition = 101
-    // TODO: Fix this animation
-//    let textureName = self.scene.gameWon ? "YouWon" : "GameOver"
-    let texture = SKTexture(imageNamed: textureName)
     let actionSequence = SKAction.sequence([
-      SKAction.setTexture(texture),
+      SKAction.scale(by: 0.0, duration: 0.0),
       SKAction.scale(to: 1.0, duration: 0.25)])
-
-    self.scene.cam!.addChild(gameOver)
-    gameOver.run(actionSequence)
+    if self.scene.gameStatus == .tutorialDone {
+      let disconnectedLabel = SKLabelNode(text: "Disconnected")
+      disconnectedLabel.name = AppConstants.ComponentNames.gameOverLabel
+      disconnectedLabel.fontSize = 50.0
+      disconnectedLabel.zPosition = SpriteZPosition.menuLabel.rawValue
+      
+      self.scene.cam!.addChild(disconnectedLabel)
+      disconnectedLabel.run(actionSequence)
+    } else if self.scene.gameStatus == .tutorialDone {
+      let tutorialCompleteLabel = SKLabelNode(text: "Tutorial Complete")
+      tutorialCompleteLabel.name = AppConstants.ComponentNames.gameOverLabel
+      tutorialCompleteLabel.fontSize = 50.0
+      tutorialCompleteLabel.zPosition = SpriteZPosition.menuLabel.rawValue
+      
+      self.scene.cam!.addChild(tutorialCompleteLabel)
+      tutorialCompleteLabel.run(actionSequence)
+    } else {
+      let textureName = (self.scene.gameStatus == .gameWon) ? "YouWon" : "GameOver"
+      let gameOver = SKSpriteNode(imageNamed: textureName)
+      gameOver.zPosition = SpriteZPosition.menuLabel.rawValue
+      
+      self.scene.cam!.addChild(gameOver)
+      gameOver.run(actionSequence)
+    }
     
     let mainMenuButton = SKLabelNode(text: "Main Menu")
     mainMenuButton.name = AppConstants.ComponentNames.backButtonName

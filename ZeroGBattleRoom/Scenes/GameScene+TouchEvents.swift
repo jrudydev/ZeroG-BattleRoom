@@ -54,8 +54,6 @@ extension GameScene {
       self.handlePlayerLaunch(pos: pos)
     case is GameOver:
       NotificationCenter.default.post(name: .restartGame, object: nil)
-    case is Disconnected:
-      NotificationCenter.default.post(name: .restartGame, object: nil)
     default: break
     }
   }

@@ -35,7 +35,7 @@ class WaitingForTap: GKState {
     tutorialLabel.fontSize = WaitingForTap.menuFontSize
     tutorialLabel.position = CGPoint(x: tutorialLabel.frame.width / 2, y: WaitingForTap.menuFontSize*2)
     tutorialLabel.position = CGPoint(x: tutorialLabel.position.x - 120, y: tutorialLabel.position.y)
-    tutorialLabel.zPosition = 100
+    tutorialLabel.zPosition = SpriteZPosition.menu.rawValue
     tutorialLabel.isUserInteractionEnabled = false
     self.scene.addChild(tutorialLabel)
     
@@ -44,7 +44,7 @@ class WaitingForTap: GKState {
     localLabel.fontSize = WaitingForTap.menuFontSize
     localLabel.position = CGPoint(x: localLabel.frame.width / 2, y: WaitingForTap.menuFontSize)
     localLabel.position = CGPoint(x: localLabel.position.x - 120, y: localLabel.position.y)
-    localLabel.zPosition = 100
+    localLabel.zPosition = SpriteZPosition.menu.rawValue
     localLabel.isUserInteractionEnabled = false
     self.scene.addChild(localLabel)
     
@@ -53,7 +53,7 @@ class WaitingForTap: GKState {
     onlineLabel.fontSize = WaitingForTap.menuFontSize
     onlineLabel.position = CGPoint(x: onlineLabel.frame.width / 2, y: 0.0)
     onlineLabel.position = CGPoint(x: onlineLabel.position.x - 120, y: onlineLabel.position.y)
-    onlineLabel.zPosition = 100
+    onlineLabel.zPosition = SpriteZPosition.menu.rawValue
     onlineLabel.isUserInteractionEnabled = false
     self.scene.addChild(onlineLabel)
     
@@ -62,7 +62,7 @@ class WaitingForTap: GKState {
     customizeLabel.fontSize = WaitingForTap.menuFontSize
     customizeLabel.position = CGPoint(x: customizeLabel.frame.width / 2, y: -WaitingForTap.menuFontSize)
     customizeLabel.position = CGPoint(x: customizeLabel.position.x - 120, y: customizeLabel.position.y)
-    customizeLabel.zPosition = 100
+    customizeLabel.zPosition = SpriteZPosition.menu.rawValue
     customizeLabel.isUserInteractionEnabled = false
     self.scene.addChild(customizeLabel)
   }

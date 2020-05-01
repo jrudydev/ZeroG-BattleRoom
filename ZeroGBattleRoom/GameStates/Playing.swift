@@ -47,7 +47,7 @@ class Playing: GKState {
     let newPosX = backButton.position.x + -UIScreen.main.bounds.width / 2 + 20.0
     let newPosY = backButton.position.y + UIScreen.main.bounds.height / 2 - 30.0
     backButton.position = CGPoint(x: newPosX, y: newPosY)
-    backButton.zPosition = 100
+    backButton.zPosition = SpriteZPosition.menu.rawValue
     backButton.isUserInteractionEnabled = false
 
     self.scene.entityManager.addInGameUIView(elements: [backButton])
@@ -60,7 +60,7 @@ class Playing: GKState {
   }
   
   override func isValidNextState(_ stateClass: AnyClass) -> Bool {
-    return stateClass is GameOver.Type || stateClass is Disconnected.Type
+    return stateClass is GameOver.Type
   }
 
   override func update(deltaTime seconds: TimeInterval) {

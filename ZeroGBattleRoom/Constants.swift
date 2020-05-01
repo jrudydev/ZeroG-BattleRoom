@@ -29,7 +29,7 @@ struct AppConstants {
     static let onlineLabelName = "online-label"
     static let shopLabelName = "shop-label"
     static let backButtonName = "back-button"
-    static let disconnectedLabel = "disconnected-label"
+    static let gameOverLabel = "game-over-label"
     static let wallPanelName = "wall-panel"
     static let gameMessageName = "game-message"
     static let playerAliasLabelName = "player-alias"

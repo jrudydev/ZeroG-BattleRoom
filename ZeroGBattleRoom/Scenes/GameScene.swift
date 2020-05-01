@@ -20,6 +20,13 @@ extension Notification.Name {
 
 class GameScene: SKScene {
   
+  enum GameOverStatus: Int {
+    case tutorialDone
+    case gameWon
+    case gameLost
+    case disconnected
+  }
+  
   var entityManager: EntityManager!
   var graphs = [String : GKGraph]()
   
@@ -27,8 +34,7 @@ class GameScene: SKScene {
     WaitingForTap(scene: self),
     Tutorial(scene: self),
     Playing(scene: self),
-    GameOver(scene: self),
-    Disconnected(scene: self)])
+    GameOver(scene: self)])
   
   private var lastUpdateTime: TimeInterval = 0
   var lastPinchMagnitude: CGFloat? = nil
@@ -52,12 +58,30 @@ class GameScene: SKScene {
     }
   }
   
-  var gameWon: Bool = false {
+  var gameStatus: GameOverStatus = .gameLost {
     didSet {
       self.gameState.enter(GameOver.self)
     }
   }
   
+//  var tutorialDone: Bool = false {
+//    didSet {
+//      self.gameState.enter(GameOver.self)
+//    }
+//  }
+//  
+//  var gameWon: Bool = false {
+//    didSet {
+//      self.gameState.enter(GameOver.self)
+//    }
+//  }
+//  
+//  var connectionDisconnect: Bool = false {
+//    didSet {
+//      self.gameState.enter(GameOver.self)
+//    }
+//  }
+//  
   private var subscriptions = Set<AnyCancellable>()
   
   override func sceneDidLoad() {
@@ -122,7 +146,7 @@ class GameScene: SKScene {
         print(localDidWin ? "Won" : "Lost")
         self.multiplayerNetworking.sendGameEnd(player1Won: localDidWin)
         
-        self.gameWon = localDidWin
+        self.gameStatus = localDidWin ? .gameWon : .gameLost
       }
     }
   }
@@ -141,7 +165,8 @@ extension GameScene {
 
 extension GameScene: MultiplayerNetworkingProtocol {
   func matchEnded() {
-    self.gameState.enter(Disconnected.self)
+    self.gameStatus = .disconnected
+    self.gameState.enter(GameOver.self)
     GameKitHelper.shared.match?.disconnect()
     GameKitHelper.shared.match = nil
   }
@@ -354,7 +379,7 @@ extension GameScene: MultiplayerNetworkingProtocol {
   }
   
   func gameOver(player1Won: Bool) {
-    self.gameWon = !player1Won
+    self.gameStatus = !player1Won ? .gameWon : .gameLost
   }
   
   func setCurrentPlayerAt(index: Int) {
