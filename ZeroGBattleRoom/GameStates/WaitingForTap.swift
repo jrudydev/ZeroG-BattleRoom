@@ -39,7 +39,7 @@ class WaitingForTap: GKState {
     tutorialLabel.isUserInteractionEnabled = false
     self.scene.addChild(tutorialLabel)
     
-    let localLabel = SKLabelNode(text: "Versus AI")
+    let localLabel = SKLabelNode(text: "Versus")
     localLabel.name = AppConstants.ComponentNames.localLabelName
     localLabel.fontSize = WaitingForTap.menuFontSize
     localLabel.position = CGPoint(x: localLabel.frame.width / 2, y: WaitingForTap.menuFontSize)
@@ -48,7 +48,7 @@ class WaitingForTap: GKState {
     localLabel.isUserInteractionEnabled = false
     self.scene.addChild(localLabel)
     
-    let onlineLabel = SKLabelNode(text: "Online Match")
+    let onlineLabel = SKLabelNode(text: "Online")
     onlineLabel.name = AppConstants.ComponentNames.onlineLabelName
     onlineLabel.fontSize = WaitingForTap.menuFontSize
     onlineLabel.position = CGPoint(x: onlineLabel.frame.width / 2, y: 0.0)
@@ -57,7 +57,7 @@ class WaitingForTap: GKState {
     onlineLabel.isUserInteractionEnabled = false
     self.scene.addChild(onlineLabel)
     
-    let customizeLabel = SKLabelNode(text: "Custom Shop")
+    let customizeLabel = SKLabelNode(text: "Shop")
     customizeLabel.name = AppConstants.ComponentNames.onlineLabelName
     customizeLabel.fontSize = WaitingForTap.menuFontSize
     customizeLabel.position = CGPoint(x: customizeLabel.frame.width / 2, y: -WaitingForTap.menuFontSize)
