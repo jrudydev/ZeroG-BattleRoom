@@ -472,6 +472,9 @@ extension EntityManager {
 }
 
 extension EntityManager {
+  
+  // MARK: - Handle UI Elements
+  
   func addInGameUIView(elements: [SKNode]) {
     let scaledComponent = ScaledContainer(name: AppConstants.ComponentNames.ingameUIViewName,
                                           elements: elements)

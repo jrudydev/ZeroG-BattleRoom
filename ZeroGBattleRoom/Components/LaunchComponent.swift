@@ -43,14 +43,14 @@ class LaunchComponent: GKComponent {
   }
   
   struct LaunchInfo {
-    var lastTouchDown: CGPoint?
+    var lastTouchBegan: CGPoint?
     var direction: CGVector?
     var directionPercent: CGFloat?
     var rotationPercent: CGFloat?
     var isLeftRotation: Bool?
     
     mutating func clear() {
-      self.lastTouchDown = nil
+      self.lastTouchBegan = nil
       self.direction = nil
       self.directionPercent = nil
       self.rotationPercent = nil

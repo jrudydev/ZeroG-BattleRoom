@@ -22,28 +22,22 @@ extension GameScene {
       return
     }
   
-    launchComponent.launchInfo.lastTouchDown = pos
-    self.updateLaunchComponents(pos: pos)
+    launchComponent.launchInfo.lastTouchBegan = pos
+    self.updateLaunchComponents(touchPosition: pos)
     
     if hero.isBeamed {
       launchComponent.showTargetLine()
     }
     
-    ShapeFactory.shared.spawnSpinnyNodeAt(pos: pos)
+    ShapeFactory.shared.spawnSpinnyNodeAt(pos: pos, color: .blue, isLongTerm: true)
   }
   
   func touchMoved(toPoint pos : CGPoint) {
     switch self.gameState.currentState {
     case is Playing:
-      self.updateLaunchComponents(pos: pos)
+      self.updateLaunchComponents(touchPosition: pos)
     default: break
     }
-    
-//    if let n = self.entityManager.spinnyNodeCopy {
-//      n.position = pos
-//      n.strokeColor = SKColor.blue
-//      self.addChild(n)
-//    }
   }
     
   func touchUp(atPoint pos : CGPoint) {
@@ -106,11 +100,13 @@ extension GameScene {
 //        hero.throwResourceAt(point: throwPoint)
       }
     }
+    
+    ShapeFactory.shared.removeAllSpinnyNodes()
   }
   
   private func launch(hero: General) {
     guard let heroLaunchComponent = hero.component(ofType: LaunchComponent.self),
-      heroLaunchComponent.launchInfo.lastTouchDown != nil else { return }
+      heroLaunchComponent.launchInfo.lastTouchBegan != nil else { return }
     
     hero.launch() { sprite, velocity, angularVelocity, vacatedPanel in
       self.multiplayerNetworking.sendMove(start: sprite.position,
@@ -176,22 +172,22 @@ extension GameScene {
 }
 
 extension GameScene {
-  private func updateLaunchComponents(pos: CGPoint) {
+  private func updateLaunchComponents(touchPosition: CGPoint) {
     guard let hero = self.entityManager.hero as? General,
       let spriteComponent = hero.component(ofType: SpriteComponent.self),
       let launchComponent = hero.component(ofType: LaunchComponent.self),
-      let lastTouchDown = launchComponent.launchInfo.lastTouchDown else { return }
+      let lastTouchBegan = launchComponent.launchInfo.lastTouchBegan else { return }
     
-    let safeLastTouch = self.convert(lastTouchDown, to: spriteComponent.node)
-    let safeMoveTouch = self.convert(pos, to: spriteComponent.node)
+//    let safeLastTouch = self.convert(lastTouchDown, to: spriteComponent.node)
+//    let safeMoveTouch = self.convert(pos, to: spriteComponent.node)
     
-    let safePosition = self.safePosition(point: safeLastTouch, from: spriteComponent.node)
-    let safeMovePosition = self.safePosition(point: safeMoveTouch, from: spriteComponent.node)
-    let touchRotation = spriteComponent.node.fullRotationTo(point: safeLastTouch)
-    let moveRotation = spriteComponent.node.fullRotationTo(point: safeMoveTouch)
+//    let safePosition = self.safePosition(point: safeLastTouch, from: spriteComponent.node)
+//    let safeMovePosition = self.safePosition(point: safeMoveTouch, from: spriteComponent.node)
+    let touchRotation = spriteComponent.node.fullRotationTo(point: lastTouchBegan)
+    let moveRotation = spriteComponent.node.fullRotationTo(point: touchPosition)
 
-    hero.updateLaunchComponents(position: safePosition,
-                                movePosition: safeMovePosition,
+    hero.updateLaunchComponents(position: lastTouchBegan,
+                                movePosition: touchPosition,
                                 rotation: touchRotation,
                                 moveRotation: moveRotation)
     

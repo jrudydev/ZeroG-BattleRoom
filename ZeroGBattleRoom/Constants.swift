@@ -38,6 +38,7 @@ struct AppConstants {
     static let magnitudePilarName = "magnitude-pilar"
     static let rotationCircleName = "ratation-circle"
     static let ingameUIViewName = "ingame-ui-view"
+    static let spinnyNodeName = "spinny-node"
   }
   
   struct Touch {
