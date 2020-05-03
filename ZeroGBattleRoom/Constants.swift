@@ -34,9 +34,10 @@ struct AppConstants {
     static let gameMessageName = "game-message"
     static let playerAliasLabelName = "player-alias"
     static let resourceName = "resource-name"
-    static let directionNode = "direciton-node"
-    static let angleNode = "angle-node"
-    static let ingameUIView = "ingame-ui-view"
+    static let targetLineName = "target-line"
+    static let magnitudePilarName = "magnitude-pilar"
+    static let rotationCircleName = "ratation-circle"
+    static let ingameUIViewName = "ingame-ui-view"
   }
   
   struct Touch {

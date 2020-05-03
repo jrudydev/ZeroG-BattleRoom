@@ -185,6 +185,7 @@ extension EntityManager {
       let aliasComponent = heroBlue.component(ofType: AliasComponent.self) {
       
       spriteComponent.node.position = CGPoint(x: 0.0, y: -mapSize.height/2 + 20)
+      spriteComponent.node.zPosition = 1000
       aliasComponent.node.text = "Player 1 (0/\(resourcesNeededToWin))"
       self.scene.addChild(spriteComponent.node)
       
@@ -209,8 +210,9 @@ extension EntityManager {
       let aliasComponent = heroRed.component(ofType: AliasComponent.self) {
       
       spriteComponent.node.position = CGPoint(x: 0.0, y: mapSize.height/2 - 20)
-      aliasComponent.node.text = "Player 2 (0/\(resourcesNeededToWin))"
+      spriteComponent.node.zPosition = SpriteZPosition.hero.rawValue
       spriteComponent.node.zRotation = CGFloat.pi
+      aliasComponent.node.text = "Player 2 (0/\(resourcesNeededToWin))"
       self.scene.addChild(spriteComponent.node)
       
       self.scene.addChild(trailComponent.node)
@@ -471,7 +473,8 @@ extension EntityManager {
 
 extension EntityManager {
   func addInGameUIView(elements: [SKNode]) {
-    let scaledComponent = ScaledContainer(name: AppConstants.ComponentNames.ingameUIView, elements: elements)
+    let scaledComponent = ScaledContainer(name: AppConstants.ComponentNames.ingameUIViewName,
+                                          elements: elements)
     
     self.scene.cam!.addChild(scaledComponent.node)
     
@@ -480,7 +483,8 @@ extension EntityManager {
   }
   
   func removeInGameUIView() {
-    guard let inGameInterface = self.uiEntityWith(nodeName: AppConstants.ComponentNames.ingameUIView) as? ScaledContainer else { return }
+    guard let inGameInterface = self.uiEntityWith(
+      nodeName: AppConstants.ComponentNames.ingameUIViewName) as? ScaledContainer else { return }
     
     inGameInterface.node.removeFromParent()
     
