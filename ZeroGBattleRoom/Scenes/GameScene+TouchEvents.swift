@@ -21,9 +21,13 @@ extension GameScene {
       launchComponent.hide()
       return
     }
-    
+  
     launchComponent.launchInfo.lastTouchDown = pos
     self.updateLaunchComponents(pos: pos)
+    
+    if hero.isBeamed {
+      launchComponent.showTargetLine()
+    }
     
     ShapeFactory.shared.spawnSpinnyNodeAt(pos: pos)
   }
@@ -108,7 +112,7 @@ extension GameScene {
     guard let heroLaunchComponent = hero.component(ofType: LaunchComponent.self),
       heroLaunchComponent.launchInfo.lastTouchDown != nil else { return }
     
-    hero.launch(){ sprite, velocity, angularVelocity, vacatedPanel in
+    hero.launch() { sprite, velocity, angularVelocity, vacatedPanel in
       self.multiplayerNetworking.sendMove(start: sprite.position,
                                           rotation: sprite.zRotation,
                                           velocity: velocity,

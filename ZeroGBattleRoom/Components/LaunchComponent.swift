@@ -36,11 +36,12 @@ class LaunchComponent: GKComponent {
   var launchInfo = LaunchInfo()
   
   override init() {
-    self.directionNode = SKShapeNode(rectOf: CGSize(width: 0.2, height: 100.0))
+    let size: CGFloat = UIScreen.main.bounds.width
+    self.directionNode = SKShapeNode(rectOf: CGSize(width: 0.2, height: size))
     self.directionNode.name = AppConstants.ComponentNames.directionNode
     self.directionNode.lineWidth = 2.5
-    self.directionNode.strokeColor = .yellow
-    self.directionNode.position = CGPoint(x: 0.0, y: 50.0)
+    self.directionNode.strokeColor = .white
+    self.directionNode.position = CGPoint(x: 0.0, y: size / 2)
     self.directionNode.zPosition = SpriteZPosition.menu.rawValue
     
     self.node.addChild(self.directionNode)
@@ -61,6 +62,12 @@ class LaunchComponent: GKComponent {
     fatalError("init(coder:) has not been implemented")
   }
   
+  func showTargetLine() {
+    if let directionNode = self.node.childNode(withName: AppConstants.ComponentNames.directionNode) {
+      directionNode.alpha = 0.5
+    }
+  }
+  
   func update(directionVector: CGVector,
               moveVector: CGVector,
               rotationVector: CGVector,
@@ -79,10 +86,10 @@ class LaunchComponent: GKComponent {
     if let directionNode = self.node.childNode(withName: AppConstants.ComponentNames.directionNode),
       let angleNode = self.node.childNode(withName: AppConstants.ComponentNames.angleNode){
       
-      directionNode.yScale = directionPercent
-      let adjustedPosY = AppConstants.Touch.maxSwipeDistance * directionPercent / 2
-      directionNode.position = CGPoint(x: 0.0, y: adjustedPosY)
-      directionNode.alpha = directionPercent
+//      directionNode.yScale = directionPercent
+//      let adjustedPosY = AppConstants.Touch.maxSwipeDistance * directionPercent / 2
+//      directionNode.position = CGPoint(x: 0.0, y: adjustedPosY)
+//      directionNode.alpha = directionPercent
       
       angleNode.xScale = rotationPercent
       let adjustedPosX = AppConstants.Touch.maxRotation * rotationPercent / 4
