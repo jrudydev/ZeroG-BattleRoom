@@ -15,23 +15,16 @@ class InterfaceComponent: GKComponent {
   static let screenSize = UIScreen.main.bounds.size
   
   let node: SKNode
-  let elements: [SKNode]
-  private var startingPositions = [CGPoint]()
+  private var startingPosition: CGPoint
   
   var viewport: CGSize
   
-  init(elements: [SKNode]) {
-    self.node = SKNode()
-    self.node.name = AppConstants.ComponentNames.uiView
+  init(node: SKNode) {
+    self.node = node
+    self.startingPosition = node.position
     self.viewport = InterfaceComponent.screenSize
-    self.elements = elements
     
     super.init()
-    
-    for element in elements {
-      self.startingPositions.append(element.position)
-      self.node.addChild(element)
-    }
   }
   
   required init?(coder: NSCoder) {
@@ -41,17 +34,15 @@ class InterfaceComponent: GKComponent {
   override func update(deltaTime seconds: TimeInterval) {
     super.update(deltaTime: seconds)
     
-    for (idx, element) in elements.enumerated() {
-      let widthScale = self.viewport.width / InterfaceComponent.screenSize.width
-      let heightScale = self.viewport.height / InterfaceComponent.screenSize.height
-      let boundryRatio = AppConstants.Layout.boundarySize.width / AppConstants.Layout.boundarySize.height
-      let screenRatio = InterfaceComponent.screenSize.width / InterfaceComponent.screenSize.height
- 
-      let scale = boundryRatio < screenRatio ? heightScale : widthScale
-      let newHeight = self.startingPositions[idx].y * scale
-      let newWidth = self.startingPositions[idx].x * scale
-      element.position = CGPoint(x: newWidth, y: newHeight)
-      element.setScale(scale)
-    }
+    let widthScale = self.viewport.width / InterfaceComponent.screenSize.width
+    let heightScale = self.viewport.height / InterfaceComponent.screenSize.height
+    let boundryRatio = AppConstants.Layout.boundarySize.width / AppConstants.Layout.boundarySize.height
+    let screenRatio = InterfaceComponent.screenSize.width / InterfaceComponent.screenSize.height
+
+    let scale = boundryRatio < screenRatio ? heightScale : widthScale
+    let newHeight = self.startingPosition.y * scale
+    let newWidth = self.startingPosition.x * scale
+    self.node.position = CGPoint(x: newWidth, y: newHeight)
+    self.node.setScale(scale)
   }
 }

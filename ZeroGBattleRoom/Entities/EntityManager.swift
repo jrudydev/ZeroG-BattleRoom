@@ -471,23 +471,18 @@ extension EntityManager {
 
 extension EntityManager {
   func addInGameUIView(elements: [SKNode]) {
-    let scaledComponent = ScaledContainer(elements: elements)
+    let scaledComponent = ScaledContainer(name: AppConstants.ComponentNames.ingameUIView, elements: elements)
     
-    if let interfaceComponent = scaledComponent.component(ofType: InterfaceComponent.self) {
-      self.scene.cam!.addChild(interfaceComponent.node)
-    }
+    self.scene.cam!.addChild(scaledComponent.node)
     
     self.uiEntities.insert(scaledComponent)
     self.addToComponentSysetem(entity: scaledComponent)
   }
   
   func removeInGameUIView() {
-    guard let inGameInterface = self.uiEntityWith(nodeName: AppConstants.ComponentNames.uiView) as? ScaledContainer,
-      let interfaceComponent = inGameInterface.component(ofType: InterfaceComponent.self) else { return }
+    guard let inGameInterface = self.uiEntityWith(nodeName: AppConstants.ComponentNames.ingameUIView) as? ScaledContainer else { return }
     
-    for element in interfaceComponent.elements {
-      element.removeFromParent()
-    }
+    inGameInterface.node.removeFromParent()
     
     self.uiEntities.remove(inGameInterface)
     self.toRemove.insert(inGameInterface)
