@@ -15,7 +15,8 @@ extension GameScene {
     self.numberOfTouches += 1
     
     guard let hero = self.entityManager.hero as? General,
-      let launchComponent = hero.component(ofType: LaunchComponent.self) else { return }
+      let launchComponent = hero.component(ofType: LaunchComponent.self),
+      let spriteComponent = hero.component(ofType: SpriteComponent.self) else { return }
 
     guard self.numberOfTouches <= 1 else {
       launchComponent.hide()
@@ -27,9 +28,14 @@ extension GameScene {
     
     if hero.isBeamed {
       launchComponent.showTargetLine()
+      
+      let directionVector = spriteComponent.node.position.vectorTo(point: pos)
+      let halfMaxSwipeDist = AppConstants.Touch.maxSwipeDistance / 2
+      let adjustmentVector = directionVector.reversed().normalized() * halfMaxSwipeDist
+      let adjustmentPosition = CGPoint(x: pos.x + adjustmentVector.dx,
+                                       y: pos.y + adjustmentVector.dy)
+      ShapeFactory.shared.spawnSpinnyNodeAt(pos: adjustmentPosition, color: .blue, isLongTerm: true)
     }
-    
-    ShapeFactory.shared.spawnSpinnyNodeAt(pos: pos, color: .blue, isLongTerm: true)
   }
   
   func touchMoved(toPoint pos : CGPoint) {
