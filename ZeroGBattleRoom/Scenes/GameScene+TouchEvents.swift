@@ -181,7 +181,7 @@ extension GameScene {
   private func updateLaunchComponents(touchPosition: CGPoint) {
     guard let hero = self.entityManager.hero as? General else { return }
     
-    hero.updateLaunchComponents(movePosition: touchPosition)
+    hero.updateLaunchComponents(touchPosition: touchPosition)
   }
 }
 
