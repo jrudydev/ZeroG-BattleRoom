@@ -273,43 +273,13 @@ extension General: ImpulsableProtocol {
 }
 
 extension General: LaunchableProtocol {
-  func updateLaunchComponents(position: CGPoint,
-                              movePosition: CGPoint,
-                              rotation: CGFloat,
-                              moveRotation: CGFloat) {
-    guard let spriteComponent = self.component(ofType: SpriteComponent.self),
-      let launchComponent = self.component(ofType: LaunchComponent.self),
+  func updateLaunchComponents(touchPosition: CGPoint) {
+    guard let launchComponent = self.component(ofType: LaunchComponent.self),
+      let targetPosition = launchComponent.launchInfo.lastTouchBegan,
       let physicsComponent = self.component(ofType: PhysicsComponent.self),
       (self.isBeamed && !physicsComponent.isEffectedByPhysics) else { return }
-    
-    let directionVector = spriteComponent.node.position.vectorTo(point: position)
-    let directionRotation = directionVector.rotation - spriteComponent.node.zRotation
-    
-    let moveVector = spriteComponent.node.position.vectorTo(point: movePosition)
-    let moveRotation = moveVector.rotation - spriteComponent.node.zRotation
-
-    let intersect: CGPoint
-    if spriteComponent.node.position.x == position.x {
-      // handle vertical slope
-      intersect = position
-    } else {
-      let touchSlope = spriteComponent.node.position.slopeTo(point: position)
-      intersect = position.intersection(m1: touchSlope, P2: movePosition, m2: -1 / touchSlope)
-    }
-    
-    let halfMaxSwipeDist = AppConstants.Touch.maxSwipeDistance / 2
-    let adjustmentVector = directionVector.reversed().normalized() * halfMaxSwipeDist
-    let adjustmentPosition = CGPoint(x: position.x + adjustmentVector.dx,
-                                      y: position.y + adjustmentVector.dy)
-    
-    let launchVector = intersect.vectorTo(point: adjustmentPosition)
-    let rotationVector = movePosition.vectorTo(point: intersect)
-    
-    launchComponent.update(directionVector: directionVector,
-                           moveVector: launchVector,
-                           rotationVector: rotationVector,
-                           directionRotation: directionRotation,
-                           isLeftRotation: rotation > moveRotation)
+  
+    launchComponent.update(targetPosition: targetPosition, movePosition: touchPosition)
   }
   
   func launch(completion: LaunchAftermath? = nil) {

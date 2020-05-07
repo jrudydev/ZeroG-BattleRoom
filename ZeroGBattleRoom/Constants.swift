@@ -36,7 +36,7 @@ struct AppConstants {
     static let resourceName = "resource-name"
     static let targetLineName = "target-line"
     static let magnitudePilarName = "magnitude-pilar"
-    static let rotationCircleName = "ratation-circle"
+    static let rotationCircleName = "rotation-circle"
     static let ingameUIViewName = "ingame-ui-view"
     static let spinnyNodeName = "spinny-node"
   }

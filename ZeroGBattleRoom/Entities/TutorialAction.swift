@@ -98,7 +98,8 @@ class TutorialAction: GKEntity {
   
   private func setupTutorialAnimation(step: Tutorial.Step) {
     guard let spriteComponent = self.ghost.component(ofType: SpriteComponent.self),
-      let physicsComponent = self.ghost.component(ofType: PhysicsComponent.self) else { return }
+      let physicsComponent = self.ghost.component(ofType: PhysicsComponent.self),
+      let launchComponent = self.ghost.component(ofType: LaunchComponent.self) else { return }
       
     self.stopAllAnimations()
     self.showTutorial()
@@ -108,10 +109,8 @@ class TutorialAction: GKEntity {
     spriteComponent.node.position = CGPoint(x: 0.0, y: startPosY)
     
     let prepareAction = SKAction.run {
-      self.ghost.updateLaunchComponents(position: .zero,
-                                        movePosition: .zero,
-                                        rotation: 0.0,
-                                        moveRotation: 0.0)
+      launchComponent.launchInfo.lastTouchBegan = .zero
+      self.ghost.updateLaunchComponents(touchPosition: .zero)
     }
     
     let launchAction = SKAction.run {
