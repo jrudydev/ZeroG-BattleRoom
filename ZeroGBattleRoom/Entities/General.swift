@@ -275,11 +275,10 @@ extension General: ImpulsableProtocol {
 extension General: LaunchableProtocol {
   func updateLaunchComponents(touchPosition: CGPoint) {
     guard let launchComponent = self.component(ofType: LaunchComponent.self),
-      let targetPosition = launchComponent.launchInfo.lastTouchBegan,
       let physicsComponent = self.component(ofType: PhysicsComponent.self),
       (self.isBeamed && !physicsComponent.isEffectedByPhysics) else { return }
   
-    launchComponent.update(targetPosition: targetPosition, movePosition: touchPosition)
+    launchComponent.update(touchPosition: touchPosition)
   }
   
   func launch(completion: LaunchAftermath? = nil) {

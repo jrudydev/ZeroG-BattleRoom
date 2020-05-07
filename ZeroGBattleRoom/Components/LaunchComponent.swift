@@ -99,10 +99,10 @@ class LaunchComponent: GKComponent {
     self.node.childNode(withName: AppConstants.ComponentNames.targetLineName)?.alpha = 0.2
   }
   
-  func update(targetPosition: CGPoint,
-              movePosition: CGPoint) {
+  func update(touchPosition: CGPoint) {
     guard let hero = self.entity as? General,
-      let heroSpriteComponent = hero.component(ofType: SpriteComponent.self) else { return }
+      let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
+      let targetPosition = self.launchInfo.lastTouchBegan else { return }
     
     let heroPosition = heroSpriteComponent.node.position
     let heroRotation = heroSpriteComponent.node.zRotation
@@ -111,14 +111,14 @@ class LaunchComponent: GKComponent {
     
     let intersect = self.getIntersect(heroPosition: heroPosition,
                                       targetPosition: targetPosition,
-                                      movePosition: movePosition)
+                                      touchPosition: touchPosition)
     let isLeftRotation = self.getIsLeftRotation(heroPosition: heroPosition,
                                                 targetPosition: targetPosition,
-                                                movePosition: movePosition)
+                                                touchPosition: touchPosition)
     let halfMagnitudeVector = self.getHalfMagnitudePos(vector: directionVector,
                                                        targetPosition: targetPosition)
     let launchVector = intersect.vectorTo(point: halfMagnitudeVector)
-    let rotationVector = movePosition.vectorTo(point: intersect)
+    let rotationVector = touchPosition.vectorTo(point: intersect)
     
     // Caculate launch distance
     let moveDistance = min(AppConstants.Touch.maxSwipeDistance, launchVector.length())
@@ -171,7 +171,7 @@ extension LaunchComponent {
   
   private func getIntersect(heroPosition: CGPoint,
                             targetPosition: CGPoint,
-                            movePosition: CGPoint) -> CGPoint {
+                            touchPosition: CGPoint) -> CGPoint {
     var intersect: CGPoint = .zero
     if heroPosition.x == targetPosition.x {
       // vertical slope
@@ -181,7 +181,7 @@ extension LaunchComponent {
       intersect = targetPosition
     } else {
       let touchSlope = heroPosition.slopeTo(point: targetPosition)
-      intersect = targetPosition.intersection(m1: touchSlope, P2: movePosition, m2: -1 / touchSlope)
+      intersect = targetPosition.intersection(m1: touchSlope, P2: touchPosition, m2: -1 / touchSlope)
     }
     
     return intersect
@@ -189,30 +189,30 @@ extension LaunchComponent {
   }
   private func getIsLeftRotation(heroPosition: CGPoint,
                                  targetPosition: CGPoint,
-                                 movePosition: CGPoint) -> Bool {
+                                 touchPosition: CGPoint) -> Bool {
     var isLeft = false
     if heroPosition.x == targetPosition.x {
       // vertical slope
       if heroPosition.y < targetPosition.y {
-        isLeft = movePosition.x < targetPosition.x
+        isLeft = touchPosition.x < targetPosition.x
       } else if heroPosition.y > targetPosition.y {
-        isLeft = movePosition.x > targetPosition.x
+        isLeft = touchPosition.x > targetPosition.x
       }
        
     } else if heroPosition.y == targetPosition.y {
       // horizontal slope
       if heroPosition.x < targetPosition.x {
-        isLeft = movePosition.y < targetPosition.y
+        isLeft = touchPosition.y < targetPosition.y
       } else if heroPosition.x > targetPosition.x {
-        isLeft = movePosition.y > targetPosition.y
+        isLeft = touchPosition.y > targetPosition.y
       }
     } else {
       let touchSlope = heroPosition.slopeTo(point: targetPosition)
      
       if heroPosition.x > targetPosition.x {
-        isLeft = movePosition.isAbove(point: targetPosition, slope: touchSlope)
+        isLeft = touchPosition.isAbove(point: targetPosition, slope: touchSlope)
       } else if heroPosition.x < targetPosition.x {
-        isLeft = !movePosition.isAbove(point: targetPosition, slope: touchSlope)
+        isLeft = !touchPosition.isAbove(point: targetPosition, slope: touchSlope)
       }
     }
   

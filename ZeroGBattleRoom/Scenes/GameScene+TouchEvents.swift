@@ -185,16 +185,16 @@ extension GameScene {
   }
 }
 
-extension CGFloat {
-  func fullRotation(isNegitive: Bool) -> CGFloat {
-    guard !isNegitive else {
-      let multiplyer: CGFloat = self < 0.0 ? -1.0 : 1.0
-      return (CGFloat.pi - abs(self)) * multiplyer
-    }
-    
-    return self
-  }
-}
+//extension CGFloat {
+//  func fullRotation(isNegitive: Bool) -> CGFloat {
+//    guard !isNegitive else {
+//      let multiplyer: CGFloat = self < 0.0 ? -1.0 : 1.0
+//      return (CGFloat.pi - abs(self)) * multiplyer
+//    }
+//    
+//    return self
+//  }
+//}
 
 extension CGPoint {
   func vectorTo(point: CGPoint) -> CGVector {
@@ -226,12 +226,12 @@ extension CGPoint {
   }
 }
 
-extension SKSpriteNode {
-  func fullRotationTo(point: CGPoint) -> CGFloat {
-    let moveVector = self.position.vectorTo(point: point)
-    let moveRotation = moveVector.rotation - self.zRotation
-    let isMovenNegitive = point.y < 0
-    
-    return moveRotation.fullRotation(isNegitive: isMovenNegitive)
-  }
-}
+//extension SKSpriteNode {
+//  func fullRotationTo(point: CGPoint) -> CGFloat {
+//    let moveVector = self.position.vectorTo(point: point)
+//    let moveRotation = moveVector.rotation - self.zRotation
+//    let isMovenNegitive = point.y < 0
+//
+//    return moveRotation.fullRotation(isNegitive: isMovenNegitive)
+//  }
+//}
