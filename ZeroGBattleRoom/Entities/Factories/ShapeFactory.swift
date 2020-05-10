@@ -26,15 +26,15 @@ class ShapeFactory {
     return self.spinnyNode?.copy() as? SKShapeNode
   }
   
-  private var longTermSpinnyNode: SKSpriteNode?
+  private var longTermSpinnyNode: SKShapeNode?
   private var longTermSpinnyNodeCopy: SKShapeNode? {
-    return self.spinnyNode?.copy() as? SKShapeNode
+    return self.longTermSpinnyNode?.copy() as? SKShapeNode
   }
   
   func spawnSpinnyNodeAt(pos: CGPoint, color: UIColor = .red, isLongTerm: Bool = false) {
     guard let gameScene = self.gameScene else { return }
     
-    guard let spinnyNodeCopy = isLongTerm ? self.spinnyNodeCopy : self.longTermSpinnyNodeCopy else { return }
+    guard let spinnyNodeCopy = isLongTerm ? self.longTermSpinnyNodeCopy : self.spinnyNodeCopy else { return }
     
     spinnyNodeCopy.position = pos
     spinnyNodeCopy.strokeColor = color
@@ -60,13 +60,14 @@ class ShapeFactory {
     spinnyNode.lineWidth = 2.5
     
     spinnyNode.run(SKAction.repeatForever(SKAction.rotate(byAngle: CGFloat(Double.pi), duration: 1)))
+    spinnyNode.run(SKAction.sequence([SKAction.wait(forDuration: 0.3), SKAction.removeFromParent()]))
   }
   
   private func createLongTermSpinnyNode() {
     let frame = UIScreen.main.bounds
     let width = (frame.size.width + frame.size.height) * 0.05
-    self.spinnyNode = SKShapeNode(rectOf: CGSize(width: width, height: width),
-                                  cornerRadius: width * 0.3)
+    self.longTermSpinnyNode = SKShapeNode(rectOf: CGSize(width: width, height: width),
+                                          cornerRadius: width * 0.3)
     
     guard let spinnyNode = self.spinnyNode else { return }
     
