@@ -13,51 +13,6 @@ import GameplayKit
 
 class LaunchComponent: GKComponent {
   
-  enum MagnitudeLevel {
-    case percent10
-    case percent20
-    case percent30
-    case percent40
-    case percent50
-    case percent60
-    case percent70
-    case percent80
-    case percent90
-    case percent100
-    
-    static func imageNameFor(fileName: String, percent: CGFloat) -> String {
-      switch percent {
-      case 0...10: return "\(fileName)-1"
-      case 10...20: return "\(fileName)-1"
-      case 20...30: return "\(fileName)-2"
-      case 30...40: return "\(fileName)-3"
-      case 40...50: return "\(fileName)-4"
-      case 50...60: return "\(fileName)-5"
-      case 60...70: return "\(fileName)-6"
-      case 70...80: return "\(fileName)-7"
-      case 80...90: return "\(fileName)-8"
-      case 90...100: return "\(fileName)-9"
-      default: return ""
-      }
-    }
-  }
-  
-  struct LaunchInfo {
-    var lastTouchBegan: CGPoint?
-    var direction: CGVector?
-    var directionPercent: CGFloat?
-    var rotationPercent: CGFloat?
-    var isLeftRotation: Bool?
-    
-    mutating func clear() {
-      self.lastTouchBegan = nil
-      self.direction = nil
-      self.directionPercent = nil
-      self.rotationPercent = nil
-      self.isLeftRotation = nil
-    }
-  }
-  
   var node = SKNode()
   var launchInfo = LaunchInfo()
   
@@ -112,21 +67,29 @@ class LaunchComponent: GKComponent {
     let intersect = self.getIntersect(heroPosition: heroPosition,
                                       targetPosition: targetPosition,
                                       touchPosition: touchPosition)
+    
     let isLeftRotation = self.getIsLeftRotation(heroPosition: heroPosition,
                                                 targetPosition: targetPosition,
                                                 touchPosition: touchPosition)
-    let halfMagnitudeVector = self.getHalfMagnitudePos(vector: directionVector,
-                                                       targetPosition: targetPosition)
-    let launchVector = intersect.vectorTo(point: halfMagnitudeVector)
+    
+    let halfMagnitudePos = self.getMagnitudePos(vector: directionVector,
+                                                targetPosition: targetPosition,
+                                                percent: 0.5)
+    
+    let launchVector = intersect.vectorTo(point: halfMagnitudePos)
     let rotationVector = touchPosition.vectorTo(point: intersect)
     
+    let isNegitiveVector = self.getIsNegitiveLaunchVector(heroPosition: heroPosition,
+                                                          targetPosition: halfMagnitudePos,
+                                                          touchPosition: touchPosition)
     // Caculate launch distance
-    let moveDistance = min(AppConstants.Touch.maxSwipeDistance, launchVector.length())
+    let vectorMagnitude = min(AppConstants.Touch.maxSwipeDistance, launchVector.length())
+    let moveDistance = isNegitiveVector ? 0.0 : vectorMagnitude
     let directionPercent = moveDistance / 100
     
     // Caculate launch rotation
     let rotationDistance = min(AppConstants.Touch.maxRotation, rotationVector.length())
-    let rotationPercent = rotationDistance / 100
+    let rotationStepPercent = MagnitudeLevel.rotationStep(magnitude: rotationDistance)
     
     // Update Node
     self.node.zRotation = directionRotation
@@ -149,7 +112,7 @@ class LaunchComponent: GKComponent {
     
     self.launchInfo.direction = directionVector
     self.launchInfo.directionPercent = directionPercent
-    self.launchInfo.rotationPercent = rotationPercent
+    self.launchInfo.rotationPercent = rotationStepPercent
     self.launchInfo.isLeftRotation = isLeftRotation
   }
   
@@ -162,8 +125,14 @@ class LaunchComponent: GKComponent {
 }
 
 extension LaunchComponent {
-  private func getHalfMagnitudePos(vector: CGVector, targetPosition: CGPoint) -> CGPoint {
-    let halfMaxSwipeDist = AppConstants.Touch.maxSwipeDistance / 2
+  private func getMagnitude(length: CGFloat) {
+    
+  }
+  
+  private func getMagnitudePos(vector: CGVector,
+                               targetPosition: CGPoint,
+                               percent: CGFloat) -> CGPoint {
+    let halfMaxSwipeDist = AppConstants.Touch.maxSwipeDistance * percent
     let adjustmentVector = vector.reversed().normalized() * halfMaxSwipeDist
     return CGPoint(x: targetPosition.x + adjustmentVector.dx,
                    y: targetPosition.y + adjustmentVector.dy)
@@ -187,12 +156,15 @@ extension LaunchComponent {
     return intersect
   
   }
+  
+  // This function computes the rotation direction by checking if the point is
+  // below or above the target line accordingly
   private func getIsLeftRotation(heroPosition: CGPoint,
                                  targetPosition: CGPoint,
                                  touchPosition: CGPoint) -> Bool {
     var isLeft = false
     if heroPosition.x == targetPosition.x {
-      // vertical slope
+      // horizontal target slope
       if heroPosition.y < targetPosition.y {
         isLeft = touchPosition.x < targetPosition.x
       } else if heroPosition.y > targetPosition.y {
@@ -200,7 +172,7 @@ extension LaunchComponent {
       }
        
     } else if heroPosition.y == targetPosition.y {
-      // horizontal slope
+      // horizontal target slope
       if heroPosition.x < targetPosition.x {
         isLeft = touchPosition.y < targetPosition.y
       } else if heroPosition.x > targetPosition.x {
@@ -218,25 +190,130 @@ extension LaunchComponent {
   
     return isLeft
   }
-}
-
-extension CGPoint {
-  func isAbove(point: CGPoint, slope: CGFloat) -> Bool {
-    guard slope != 0 || slope != CGFloat.infinity else { return false }
-    
-    // PointSlope Line Formula: y = xm + b
-    // b = y - xm
-    let b = point.y - point.x * slope
   
-    // Check if point is above with this formula: y > xm + b
-    return self.y > self.x * slope + b
+  // This function checks if the point is below or above the perpendicular line
+  private func getIsNegitiveLaunchVector(heroPosition: CGPoint,
+                                         targetPosition: CGPoint,
+                                         touchPosition: CGPoint) -> Bool {
+    var isNegitive = false
+    if heroPosition.x == targetPosition.x {
+      // horizontal target slope
+      if heroPosition.y < targetPosition.y {
+        isNegitive = touchPosition.y < targetPosition.y
+      } else if heroPosition.y > targetPosition.y {
+        isNegitive = touchPosition.y > targetPosition.y
+      }
+    } else if heroPosition.x == targetPosition.x {
+      // horizontal target slope
+      if heroPosition.x < targetPosition.x {
+        isNegitive = touchPosition.x < targetPosition.x
+      } else if heroPosition.x > targetPosition.x {
+        isNegitive = touchPosition.x > targetPosition.x
+      }
+    } else {
+      let touchSlope = heroPosition.slopeTo(point: targetPosition)
+      let perpendicularSlope = -1 / touchSlope
+      
+      if heroPosition.y > targetPosition.y {
+        isNegitive = touchPosition.isAbove(point: targetPosition, slope: perpendicularSlope)
+      } else if heroPosition.y < targetPosition.y {
+        isNegitive = !touchPosition.isAbove(point: targetPosition, slope: perpendicularSlope)
+      }
+    }
+
+    return isNegitive
   }
 }
 
-extension SKSpriteNode {
-  func setTexture(imageNamed: String) {
-    let magnitudeTexture = SKTexture(imageNamed: imageNamed)
-    self.texture = magnitudeTexture
-    self.size = self.texture!.size()
+extension LaunchComponent {
+  struct LaunchInfo {
+    var lastTouchBegan: CGPoint?
+    var direction: CGVector?
+    var directionPercent: CGFloat?
+    var rotationPercent: CGFloat?
+    var isLeftRotation: Bool?
+    
+    mutating func clear() {
+      self.lastTouchBegan = nil
+      self.direction = nil
+      self.directionPercent = nil
+      self.rotationPercent = nil
+      self.isLeftRotation = nil
+    }
+  }
+}
+
+extension LaunchComponent {
+  enum MagnitudeLevel {
+    case percent0
+    case percent10
+    case percent20
+    case percent30
+    case percent40
+    case percent50
+    case percent60
+    case percent70
+    case percent80
+    case percent90
+    case percent100
+    
+    var magnitudePecent: CGFloat {
+      switch self {
+      case .percent0: return 0.0
+      case .percent10: return 0.1
+      case .percent20: return 0.2
+      case .percent30: return 0.3
+      case .percent40: return 0.4
+      case .percent50: return 0.5
+      case .percent60: return 0.6
+      case .percent70: return 0.7
+      case .percent80: return 0.8
+      case .percent90: return 0.9
+      case .percent100: return 1.0
+      }
+    }
+  }
+}
+
+extension LaunchComponent.MagnitudeLevel {
+  static func rotationStep(magnitude: CGFloat) -> CGFloat {
+    let rotationPercent = magnitude / 100
+    let magnitudeLevel = Self.magnitudeStep(percent: rotationPercent)
+    
+    return magnitudeLevel.magnitudePecent
+  }
+  
+  static func magnitudeStep(percent: CGFloat) -> LaunchComponent.MagnitudeLevel {
+    switch percent {
+    case 0...0.1: return .percent0
+    case 0.1...0.2: return .percent20
+    case 0.2...0.3: return .percent30
+    case 0.3...0.4: return .percent40
+    case 0.4...0.5: return .percent50
+    case 0.5...0.6: return .percent60
+    case 0.6...0.7: return .percent70
+    case 0.7...0.8: return .percent80
+    case 0.8...0.9: return .percent90
+    case 0.9...1.0: return .percent100
+    case let p where p < 0: return .percent10
+    case let p where p > 100: return .percent100
+    default: return .percent0
+    }
+  }
+  
+  static func imageNameFor(fileName: String, percent: CGFloat) -> String {
+    switch percent {
+    case 0...10: return "\(fileName)-1"
+    case 10...20: return "\(fileName)-1"
+    case 20...30: return "\(fileName)-2"
+    case 30...40: return "\(fileName)-3"
+    case 40...50: return "\(fileName)-4"
+    case 50...60: return "\(fileName)-5"
+    case 60...70: return "\(fileName)-6"
+    case 70...80: return "\(fileName)-7"
+    case 80...90: return "\(fileName)-8"
+    case 90...100: return "\(fileName)-9"
+    default: return ""
+    }
   }
 }
