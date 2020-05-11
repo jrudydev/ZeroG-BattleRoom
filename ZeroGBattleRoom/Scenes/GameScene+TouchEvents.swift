@@ -24,7 +24,6 @@ extension GameScene {
     }
     
     let heroDistanceVector = herpSpriteComponent.node.position.vectorTo(point: pos)
-    print(heroDistanceVector.length())
     guard heroDistanceVector.length() > AppConstants.Touch.maxSwipeDistance else {
       launchComponent.hide()
       return

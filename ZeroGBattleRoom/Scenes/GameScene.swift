@@ -143,7 +143,6 @@ class GameScene: SKScene {
           localDidWin = teamComponent.team == .team2
         default: break
         }
-        print(localDidWin ? "Won" : "Lost")
         self.multiplayerNetworking.sendGameEnd(player1Won: localDidWin)
         
         self.gameStatus = localDidWin ? .gameWon : .gameLost
