@@ -144,10 +144,8 @@ extension GameScene: SKPhysicsContactDelegate {
     self.entityManager.resourcesDelivered += total
     hero.numberOfDeposits += total
     
-    if self.entityManager.currentPlayerIndex < self.multiplayerNetworking.playerAliases.count {
-      let alias = self.multiplayerNetworking.playerAliases [self.entityManager.currentPlayerIndex]
-      aliasComponent.node.text = "\(alias) (\(hero.numberOfDeposits)/\(resourcesNeededToWin))"
-    }
+    let heroAlias = self.getPlayerAliasAt(index: self.entityManager.currentPlayerIndex)
+    aliasComponent.node.text = "\(heroAlias) (\(hero.numberOfDeposits)/\(resourcesNeededToWin))"
     
     switch teamComponent.team {
     case .team1: depositComponent.team1Deposits += total

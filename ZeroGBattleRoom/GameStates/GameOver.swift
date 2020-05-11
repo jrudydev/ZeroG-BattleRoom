@@ -31,7 +31,7 @@ class GameOver: GKState {
     let actionSequence = SKAction.sequence([
       SKAction.scale(by: 0.0, duration: 0.0),
       SKAction.scale(to: 1.0, duration: 0.25)])
-    if self.scene.gameStatus == .tutorialDone {
+    if self.scene.gameStatus == .disconnected {
       let disconnectedLabel = SKLabelNode(text: "Disconnected")
       disconnectedLabel.name = AppConstants.ComponentNames.gameOverLabel
       disconnectedLabel.fontSize = 50.0

@@ -33,6 +33,7 @@ class GameScene: SKScene {
   lazy var gameState: GKStateMachine = GKStateMachine(states: [
     WaitingForTap(scene: self),
     Tutorial(scene: self),
+    MatchFound(scene: self),
     Playing(scene: self),
     GameOver(scene: self)])
   
@@ -383,7 +384,7 @@ extension GameScene: MultiplayerNetworkingProtocol {
   
   func setCurrentPlayerAt(index: Int) {
     self.entityManager.currentPlayerIndex = index
-    self.gameState.enter(Playing.self)
+    self.gameState.enter(MatchFound.self)
   
     SnapshotManager.shared.isSendingSnapshots = true
   }
@@ -392,5 +393,25 @@ extension GameScene: MultiplayerNetworkingProtocol {
 extension GameScene: GameSceneProtocol {
   func viewResized(size: CGSize) {
     self.viewportSize = size
+  }
+}
+
+extension GameScene {
+  func getPlayerAliasAt(index: Int) -> String {
+    switch index {
+    case 0:
+      if self.multiplayerNetworking.playerAliases.count > 0 {
+        return self.multiplayerNetworking.playerAliases[0]
+      } else {
+        return "Player 1"
+      }
+    case 1:
+      if self.multiplayerNetworking.playerAliases.count > 1 {
+        return self.multiplayerNetworking.playerAliases[1]
+      }
+    default: break
+    }
+    
+    return "MuskBot"
   }
 }

@@ -186,7 +186,8 @@ extension EntityManager {
       
       spriteComponent.node.position = CGPoint(x: 0.0, y: -mapSize.height/2 + 20)
       spriteComponent.node.zPosition = 1000
-      aliasComponent.node.text = "Player 1 (0/\(resourcesNeededToWin))"
+      let playerAlias = self.scene.getPlayerAliasAt(index: 0)
+      aliasComponent.node.text = "\(playerAlias) (0/\(resourcesNeededToWin))"
       self.scene.addChild(spriteComponent.node)
       
       self.scene.addChild(trailComponent.node)
@@ -212,7 +213,8 @@ extension EntityManager {
       spriteComponent.node.position = CGPoint(x: 0.0, y: mapSize.height/2 - 20)
       spriteComponent.node.zPosition = SpriteZPosition.hero.rawValue
       spriteComponent.node.zRotation = CGFloat.pi
-      aliasComponent.node.text = "Player 2 (0/\(resourcesNeededToWin))"
+      let playerAlias = self.scene.getPlayerAliasAt(index: 0)
+      aliasComponent.node.text = "\(playerAlias) (0/\(resourcesNeededToWin))"
       self.scene.addChild(spriteComponent.node)
       
       self.scene.addChild(trailComponent.node)

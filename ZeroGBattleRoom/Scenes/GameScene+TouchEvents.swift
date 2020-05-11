@@ -65,7 +65,7 @@ extension GameScene {
       self.gameState.enter(Tutorial.self)
     }
     if let name = touchedNode.name, name == AppConstants.ComponentNames.localLabelName {
-      self.gameState.enter(Playing.self)
+      self.gameState.enter(MatchFound.self)
     }
     if let name = touchedNode.name, name == AppConstants.ComponentNames.onlineLabelName {
       NotificationCenter.default.post(name: .startMatchmaking, object: nil)
