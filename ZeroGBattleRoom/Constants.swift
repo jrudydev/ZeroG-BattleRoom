@@ -38,7 +38,6 @@ struct AppConstants {
     static let targetLineName = "target-line"
     static let targetBaseLineName = "target-base-line"
     static let targetMidCircleName = "target-mid-circle"
-    static let targetChevronName = "target-chevron-name"
     static let targetLeftChevronName = "target-left-chevron-name"
     static let targetRightChevronName = "target-right-chevron-name"
     static let magnitudePilarName = "magnitude-pilar"

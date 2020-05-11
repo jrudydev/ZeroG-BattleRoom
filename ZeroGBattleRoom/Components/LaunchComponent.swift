@@ -227,7 +227,8 @@ class LaunchComponent: GKComponent {
     self.node.childNode(withName: AppConstants.ComponentNames.rotationCircleName)?.alpha = 0.0
     self.node.childNode(withName: AppConstants.ComponentNames.targetBaseLineName)?.alpha = 0.0
     self.node.childNode(withName: AppConstants.ComponentNames.targetMidCircleName)?.alpha = 0.0
-    self.node.childNode(withName: AppConstants.ComponentNames.targetChevronName)?.alpha = 0.0
+    self.node.childNode(withName: AppConstants.ComponentNames.targetLeftChevronName)?.alpha = 0.0
+    self.node.childNode(withName: AppConstants.ComponentNames.targetRightChevronName)?.alpha = 0.0
     self.node.childNode(withName: AppConstants.ComponentNames.magnitudePilarName)?.alpha = 0.0
     self.launchInfo.clear()
   }
