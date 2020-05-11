@@ -15,26 +15,31 @@ extension GameScene {
     self.numberOfTouches += 1
     
     guard let hero = self.entityManager.hero as? General,
+      let herpSpriteComponent = hero.component(ofType: SpriteComponent.self),
       let launchComponent = hero.component(ofType: LaunchComponent.self) else { return }
 
     guard self.numberOfTouches <= 1 else {
       launchComponent.hide()
       return
     }
+    
+    let heroDistanceVector = herpSpriteComponent.node.position.vectorTo(point: pos)
+    print(heroDistanceVector.length())
+    guard heroDistanceVector.length() > AppConstants.Touch.maxSwipeDistance else {
+      launchComponent.hide()
+      return
+    }
   
     launchComponent.launchInfo.lastTouchBegan = pos
-    self.updateLaunchComponents(touchPosition: pos)
-    
-    if hero.isBeamed {
-      launchComponent.showTargetLine()
-      ShapeFactory.shared.spawnSpinnyNodeAt(pos: pos, color: .blue)
-    }
+    hero.updateLaunchComponents(touchPosition: pos)
   }
   
   func touchMoved(toPoint pos : CGPoint) {
     switch self.gameState.currentState {
     case is Playing:
-      self.updateLaunchComponents(touchPosition: pos)
+      if let hero = self.entityManager.hero as? General {
+        hero.updateLaunchComponents(touchPosition: pos)
+      }
     default: break
     }
   }
@@ -167,14 +172,6 @@ extension GameScene {
   
   override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
     for t in touches { self.touchUp(atPoint: t.location(in: self)) }
-  }
-}
-
-extension GameScene {
-  private func updateLaunchComponents(touchPosition: CGPoint) {
-    guard let hero = self.entityManager.hero as? General else { return }
-    
-    hero.updateLaunchComponents(touchPosition: touchPosition)
   }
 }
 
