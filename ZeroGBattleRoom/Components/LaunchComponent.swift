@@ -413,7 +413,7 @@ extension LaunchComponent.MagnitudeLevel {
   
   static func imageNameFor(fileName: String, percent: CGFloat) -> String {
     switch percent {
-    case 0...10: return "\(fileName)-1"
+    case 0...10: return "\(fileName)-0"
     case 10...20: return "\(fileName)-1"
     case 20...30: return "\(fileName)-2"
     case 30...40: return "\(fileName)-3"
