@@ -118,38 +118,34 @@ extension GameScene: SKPhysicsContactDelegate {
     guard let handsComponent = hero.component(ofType: HandsComponent.self),
       let teamComponent = hero.component(ofType: TeamComponent.self),
       let aliasComponent = hero.component(ofType: AliasComponent.self),
-      let depositShapeComponent = deposit.component(ofType: ShapeComponent.self),
+      let deliveredComponent = hero.component(ofType: DeliveredComponent.self),
       let depositComponent = deposit.component(ofType: DepositComponent.self),
       (handsComponent.leftHandSlot != nil || handsComponent.rightHandSlot != nil) else { return }
       
-    var total = 0
     if let lefthanditem = handsComponent.leftHandSlot,
       let shapeComponent = lefthanditem.component(ofType: ShapeComponent.self) {
       
       handsComponent.release(resource: lefthanditem)
       shapeComponent.node.removeFromParent()
-      
-      total += 1
+    
+      deliveredComponent.resources.insert(lefthanditem)
     }
     
     if let rightHandItem = handsComponent.rightHandSlot,
       let shapeComponent = rightHandItem.component(ofType: ShapeComponent.self) {
-        
-     shapeComponent.node.removeFromParent()
-        shapeComponent.node.removeFromParent()
       
-      total += 1
+      shapeComponent.node.removeFromParent()
+      shapeComponent.node.removeFromParent()
+      
+      deliveredComponent.resources.insert(rightHandItem)
     }
-    
-    self.entityManager.resourcesDelivered += total
-    hero.numberOfDeposits += total
     
     let heroAlias = self.getPlayerAliasAt(index: self.entityManager.currentPlayerIndex)
     aliasComponent.node.text = "\(heroAlias) (\(hero.numberOfDeposits)/\(resourcesNeededToWin))"
     
     switch teamComponent.team {
-    case .team1: depositComponent.team1Deposits += total
-    case .team2: depositComponent.team2Deposits += total
+    case .team1: depositComponent.team1Deposits = hero.numberOfDeposits
+    case .team2: depositComponent.team2Deposits = hero.numberOfDeposits
     default: break
     }
     
@@ -158,12 +154,7 @@ extension GameScene: SKPhysicsContactDelegate {
       label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
     }
     
-    if let particles = SKEmitterNode(fileNamed: "Deposit") {
-      particles.position = depositShapeComponent.node.position
-      particles.zPosition = SpriteZPosition.particles.rawValue
-      self.addChild(particles)
-      particles.run(SKAction.sequence([SKAction.wait(forDuration: 1.0), SKAction.removeFromParent()]))
-    }
+    ShapeFactory.shared.spawnDepositParticleEffect(pos: depositNode.position)
     
     self.run(SoundManager.shared.bambooBreakSound)
   }

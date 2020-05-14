@@ -76,8 +76,7 @@ class SnapshotManager {
   }
 
   private let timer = Timer.publish(every: SnapshotManager.frequency,
-                                    on: .main,
-                                    in: .common).autoconnect()
+                                    on: .main, in: .common).autoconnect()
   private var subscriptions = Set<AnyCancellable>()
 
   unowned var scene: GameScene?

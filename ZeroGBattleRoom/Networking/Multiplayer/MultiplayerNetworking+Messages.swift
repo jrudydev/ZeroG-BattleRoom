@@ -61,13 +61,20 @@ extension MultiplayerNetworking {
     let velocity: CGVector
     let angularVelocity: CGFloat
     let resourceIndecies: [Int]
+    let scoredResourceIndecies: [Int]
     
-    init(position: CGPoint, rotation: CGFloat, velocity: CGVector, angularVelocity: CGFloat, resourceIndecies: [Int] = []) {
+    init(position: CGPoint,
+         rotation: CGFloat,
+         velocity: CGVector,
+         angularVelocity: CGFloat,
+         resourceIndecies: [Int] = [],
+         scoredResourceIndecies: [Int] = []) {
       self.position = position
       self.rotation = rotation
       self.velocity = velocity
       self.angularVelocity = angularVelocity
       self.resourceIndecies = resourceIndecies
+      self.scoredResourceIndecies = scoredResourceIndecies
     }
   }
 }

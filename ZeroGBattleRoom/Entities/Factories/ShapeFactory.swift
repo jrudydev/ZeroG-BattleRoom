@@ -77,3 +77,15 @@ class ShapeFactory {
     spinnyNode.run(SKAction.repeatForever(SKAction.rotate(byAngle: CGFloat(Double.pi), duration: 1)))
   }
 }
+
+extension ShapeFactory {
+  func spawnDepositParticleEffect(pos: CGPoint) {
+    guard let scene = self.gameScene,
+      let particles = SKEmitterNode(fileNamed: "Deposit") else { return }
+    
+    particles.position = pos
+    particles.zPosition = SpriteZPosition.particles.rawValue
+    scene.addChild(particles)
+    particles.run(SKAction.sequence([SKAction.wait(forDuration: 1.0), SKAction.removeFromParent()]))
+  }
+}

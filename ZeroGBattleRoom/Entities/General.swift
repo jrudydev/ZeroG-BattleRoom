@@ -35,7 +35,11 @@ class General: GKEntity, BeamableProtocol {
       physicsComponent.isEffectedByPhysics = true
     }
   }
-  var numberOfDeposits = 0
+  var numberOfDeposits: Int {
+    guard let deliveredComponent = self.component(ofType: DeliveredComponent.self) else { return 0 }
+    
+    return deliveredComponent.resources.count
+  }
   
   unowned var occupiedPanel: Panel? = nil
 
@@ -72,6 +76,8 @@ class General: GKEntity, BeamableProtocol {
     let launchComponent = LaunchComponent()
     spriteComponent.node.addChild(launchComponent.node)
     self.addComponent(launchComponent)
+    
+    self.addComponent(DeliveredComponent())
     
     self.setupActions()
   }

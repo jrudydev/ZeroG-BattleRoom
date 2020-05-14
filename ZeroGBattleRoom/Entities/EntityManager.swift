@@ -32,7 +32,6 @@ class EntityManager {
   var toRemove = Set<GKEntity>()
   
   var currentPlayerIndex = 0
-  var resourcesDelivered = 0
   
   var hero: GKEntity? {
     guard self.playerEntites.count > 0 else { return nil }
