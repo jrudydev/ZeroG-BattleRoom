@@ -117,9 +117,9 @@ extension GameScene {
                                           velocity: velocity,
                                           angularVelocity: angularVelocity,
                                           wasLaunch: true)
-      if let index = self.entityManager.indexForWall(panel: vacatedPanel) {
-        self.multiplayerNetworking.sendWall(index: index, isOccupied: false)
-      }
+//      if let index = self.entityManager.indexForWall(panel: vacatedPanel) {
+//        self.multiplayerNetworking.sendWall(index: index, isOccupied: false)
+//      }
     }
   }
 }

@@ -97,36 +97,36 @@ extension MultiplayerNetworking {
     self.sendData(Data.archiveJSON(object: message))
   }
   
-  func sendImpacted(senderIndex: Int) {
-    let message = UnifiedMessage(type: .impacted, senderIndex: senderIndex)
-//    self.sendData(Data.archiveJSON(object: message))
-  }
-  
-  func sendWall(index: Int, isOccupied: Bool) {
-    let message = UnifiedMessage(type: .wallHit,
-                                 boolValue: isOccupied,
-                                 resourceIndex: index)
-//    self.sendData(Data.archiveJSON(object: message))
-  }
-  
-  func sendGrabbedResource(index: Int, playerIndex: Int, senderIndex: Int) {
-    let message = UnifiedMessage(type: .grabResource, resourceIndex: index,
-                                 playerIndex: playerIndex,
-                                 senderIndex: senderIndex)
-//    self.sendData(Data.archiveJSON(object: message))
-  }
-  
-  func sendAssignResource(index: Int, playerIndex: Int) {
-    let message = UnifiedMessage(type: .assignResource, resourceIndex: index,
-                                 playerIndex: playerIndex)
-//    self.sendData(Data.archiveJSON(object: message))
-  }
-  
-  func sendResourceMoveAt(index: Int, start pos: CGPoint, direction: CGVector) {
-//    let resourceElement = MessageSnapshotElement(position: pos, rotation: .zero, velocity: direction)
-//    let message = UnifiedMessage(type: .moveResource, resourceIndex: index, elements: [[resourceElement]])
-//    self.sendData(Data.archiveJSON(object: message))
-  }
+//  func sendImpacted(senderIndex: Int) {
+//    let message = UnifiedMessage(type: .impacted, senderIndex: senderIndex)
+////    self.sendData(Data.archiveJSON(object: message))
+//  }
+//  
+//  func sendWall(index: Int, isOccupied: Bool) {
+//    let message = UnifiedMessage(type: .wallHit,
+//                                 boolValue: isOccupied,
+//                                 resourceIndex: index)
+////    self.sendData(Data.archiveJSON(object: message))
+//  }
+//  
+//  func sendGrabbedResource(index: Int, playerIndex: Int, senderIndex: Int) {
+//    let message = UnifiedMessage(type: .grabResource, resourceIndex: index,
+//                                 playerIndex: playerIndex,
+//                                 senderIndex: senderIndex)
+////    self.sendData(Data.archiveJSON(object: message))
+//  }
+//  
+//  func sendAssignResource(index: Int, playerIndex: Int) {
+//    let message = UnifiedMessage(type: .assignResource, resourceIndex: index,
+//                                 playerIndex: playerIndex)
+////    self.sendData(Data.archiveJSON(object: message))
+//  }
+//  
+//  func sendResourceMoveAt(index: Int, start pos: CGPoint, direction: CGVector) {
+////    let resourceElement = MessageSnapshotElement(position: pos, rotation: .zero, velocity: direction)
+////    let message = UnifiedMessage(type: .moveResource, resourceIndex: index, elements: [[resourceElement]])
+////    self.sendData(Data.archiveJSON(object: message))
+//  }
   
   func sendSnapshot(_ elements: [SnapshotElementGroup]) {
     let message = UnifiedMessage(type: .snapshot, elements: elements)

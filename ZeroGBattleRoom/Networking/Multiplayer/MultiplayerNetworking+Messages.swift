@@ -17,11 +17,11 @@ extension MultiplayerNetworking {
     case randomeNumber
     case gameBegin
     case move
-    case moveResource
-    case impacted
-    case wallHit
-    case grabResource
-    case assignResource
+//    case moveResource
+//    case impacted
+//    case wallHit
+//    case grabResource
+//    case assignResource
     case gameOver
     case snapshot
   }

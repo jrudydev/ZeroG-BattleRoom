@@ -168,6 +168,20 @@ class EntityManager {
       physicsComponent.physicsBody.linearDamping = speed > maxSpeed ? 0.4 : 0.0
     }
   }
+  
+  func isScored(resource: Package) -> Bool {
+    var isScored = false
+    for player in self.playerEntites {
+      if let deliveredComponent = player.component(ofType: DeliveredComponent.self) {
+        if deliveredComponent.resources.contains(resource) {
+          isScored = true
+          break
+        }
+      }
+    }
+    
+    return isScored
+  }
 }
 
 extension EntityManager {

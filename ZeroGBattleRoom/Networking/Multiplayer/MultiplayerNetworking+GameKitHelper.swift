@@ -35,16 +35,16 @@ extension MultiplayerNetworking: GameKitHelperDelegate {
       self.handleGameBegin(message)
     case .move:
       try? self.handleMove(message)
-    case .impacted:
-      self.handleImpacted(message)
-    case .wallHit:
-      self.handleWallHit(message)
-    case .moveResource:
-      self.handleMoveResource(message)
-    case .grabResource:
-      self.handleGrabResource(message)
-    case .assignResource:
-      self.handleAssignResource(message)
+//    case .impacted:
+//      self.handleImpacted(message)
+//    case .wallHit:
+//      self.handleWallHit(message)
+//    case .moveResource:
+//      self.handleMoveResource(message)
+//    case .grabResource:
+//      self.handleGrabResource(message)
+//    case .assignResource:
+//      self.handleAssignResource(message)
     case .gameOver:
       self.handleGameOver(message)
     case .snapshot:
@@ -114,54 +114,54 @@ extension MultiplayerNetworking {
                                 wasLaunch: wasLaunch)
   }
   
-  private func handleMoveResource(_ message: UnifiedMessage) {
-    guard let elements = message.elements,
-      elements.count > 0,
-      let resoureceGroup = elements.first,
-      resoureceGroup.count > 0 else { fatalError("Error: Element group array is empty.")}
-    guard let index = message.resourceIndex else { fatalError("Error: Resource index is missing.") }
-    
-    print("Resource move message received")
-    self.delegate?.moveResourceAt(index: index,
-                                  position: resoureceGroup[0].position,
-                                  rotation: resoureceGroup[0].rotation,
-                                  velocity: resoureceGroup[0].velocity,
-                                  angularVelocity: resoureceGroup[0].angularVelocity)
-  }
-  
-  private func handleImpacted(_ message: UnifiedMessage) {
-    guard let senderIndex = message.senderIndex else { fatalError("Error: Player index is missing.") }
-    
-    print("Impacted message received")
-    self.delegate?.impactPlayerAt(senderIndex: senderIndex)
-  }
-  
-  private func handleWallHit(_ message: UnifiedMessage) {
-    guard let index = message.resourceIndex else { fatalError("Error: Wall index is missing.") }
-    guard let boolValue = message.boolValue else { fatalError("Error: Occupied bool is missing.") }
-    
-    print("Impacted message received")
-    self.delegate?.syncWallAt(index: index, isOccupied: boolValue)
-  }
-  
-  private func handleGrabResource(_ message: UnifiedMessage) {
-    guard let index = message.resourceIndex else { fatalError("Error: Resource index is missing.") }
-    guard let playerIndex = message.playerIndex else { fatalError("Error: Player index is missing.") }
-    guard let senderIndex = message.senderIndex else { fatalError("Error: Sender index is missing.") }
-    
-    print("Grab message received")
-    self.delegate?.grabResourceAt(index: index,
-                                  playerIndex: playerIndex,
-                                  senderIndex: senderIndex)
-  }
-    
-  private func handleAssignResource(_ message: UnifiedMessage) {
-    guard let index = message.resourceIndex else { fatalError("Error: Resource index is missing.") }
-    guard let playerIndex = message.playerIndex else { fatalError("Error: Player index is missing.") }
-    
-    print("Grab message received")
-    self.delegate?.assignResourceAt(index: index, playerIndex: playerIndex)
-  }
+//  private func handleMoveResource(_ message: UnifiedMessage) {
+//    guard let elements = message.elements,
+//      elements.count > 0,
+//      let resoureceGroup = elements.first,
+//      resoureceGroup.count > 0 else { fatalError("Error: Element group array is empty.")}
+//    guard let index = message.resourceIndex else { fatalError("Error: Resource index is missing.") }
+//
+//    print("Resource move message received")
+//    self.delegate?.moveResourceAt(index: index,
+//                                  position: resoureceGroup[0].position,
+//                                  rotation: resoureceGroup[0].rotation,
+//                                  velocity: resoureceGroup[0].velocity,
+//                                  angularVelocity: resoureceGroup[0].angularVelocity)
+//  }
+//
+//  private func handleImpacted(_ message: UnifiedMessage) {
+//    guard let senderIndex = message.senderIndex else { fatalError("Error: Player index is missing.") }
+//
+//    print("Impacted message received")
+//    self.delegate?.impactPlayerAt(senderIndex: senderIndex)
+//  }
+//
+//  private func handleWallHit(_ message: UnifiedMessage) {
+//    guard let index = message.resourceIndex else { fatalError("Error: Wall index is missing.") }
+//    guard let boolValue = message.boolValue else { fatalError("Error: Occupied bool is missing.") }
+//
+//    print("Impacted message received")
+//    self.delegate?.syncWallAt(index: index, isOccupied: boolValue)
+//  }
+//
+//  private func handleGrabResource(_ message: UnifiedMessage) {
+//    guard let index = message.resourceIndex else { fatalError("Error: Resource index is missing.") }
+//    guard let playerIndex = message.playerIndex else { fatalError("Error: Player index is missing.") }
+//    guard let senderIndex = message.senderIndex else { fatalError("Error: Sender index is missing.") }
+//
+//    print("Grab message received")
+//    self.delegate?.grabResourceAt(index: index,
+//                                  playerIndex: playerIndex,
+//                                  senderIndex: senderIndex)
+//  }
+//
+//  private func handleAssignResource(_ message: UnifiedMessage) {
+//    guard let index = message.resourceIndex else { fatalError("Error: Resource index is missing.") }
+//    guard let playerIndex = message.playerIndex else { fatalError("Error: Player index is missing.") }
+//
+//    print("Grab message received")
+//    self.delegate?.assignResourceAt(index: index, playerIndex: playerIndex)
+//  }
   
   private func handleGameOver(_ message: UnifiedMessage) {
     guard let player1Won = message.boolValue else { fatalError("Error: Bool value is missing." ) }

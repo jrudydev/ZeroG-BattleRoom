@@ -74,8 +74,8 @@ extension GameScene: SKPhysicsContactDelegate {
     firstHero.impactedAt(point: firstHeroSpriteComponent.node.position)
     secondHero.impactedAt(point: firstHeroSpriteComponent.node.position)
     
-    self.multiplayerNetworking.sendImpacted(senderIndex: 0)
-    self.multiplayerNetworking.sendImpacted(senderIndex: 1)
+//    self.multiplayerNetworking.sendImpacted(senderIndex: 0)
+//    self.multiplayerNetworking.sendImpacted(senderIndex: 1)
   }
   
   private func handleHeroPackackageCollision(firstBody: SKPhysicsBody, secondBody: SKPhysicsBody) {
@@ -95,10 +95,10 @@ extension GameScene: SKPhysicsContactDelegate {
       if let resourceIndex = self.entityManager.indexForResource(shape: resourceShapeComponent.node),
         let heroIndex = self.entityManager.playerEntites.firstIndex(of: hero) {
       
-        self.multiplayerNetworking
-          .sendGrabbedResource(index: resourceIndex,
-                               playerIndex: heroIndex,
-                               senderIndex: self.entityManager.currentPlayerIndex)
+//        self.multiplayerNetworking
+//          .sendGrabbedResource(index: resourceIndex,
+//                               playerIndex: heroIndex,
+//                               senderIndex: self.entityManager.currentPlayerIndex)
       }
       hero.updateResourcePositions()
     } else {
@@ -202,9 +202,9 @@ extension GameScene: SKPhysicsContactDelegate {
       hero.occupiedPanel = panel
       tractorBeamComponent.isOccupied = true
       
-      if let index = self.entityManager.indexForWall(panel: panel) {
-        self.multiplayerNetworking.sendWall(index: index, isOccupied: true)
-      }
+//      if let index = self.entityManager.indexForWall(panel: panel) {
+//        self.multiplayerNetworking.sendWall(index: index, isOccupied: true)
+//      }
       impulseComponent.isOnCooldown = false
       
       self.run(SoundManager.shared.blipSound)

@@ -26,7 +26,8 @@ class SnapshotManager {
     for entity in entities {
       if let spriteComponent = entity.component(ofType: SpriteComponent.self),
         let physicsComponent = entity.component(ofType: PhysicsComponent.self),
-        let handsComponent = entity.component(ofType: HandsComponent.self) {
+        let handsComponent = entity.component(ofType: HandsComponent.self),
+        let deliveredComponent = entity.component(ofType: DeliveredComponent.self) {
         
         var resourceIndecies = [Int]()
         if let leftHandResource = handsComponent.leftHandSlot,
@@ -41,13 +42,23 @@ class SnapshotManager {
           
           resourceIndecies.append(resourceIndex)
         }
-      
+        
+        var scoredResourceIndecies = [Int]()
+        for resource in deliveredComponent.resources {
+          if let resourceShapeComponent = resource.component(ofType: ShapeComponent.self),
+            let resourceIndex = self.scene?.entityManager.indexForResource(shape: resourceShapeComponent.node) {
+            
+            scoredResourceIndecies.append(resourceIndex)
+          }
+        }
+        
         let snapshot = MultiplayerNetworking.MessageSnapshotElement(
           position: spriteComponent.node .position,
           rotation: spriteComponent.node.zRotation,
           velocity: physicsComponent.physicsBody.velocity,
           angularVelocity: physicsComponent.physicsBody.angularVelocity,
-          resourceIndecies: resourceIndecies)
+          resourceIndecies: resourceIndecies,
+          scoredResourceIndecies: scoredResourceIndecies)
         info.append(snapshot)
       }
     }
