@@ -97,11 +97,6 @@ class General: GKEntity, BeamableProtocol {
         self.stopAllAnimation()
         self.startAnimation(type: .idle)
         
-        if let launchComponent = self.component(ofType: LaunchComponent.self) {
-          let launchLineNode = launchComponent.node.childNode(withName: AppConstants.ComponentNames.launchLineName) as? SKShapeNode
-          launchLineNode?.alpha = LaunchComponent.targetLineAlpha
-        }
-        
         self.state = .beamed
       }
     

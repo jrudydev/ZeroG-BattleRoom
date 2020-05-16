@@ -172,6 +172,7 @@ extension GameScene: SKPhysicsContactDelegate {
       let spriteComponent = hero.component(ofType: SpriteComponent.self),
       let physicsComponent = hero.component(ofType: PhysicsComponent.self),
       let impulseComponent = hero.component(ofType: ImpulseComponent.self),
+      let launchComponent = hero.component(ofType: LaunchComponent.self),
       let panel = self.entityManager.panelWith(node: beam) as? Panel,
       let panelShapeComponent = panel.component(ofType: ShapeComponent.self),
       let tractorBeamComponent = panel.component(ofType: BeamComponent.self),
@@ -203,6 +204,10 @@ extension GameScene: SKPhysicsContactDelegate {
       }
       
       hero.switchToState(.beamed)
+      if hero == self.entityManager.playerEntites[self.entityManager.currentPlayerIndex] {
+        let launchLineNode = launchComponent.node.childNode(withName: AppConstants.ComponentNames.launchLineName) as? SKShapeNode
+        launchLineNode?.alpha = LaunchComponent.targetLineAlpha
+      }
       
       hero.occupiedPanel = panel
       tractorBeamComponent.isOccupied = true
