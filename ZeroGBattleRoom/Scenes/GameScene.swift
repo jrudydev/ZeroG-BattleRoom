@@ -419,6 +419,8 @@ extension GameScene: GameSceneProtocol {
 
 extension GameScene {
   func getPlayerAliasAt(index: Int) -> String {
+    print("Get Order: \(self.multiplayerNetworking.orderOfPlayers)")
+    
     if index == 0 {
       if self.multiplayerNetworking.playerAliases.count > 0 {
         return self.multiplayerNetworking.playerAliases[0]

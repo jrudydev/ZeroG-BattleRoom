@@ -134,16 +134,18 @@ extension GameViewController {
         
         self.sceneDelegate = sceneNode
         
-        sceneNode.multiplayerNetworking = MultiplayerNetworking()
-        self.setupNetworkingNotifcations(delegate: sceneNode)
+        let networking = MultiplayerNetworking()
+        sceneNode.multiplayerNetworking = networking
+        self.setupNetworkingNotifcations(networking: networking, delegate: sceneNode)
       }
     }
     
     self.viewDidLayoutSubviews()
   }
   
-  private func setupNetworkingNotifcations(delegate: MultiplayerNetworkingProtocol) {
-    let networking = MultiplayerNetworking()
+  private func setupNetworkingNotifcations(networking: MultiplayerNetworking,
+                                           delegate: MultiplayerNetworkingProtocol) {
+    
     networking.delegate = delegate
     NotificationCenter.Publisher(center: .default, name: .startMatchmaking, object: nil)
       .sink(receiveValue: { notification in

@@ -156,23 +156,20 @@ extension MultiplayerNetworking {
       return
     }
     
-    let contains = self.orderOfPlayers.contains { details -> Bool in
+    let firstIndex = self.orderOfPlayers.firstIndex(where: { details in
       let detailsPlayer = details[DetailsKeys.playerKey] as! GKPlayer
       let player = randomNumberDetails[DetailsKeys.playerKey] as! GKPlayer
 
       return detailsPlayer == player
+    })
+    
+    if let index = firstIndex {
+      let randomNumber = randomNumberDetails[DetailsKeys.randomNumberKey]
+      self.orderOfPlayers[index][DetailsKeys.randomNumberKey] = randomNumber
+    } else {
+      self.orderOfPlayers.append(randomNumberDetails)
     }
     
-    if contains {
-      let index = self.orderOfPlayers.firstIndex { details -> Bool in
-        let detailsPlayer = details[DetailsKeys.playerKey] as! GKPlayer
-        let player = randomNumberDetails[DetailsKeys.playerKey] as! GKPlayer
-        
-        return detailsPlayer == player
-      }
-    }
-    
-    self.orderOfPlayers.append(randomNumberDetails)
     self.orderOfPlayers.sort { first, second in
       let firstNumber = first[DetailsKeys.randomNumberKey] as! Double
       let secondNumber = second[DetailsKeys.randomNumberKey] as! Double
