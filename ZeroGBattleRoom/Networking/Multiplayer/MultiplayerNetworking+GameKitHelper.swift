@@ -185,14 +185,9 @@ extension MultiplayerNetworking {
       throw(NetworkError.playerNotFound(message: "Missing players group: \(playerGroup)"))
     }
     
-    print("Snapshot received")
-    
     // NOTE: Update remote players only
     for (idx, playerSnap) in playerGroup.enumerated() {
-      guard idx != self.indicesForPlayers.local else {
-        print("Skip local player sync.")
-        continue
-      }
+      guard idx != self.indicesForPlayers.local else { continue }
 
       self.delegate?.syncPlayerAt(index: idx,
                                   position: playerSnap.position,

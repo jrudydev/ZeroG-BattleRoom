@@ -178,6 +178,10 @@ extension GameScene: MultiplayerNetworkingProtocol {
         aliasComponent.node.text = "\(alias) (0/\(resourcesNeededToWin))"
       }
     }
+    
+    if let matchState = self.gameState.currentState as? MatchFound {
+      matchState.updatePlayerNames(playerAliases: playerAliases)
+    }
   }
   
   func movePlayerAt(index: Int,
@@ -415,20 +419,22 @@ extension GameScene: GameSceneProtocol {
 
 extension GameScene {
   func getPlayerAliasAt(index: Int) -> String {
-    switch index {
-    case 0:
+    if index == 0 {
       if self.multiplayerNetworking.playerAliases.count > 0 {
         return self.multiplayerNetworking.playerAliases[0]
       } else {
         return "Player 1"
       }
-    case 1:
-      if self.multiplayerNetworking.playerAliases.count > 1 {
-        return self.multiplayerNetworking.playerAliases[1]
-      }
-    default: break
     }
     
-    return "MuskBot"
+    if index == 1 {
+      if self.multiplayerNetworking.playerAliases.count > 1 {
+        return self.multiplayerNetworking.playerAliases[1]
+      } else {
+        return "MuskBot"
+      }
+    }
+    
+    return "No Name"
   }
 }

@@ -43,7 +43,7 @@ class General: GKEntity, BeamableProtocol {
   
   unowned var occupiedPanel: Panel? = nil
 
-  init(imageName: String, team: Team, resourceReleased: @escaping (SKShapeNode) -> Void) {
+  init(imageName: String, team: Team) {
     super.init()
     
     let spriteComponent = SpriteComponent(texture: SKTexture(imageNamed: imageName))
@@ -56,12 +56,7 @@ class General: GKEntity, BeamableProtocol {
     spriteComponent.node.physicsBody = physicsBody
 
     self.addComponent(ImpulseComponent())
-    
-    self.addComponent(HandsComponent(didRemoveResource: { resource in
-      guard let shapeComponent = resource.component(ofType: ShapeComponent.self) else { return }
-      
-      resourceReleased(shapeComponent.node)
-    }))
+    self.addComponent(HandsComponent())
     
     let trailComponent = TrailComponent()
     self.addComponent(trailComponent)
@@ -69,9 +64,7 @@ class General: GKEntity, BeamableProtocol {
 //      spriteComponent.node.addChild(emitter)
     }
     
-    let nameComponent = AliasComponent()
-    self.addComponent(nameComponent)
-//    spriteComponent.node.addChild(nameComponent.node)
+    self.addComponent(AliasComponent())
     
     let launchComponent = LaunchComponent()
     spriteComponent.node.addChild(launchComponent.node)

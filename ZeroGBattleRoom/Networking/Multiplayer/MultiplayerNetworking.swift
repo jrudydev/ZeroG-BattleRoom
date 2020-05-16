@@ -170,7 +170,6 @@ extension MultiplayerNetworking {
         
         return detailsPlayer == player
       }
-      self.orderOfPlayers.remove(at: index!)
     }
     
     self.orderOfPlayers.append(randomNumberDetails)

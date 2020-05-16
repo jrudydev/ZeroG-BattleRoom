@@ -140,6 +140,7 @@ extension GameScene: SKPhysicsContactDelegate {
       deliveredComponent.resources.insert(rightHandItem)
     }
     
+    // TODO: There is a bug here wher the scorer alias will always be changed to the host
     let heroAlias = self.getPlayerAliasAt(index: self.entityManager.currentPlayerIndex)
     aliasComponent.node.text = "\(heroAlias) (\(hero.numberOfDeposits)/\(resourcesNeededToWin))"
     

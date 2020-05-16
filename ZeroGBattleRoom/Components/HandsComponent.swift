@@ -28,7 +28,7 @@ class HandsComponent: GKComponent {
         shapeComponent.node.removeFromParent()
         resource.enableCollisionDetections()
         
-        self.didRemoveResource(resource)
+        self.didRemoveResource?(resource)
       }
     }
     
@@ -58,7 +58,7 @@ class HandsComponent: GKComponent {
         shapeComponent.node.removeFromParent()
         resource.enableCollisionDetections()
         
-        self.didRemoveResource(resource)
+        self.didRemoveResource?(resource)
       }
     }
     
@@ -100,11 +100,9 @@ class HandsComponent: GKComponent {
   }
   
   private var isOffHandEnabled = true
-  private let didRemoveResource: (Package) -> Void
+  var didRemoveResource: ((Package) -> Void)?
   
-  init(didRemoveResource: @escaping (Package) -> Void) {
-    self.didRemoveResource = didRemoveResource
-    
+  override init() {
     super.init()
   }
   

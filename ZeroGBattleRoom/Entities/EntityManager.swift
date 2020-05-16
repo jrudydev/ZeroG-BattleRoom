@@ -23,7 +23,10 @@ class EntityManager {
     return [aliasComponent, interfaceComponent]
   }()
   
-  var playerEntites = [GKEntity]()
+  var playerEntites: [GKEntity] = [
+    General(imageName: "spaceman-idle-0", team: .team1),
+    General(imageName: "spaceman-idle-0", team: .team2)
+  ]
   var resourcesEntities = [GKEntity]()
   var wallEntities = [GKEntity]()
   var tutorialEntiies = [GKEntity]()
@@ -186,58 +189,54 @@ class EntityManager {
 
 extension EntityManager {
   func spawnHeros(mapSize: CGSize) {
-    let heroBlue = General(imageName: "spaceman-idle-0", team: .team1, resourceReleased: {
-      [weak self] shape in
-      
-      guard let self = self else { return }
-      
-      self.scene.addChild(shape)
-    })
+    let heroBlue = self.playerEntites[0]
     if let spriteComponent = heroBlue.component(ofType: SpriteComponent.self),
       let trailComponent = heroBlue.component(ofType: TrailComponent.self),
-      let aliasComponent = heroBlue.component(ofType: AliasComponent.self) {
+      let aliasComponent = heroBlue.component(ofType: AliasComponent.self),
+      let handsComponent = heroBlue.component(ofType: HandsComponent.self) {
+      
+      handsComponent.didRemoveResource = { resource in
+        guard let shapeComponent = resource.component(ofType: ShapeComponent.self) else { return }
+        
+        self.scene.addChild(shapeComponent.node)
+      }
       
       spriteComponent.node.position = CGPoint(x: 0.0, y: -mapSize.height/2 + 20)
-      spriteComponent.node.zPosition = 1000
-      let playerAlias = self.scene.getPlayerAliasAt(index: 0)
-      aliasComponent.node.text = "\(playerAlias) (0/\(resourcesNeededToWin))"
+      spriteComponent.node.zPosition = SpriteZPosition.hero.rawValue
       self.scene.addChild(spriteComponent.node)
       
       self.scene.addChild(trailComponent.node)
-    }
-    self.playerEntites.append(heroBlue)
-    self.addToComponentSysetem(entity: heroBlue)
-    
-    if let aliasComponent = heroBlue.component(ofType: AliasComponent.self) {
+      
+      aliasComponent.node.text = self.scene.getPlayerAliasAt(index: 0)
       self.scene.addChild(aliasComponent.node)
     }
+
+    self.addToComponentSysetem(entity: heroBlue)
     
-    let heroRed = General(imageName: "spaceman-idle-0", team: .team2, resourceReleased: {
-      [weak self] shape in
-      
-      guard let self = self else { return }
-      
-      self.scene.addChild(shape)
-    })
+    let heroRed = self.playerEntites[1]
     if let spriteComponent = heroRed.component(ofType: SpriteComponent.self),
       let trailComponent = heroRed.component(ofType: TrailComponent.self),
-      let aliasComponent = heroRed.component(ofType: AliasComponent.self) {
+      let aliasComponent = heroRed.component(ofType: AliasComponent.self),
+      let handsComponent = heroRed.component(ofType: HandsComponent.self) {
+      
+      handsComponent.didRemoveResource = { resource in
+        guard let shapeComponent = resource.component(ofType: ShapeComponent.self) else { return }
+        
+        self.scene.addChild(shapeComponent.node)
+      }
       
       spriteComponent.node.position = CGPoint(x: 0.0, y: mapSize.height/2 - 20)
       spriteComponent.node.zPosition = SpriteZPosition.hero.rawValue
       spriteComponent.node.zRotation = CGFloat.pi
-      let playerAlias = self.scene.getPlayerAliasAt(index: 0)
-      aliasComponent.node.text = "\(playerAlias) (0/\(resourcesNeededToWin))"
       self.scene.addChild(spriteComponent.node)
       
       self.scene.addChild(trailComponent.node)
-    }
-    self.playerEntites.append(heroRed)
-    self.addToComponentSysetem(entity: heroRed)
-    
-    if let aliasComponent = heroRed.component(ofType: AliasComponent.self) {
+      
+      aliasComponent.node.text = self.scene.getPlayerAliasAt(index: 1)
       self.scene.addChild(aliasComponent.node)
     }
+
+    self.addToComponentSysetem(entity: heroRed)
   }
   
   func spawnResources() {
