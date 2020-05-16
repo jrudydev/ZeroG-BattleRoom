@@ -145,7 +145,6 @@ extension GameViewController {
   
   private func setupNetworkingNotifcations(networking: MultiplayerNetworking,
                                            delegate: MultiplayerNetworkingProtocol) {
-    
     networking.delegate = delegate
     NotificationCenter.Publisher(center: .default, name: .startMatchmaking, object: nil)
       .sink(receiveValue: { notification in

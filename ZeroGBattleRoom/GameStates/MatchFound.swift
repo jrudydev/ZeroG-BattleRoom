@@ -36,6 +36,8 @@ class MatchFound: GKState {
   }
   
   override func didEnter(from previousState: GKState?) {
+    self.scene.multiplayerNetworking?.resetPlayerOrder()
+    
     let background = SKShapeNode(rectOf: UIScreen.main.bounds.size)
     background.name = AppConstants.ComponentNames.menuBackgroundName
     background.fillColor = UIColor.black.withAlphaComponent(20.0)
@@ -69,16 +71,14 @@ class MatchFound: GKState {
     player1Label.fontSize = 30.0
     player1Label.position = CGPoint(x: 0.0, y: 100.0)
     player1Label.zPosition = SpriteZPosition.menuLabel.rawValue
-    player1Label.alpha = 0.5
     self.scene.addChild(player1Label)
     
-    let player2Alias = self.scene.getPlayerAliasAt(index: 0)
+    let player2Alias = self.scene.getPlayerAliasAt(index: 1)
     let player2Label = SKLabelNode(text: player2Alias)
     player2Label.name = AppConstants.ComponentNames.matchFoundPlayer2Label
     player2Label.fontSize = 30.0
     player2Label.position = CGPoint(x: 0.0, y: -100.0)
     player2Label.zPosition = SpriteZPosition.menuLabel.rawValue
-    player2Label.alpha = 0.5
     self.scene.addChild(player2Label)
   }
   
@@ -105,18 +105,5 @@ class MatchFound: GKState {
   
   override func isValidNextState(_ stateClass: AnyClass) -> Bool {
     return stateClass is Playing.Type
-  }
-}
-
-extension MatchFound {
-  func updatePlayerNames(playerAliases: [String]) {
-    guard let hostLabel = self.scene.childNode(withName: AppConstants.ComponentNames.matchFoundPlayer1Label) as? SKLabelNode,
-      let clientLabel = self.scene.childNode(withName: AppConstants.ComponentNames.matchFoundPlayer2Label) as? SKLabelNode else { return }
-  
-    hostLabel.text = playerAliases[0]
-    hostLabel.alpha = 1.0
-    
-    clientLabel.text = playerAliases[1]
-    clientLabel.alpha = 1.0
   }
 }

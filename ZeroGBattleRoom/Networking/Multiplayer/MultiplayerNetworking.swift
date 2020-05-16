@@ -48,7 +48,12 @@ class MultiplayerNetworking {
     return self.orderOfPlayers.count == match.players.count + 1
   }
   
-  var orderOfPlayers: [[String: Any]]
+  private lazy var baseOrder: [[String: Any]] = {
+    return [[
+      DetailsKeys.playerKey: GKLocalPlayer.local,
+      DetailsKeys.randomNumberKey: self.ourRandomNumber]]
+  }()
+  var orderOfPlayers = [[String: Any]]()
   var recievedAllRandomNumbers = false
   var isPlayer1 = false
   
@@ -70,9 +75,11 @@ class MultiplayerNetworking {
   var delegate: MultiplayerNetworkingProtocol?
   
   init() {
-    self.orderOfPlayers = [[
-      DetailsKeys.playerKey: GKLocalPlayer.local,
-      DetailsKeys.randomNumberKey: self.ourRandomNumber]]
+    self.resetPlayerOrder()
+  }
+  
+  func resetPlayerOrder() {
+    self.orderOfPlayers = baseOrder
   }
   
   func sendData(_ data: Data, mode: GKMatch.SendDataMode = .reliable) {
