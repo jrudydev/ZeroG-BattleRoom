@@ -28,11 +28,13 @@ class GameOver: GKState {
     background.zPosition = 100
     self.scene.cam!.addChild(background)
     
+    let titlePosition = CGPoint(x: 0.0, y: UIScreen.main.bounds.height * 0.2)
     let actionSequence = SKAction.sequence([
       SKAction.scale(by: 0.0, duration: 0.0),
       SKAction.scale(to: 1.0, duration: 0.25)])
     if self.scene.gameStatus == .disconnected {
       let disconnectedSprite = SKSpriteNode(imageNamed: "disconnected")
+      disconnectedSprite.position = titlePosition
       disconnectedSprite.zPosition = SpriteZPosition.menuLabel.rawValue
       
       let labelWidth = UIScreen.main.bounds.width - UIScreen.main.bounds.width * 0.2
@@ -43,6 +45,7 @@ class GameOver: GKState {
       disconnectedSprite.run(actionSequence)
     } else if self.scene.gameStatus == .tutorialDone {
       let tutorialDoneSprite = SKSpriteNode(imageNamed: "tutorialdone")
+      tutorialDoneSprite.position = titlePosition
       tutorialDoneSprite.zPosition = SpriteZPosition.menuLabel.rawValue
       
       let labelWidth = UIScreen.main.bounds.width - UIScreen.main.bounds.width * 0.2
@@ -54,6 +57,7 @@ class GameOver: GKState {
     } else {
       let textureName = (self.scene.gameStatus == .gameWon) ? "gamewon" : "gameover"
       let gameOverSprite = SKSpriteNode(imageNamed: textureName)
+      gameOverSprite.position = titlePosition
       gameOverSprite.zPosition = SpriteZPosition.menuLabel.rawValue
       
       let labelWidth = UIScreen.main.bounds.width - UIScreen.main.bounds.width * 0.2
