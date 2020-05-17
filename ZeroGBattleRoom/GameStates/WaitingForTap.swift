@@ -68,16 +68,16 @@ class WaitingForTap: GKState {
   }
   
   override func willExit(to nextState: GKState) {
-    let menuImage = self.scene.childNode(withName: AppConstants.ComponentNames.menuImageName)!
-    menuImage.removeFromParent()
-    let tutorialLabel = self.scene.childNode(withName: AppConstants.ComponentNames.tutorialLabelName)!
-    tutorialLabel.removeFromParent()
-    let localLabel = self.scene.childNode(withName: AppConstants.ComponentNames.localLabelName)!
-    localLabel.removeFromParent()
-    let onlineLabel = self.scene.childNode(withName: AppConstants.ComponentNames.onlineLabelName)!
-    onlineLabel.removeFromParent()
-    let shopLabel = self.scene.childNode(withName: AppConstants.ComponentNames.onlineLabelName)!
-    shopLabel.removeFromParent()
+    let menuImage = self.scene.childNode(withName: AppConstants.ComponentNames.menuImageName)
+    menuImage?.removeFromParent()
+    let tutorialLabel = self.scene.childNode(withName: AppConstants.ComponentNames.tutorialLabelName)
+    tutorialLabel?.removeFromParent()
+    let localLabel = self.scene.childNode(withName: AppConstants.ComponentNames.localLabelName)
+    localLabel?.removeFromParent()
+    let onlineLabel = self.scene.childNode(withName: AppConstants.ComponentNames.onlineLabelName)
+    onlineLabel?.removeFromParent()
+    let shopLabel = self.scene.childNode(withName: AppConstants.ComponentNames.onlineLabelName)
+    shopLabel?.removeFromParent()
   }
   
   override func isValidNextState(_ stateClass: AnyClass) -> Bool {

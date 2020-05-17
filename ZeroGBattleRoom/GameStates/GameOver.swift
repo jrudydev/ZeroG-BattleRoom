@@ -32,28 +32,36 @@ class GameOver: GKState {
       SKAction.scale(by: 0.0, duration: 0.0),
       SKAction.scale(to: 1.0, duration: 0.25)])
     if self.scene.gameStatus == .disconnected {
-      let disconnectedLabel = SKLabelNode(text: "Disconnected")
-      disconnectedLabel.name = AppConstants.ComponentNames.gameOverLabel
-      disconnectedLabel.fontSize = 50.0
-      disconnectedLabel.zPosition = SpriteZPosition.menuLabel.rawValue
+      let disconnectedSprite = SKSpriteNode(imageNamed: "disconnected")
+      disconnectedSprite.zPosition = SpriteZPosition.menuLabel.rawValue
       
-      self.scene.cam!.addChild(disconnectedLabel)
-      disconnectedLabel.run(actionSequence)
+      let labelWidth = UIScreen.main.bounds.width - UIScreen.main.bounds.width * 0.2
+      let labelHeight = labelWidth / disconnectedSprite.size.width * disconnectedSprite.size.height
+      disconnectedSprite.size = CGSize(width: labelWidth, height: labelHeight)
+      
+      self.scene.cam!.addChild(disconnectedSprite)
+      disconnectedSprite.run(actionSequence)
     } else if self.scene.gameStatus == .tutorialDone {
-      let tutorialCompleteLabel = SKLabelNode(text: "Tutorial Complete")
-      tutorialCompleteLabel.name = AppConstants.ComponentNames.gameOverLabel
-      tutorialCompleteLabel.fontSize = 50.0
-      tutorialCompleteLabel.zPosition = SpriteZPosition.menuLabel.rawValue
+      let tutorialDoneSprite = SKSpriteNode(imageNamed: "tutorialdone")
+      tutorialDoneSprite.zPosition = SpriteZPosition.menuLabel.rawValue
       
-      self.scene.cam!.addChild(tutorialCompleteLabel)
-      tutorialCompleteLabel.run(actionSequence)
+      let labelWidth = UIScreen.main.bounds.width - UIScreen.main.bounds.width * 0.2
+      let labelHeight = labelWidth / tutorialDoneSprite.size.width * tutorialDoneSprite.size.height
+      tutorialDoneSprite.size = CGSize(width: labelWidth, height: labelHeight)
+
+      self.scene.cam!.addChild(tutorialDoneSprite)
+      tutorialDoneSprite.run(actionSequence)
     } else {
-      let textureName = (self.scene.gameStatus == .gameWon) ? "YouWon" : "GameOver"
-      let gameOver = SKSpriteNode(imageNamed: textureName)
-      gameOver.zPosition = SpriteZPosition.menuLabel.rawValue
+      let textureName = (self.scene.gameStatus == .gameWon) ? "gamewon" : "gameover"
+      let gameOverSprite = SKSpriteNode(imageNamed: textureName)
+      gameOverSprite.zPosition = SpriteZPosition.menuLabel.rawValue
       
-      self.scene.cam!.addChild(gameOver)
-      gameOver.run(actionSequence)
+      let labelWidth = UIScreen.main.bounds.width - UIScreen.main.bounds.width * 0.2
+      let labelHeight = labelWidth / gameOverSprite.size.width * gameOverSprite.size.height
+      gameOverSprite.size = CGSize(width: labelWidth, height: labelHeight)
+      
+      self.scene.cam!.addChild(gameOverSprite)
+      gameOverSprite.run(actionSequence)
     }
     
     let mainMenuButton = SKLabelNode(text: "Main Menu")

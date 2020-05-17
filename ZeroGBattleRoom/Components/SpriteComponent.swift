@@ -19,6 +19,7 @@ enum SpriteZPosition: CGFloat {
   case simulation = -19
   case particles  = 10
   case hero       = 20
+  case inGaemUI   = 40
   case menu       = 100
   case menuLabel  = 101
 }

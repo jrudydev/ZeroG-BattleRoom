@@ -64,7 +64,6 @@
 		93E61FEC246A262F0038F168 /* DeliveredComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93E61FEB246A262F0038F168 /* DeliveredComponent.swift */; };
 		93EC94F024583B0E000CC1D3 /* ScaledContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93EC94EF24583B0E000CC1D3 /* ScaledContainer.swift */; };
 		93EC94F424588D8D000CC1D3 /* Tutorial.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93EC94F324588D8D000CC1D3 /* Tutorial.swift */; };
-		93EFD9802445F311005D68A2 /* Disconnected.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93EFD97F2445F311005D68A2 /* Disconnected.swift */; };
 		93F3DCB5244309960058B288 /* ImpulsableProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F3DCB4244309960058B288 /* ImpulsableProtocol.swift */; };
 		93F3DCB7244309A80058B288 /* ImpactableProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F3DCB6244309A80058B288 /* ImpactableProtocol.swift */; };
 		93F3DCB9244309B80058B288 /* LaunchableProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93F3DCB8244309B80058B288 /* LaunchableProtocol.swift */; };
@@ -137,7 +136,6 @@
 		93E61FEB246A262F0038F168 /* DeliveredComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeliveredComponent.swift; sourceTree = "<group>"; };
 		93EC94EF24583B0E000CC1D3 /* ScaledContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScaledContainer.swift; sourceTree = "<group>"; };
 		93EC94F324588D8D000CC1D3 /* Tutorial.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tutorial.swift; sourceTree = "<group>"; };
-		93EFD97F2445F311005D68A2 /* Disconnected.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Disconnected.swift; sourceTree = "<group>"; };
 		93F3DCB4244309960058B288 /* ImpulsableProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImpulsableProtocol.swift; sourceTree = "<group>"; };
 		93F3DCB6244309A80058B288 /* ImpactableProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImpactableProtocol.swift; sourceTree = "<group>"; };
 		93F3DCB8244309B80058B288 /* LaunchableProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchableProtocol.swift; sourceTree = "<group>"; };
@@ -307,7 +305,6 @@
 		93A55F03243089840027E83E /* GameStates */ = {
 			isa = PBXGroup;
 			children = (
-				93EFD97F2445F311005D68A2 /* Disconnected.swift */,
 				93A55F05243089840027E83E /* GameOver.swift */,
 				93A55F06243089840027E83E /* Playing.swift */,
 				93EC94F324588D8D000CC1D3 /* Tutorial.swift */,
@@ -512,7 +509,6 @@
 				934D2C2D2459A3B000AA7803 /* TutorialAction.swift in Sources */,
 				937614C124555F9C004D4CF8 /* NetworkError.swift in Sources */,
 				935C3D04245B4149006B0DF7 /* ShapeFactory.swift in Sources */,
-				93EFD9802445F311005D68A2 /* Disconnected.swift in Sources */,
 				93A55EFA24307D4F0027E83E /* SoundManager.swift in Sources */,
 				93A55F09243089850027E83E /* GameOver.swift in Sources */,
 				93EC94F024583B0E000CC1D3 /* ScaledContainer.swift in Sources */,

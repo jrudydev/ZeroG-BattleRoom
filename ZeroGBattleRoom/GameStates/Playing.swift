@@ -54,9 +54,8 @@ class Playing: GKState {
   }
   
   override func willExit(to nextState: GKState) {
-    // TODO: This is not resetting the intrerface as intended
-    self.scene.entityManager.resetInterface()
     self.scene.entityManager.removeInGameUIView()
+    NotificationCenter.default.post(name: .resizeView, object: -1000.0)
   }
   
   override func isValidNextState(_ stateClass: AnyClass) -> Bool {

@@ -45,6 +45,16 @@ class MatchFound: GKState {
     background.zPosition = 100
     self.scene.addChild(background)
     
+    let matchFoundSprite = SKSpriteNode(imageNamed: "matchfound")
+    matchFoundSprite.position = CGPoint(x: 0.0, y: 250.0)
+    matchFoundSprite.zPosition = SpriteZPosition.menuLabel.rawValue
+    
+    let labelWidth = UIScreen.main.bounds.width - UIScreen.main.bounds.width * 0.2
+    let labelHeight = labelWidth / matchFoundSprite.size.width * matchFoundSprite.size.height
+    matchFoundSprite.size = CGSize(width: labelWidth, height: labelHeight)
+    
+    self.scene.addChild(matchFoundSprite)
+    
     let vsLabel = SKLabelNode(text: "vs")
     vsLabel.name = AppConstants.ComponentNames.matchFoundVSLabel
     vsLabel.fontSize = 30.0

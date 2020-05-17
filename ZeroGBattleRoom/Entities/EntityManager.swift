@@ -134,14 +134,6 @@ class EntityManager {
     self.updateResourceVelocity()
   }
   
-  func resetInterface() {
-    for entity in self.uiEntities {
-      if let scaledComponent = entity as? ScaledContainer {
-        scaledComponent.updateViewPort(size: UIScreen.main.bounds.size)
-      }
-    }
-  }
-  
   private func addToComponentSysetem(entity: GKEntity) {
     for componentSystem in self.componentSystems {
       componentSystem.addComponent(foundIn: entity)
@@ -455,10 +447,9 @@ extension EntityManager {
   
   func uiEntityWith(nodeName: String) -> GKEntity? {
     let element = self.uiEntities.first { entity -> Bool in
-      guard let uiEntity = entity as? ScaledContainer,
-        let uiComponent = uiEntity.component(ofType: InterfaceComponent.self) else { return false }
+      guard let uiEntity = entity as? ScaledContainer else { return false }
 
-      return uiComponent.node.name == nodeName
+      return uiEntity.node.name == nodeName
     }
     
     return element
