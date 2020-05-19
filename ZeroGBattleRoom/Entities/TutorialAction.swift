@@ -12,39 +12,31 @@ import GameplayKit
  
 
 class TutorialAction: GKEntity {
-  let firstTapHand: SpriteComponent
-  let secondTapHand: SpriteComponent
-  
   unowned let ghost: General
   
   private var currentStep: Tutorial.Step? = nil
   private var stepFinished = false {
     didSet {
-      guard stepFinished else { return }
+      guard stepFinished,
+        let tapSpriteComponent = self.component(ofType: SpriteComponent.self) else { return }
       
-      self.firstTapHand.node.removeAllActions()
-      self.secondTapHand.node.removeAllActions()
+      tapSpriteComponent.node.removeAllActions()
       
       self.stepFinished = false
     }
   }
   
   init(hero: General) {
-    self.firstTapHand = SpriteComponent(texture: SKTexture(imageNamed: "tap"))
-    self.firstTapHand.node.anchorPoint = CGPoint(x: 0.3, y: 0.7)
-    self.secondTapHand = SpriteComponent(texture: SKTexture(imageNamed: "block"))
+    let tapComponent = SpriteComponent(texture: SKTexture(imageNamed: "tap"))
+    tapComponent.node.position = Tutorial.Step.tapLaunch.tapPosition
+    tapComponent.node.anchorPoint = CGPoint(x: 0.35, y: 0.9)
+    
     self.ghost = hero
 
     super.init()
     
-    self.firstTapHand.node.zPosition = SpriteZPosition.menu.rawValue
-    self.addComponent(self.firstTapHand)
-    
-    self.secondTapHand.node.alpha = 0.0
-    self.secondTapHand.node.zPosition = SpriteZPosition.menu.rawValue
-    self.addComponent(self.secondTapHand)
-    
-    self.setupNextStep()
+    tapComponent.node.zPosition = SpriteZPosition.menu.rawValue
+    self.addComponent(tapComponent)
   }
   
   required init?(coder: NSCoder) {
@@ -65,23 +57,26 @@ class TutorialAction: GKEntity {
   }
   
   func stopAllAnimations() {
-    self.firstTapHand.node.removeAllActions()
-    self.secondTapHand.node.removeAllActions()
+    guard let tapSpriteComponent = self.component(ofType: SpriteComponent.self) else { return }
+    
+    tapSpriteComponent.node.removeAllActions()
   
     self.hideTutorial()
   }
   
   private func hideTutorial() {
-    self.firstTapHand.node.alpha = 0.0
-    self.secondTapHand.node.alpha = 0.0
+    guard let tapSpriteComponent = self.component(ofType: SpriteComponent.self) else { return }
+    
+    tapSpriteComponent.node.alpha = 0.0
     if let ghostSpriteComponent = self.ghost.component(ofType: SpriteComponent.self) {
       ghostSpriteComponent.node.alpha = 0.0
     }
   }
   
   private func showTutorial() {
-    self.firstTapHand.node.alpha = 1.0
-//    self.secondTapHand.node.alpha = 1.0
+    guard let tapSpriteComponent = self.component(ofType: SpriteComponent.self) else { return }
+    
+    tapSpriteComponent.node.alpha = 1.0
     if let ghostSpriteComponent = self.ghost.component(ofType: SpriteComponent.self) {
       ghostSpriteComponent.node.alpha = 0.5
     }
@@ -97,24 +92,26 @@ class TutorialAction: GKEntity {
     self.stopAllAnimations()
     self.showTutorial()
     
+    let heroPosition = step.startPosition
+    let tapPosition = step.tapPosition
     switch step {
     case .tapLaunch:
-      tapSpriteComponent.node.position = step.tapPosition
-      spriteComponent.node.position = step.startPosition
+      tapSpriteComponent.node.position = tapPosition
+      spriteComponent.node.position = heroPosition
       
       let prepareAction = SKAction.run {
-        launchComponent.launchInfo.lastTouchBegan = step.tapPosition
-        self.ghost.updateLaunchComponents(touchPosition: .zero)
+        launchComponent.launchInfo.lastTouchBegan = tapPosition
+        self.ghost.updateLaunchComponents(touchPosition: tapPosition)
       }
       
       let launchAction = SKAction.run {
         self.ghost.launch()
         
-        ShapeFactory.shared.spawnSpinnyNodeAt(pos: .zero)
+        ShapeFactory.shared.spawnSpinnyNodeAt(pos: tapPosition)
       }
 
       let resetAction = SKAction.run {
-        spriteComponent.node.position = step.startPosition
+        spriteComponent.node.position = heroPosition
         spriteComponent.node.zRotation = 0.0
         physicsComponent.physicsBody.velocity = .zero
         physicsComponent.physicsBody.angularVelocity = .zero
@@ -137,7 +134,7 @@ class TutorialAction: GKEntity {
         SKAction.wait(forDuration: 3.5)]))
       
       let runGroup = SKAction.group([launchSequence, tapSequece])
-      self.firstTapHand.node.run(runGroup)
+      tapSpriteComponent.node.run(runGroup)
     default:
       break
     }

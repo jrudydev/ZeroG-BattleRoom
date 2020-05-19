@@ -406,7 +406,7 @@ extension EntityManager {
   }
   
   func panelWith(node: SKShapeNode) -> GKEntity? {
-    let panel = self.entities.first { entity -> Bool in
+    let panel = self.wallEntities.first { entity -> Bool in
       guard let panelEntity = entity as? Panel,
         let beamComponent = panelEntity.component(ofType: BeamComponent.self) else { return false }
       
@@ -555,24 +555,57 @@ extension EntityManager {
     }
   }
   
+  func loadTutorialLevel() {
+    guard let scene = SKScene(fileNamed: "TutorialScene") else { return }
+    
+    scene.enumerateChildNodes(withName: AppConstants.ComponentNames.wallPanelName) { wallNode, _  in
+      var team: Team? = nil
+      if let userData = wallNode.userData, let teamRawValue = userData[Tutorial.teamUserDataKey] as? Int {
+        team = Team(rawValue: teamRawValue)
+      }
+      
+      var config: Panel.BeamArrangment = .none
+      if let userData = wallNode.userData,
+        let beamsRawValue = userData[Tutorial.beamsUserDataKey] as? Int {
+        
+        config = Panel.BeamArrangment(rawValue: beamsRawValue)!
+      }
+      
+      guard let panel = self.scene.entityManager.panelFactory.panelSegment(beamConfig: config,
+                                                                           number: 1,
+                                                                           team: team).first,
+        let panelShapeComponent = panel.component(ofType: ShapeComponent.self) else { return }
+      
+      panelShapeComponent.node.position = wallNode.position
+      panelShapeComponent.node.zRotation = wallNode.zRotation
+      
+      self.scene.addChild(panelShapeComponent.node)
+      self.wallEntities.append(panel)
+    }
+  }
+  
   func setupTutorial() {
     guard let hero = self.playerEntites[1] as? General,
       let heroAliasComponent = hero.component(ofType: AliasComponent.self),
+      let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
       let ghost = self.playerEntites[1] as? General,
       let ghostAliasComponent = ghost.component(ofType: AliasComponent.self),
-      let spriteComponent = ghost.component(ofType: SpriteComponent.self),
-      let physicsComponent = ghost.component(ofType: PhysicsComponent.self) else { return }
+      let ghostSpriteComponent = ghost.component(ofType: SpriteComponent.self),
+      let ghostPhysicsComponent = ghost.component(ofType: PhysicsComponent.self) else { return }
+    
+    heroSpriteComponent.node.position = Tutorial.Step.tapLaunch.startPosition
     
     heroAliasComponent.node.text = ""
     ghostAliasComponent.node.text = ""
     
     ghost.switchToState(.moving)
-    spriteComponent.node.alpha = 0.5
-    physicsComponent.physicsBody.collisionBitMask = PhysicsCategoryMask.package
+    ghostSpriteComponent.node.alpha = 0.5
+    ghostPhysicsComponent.physicsBody.collisionBitMask = PhysicsCategoryMask.package
     
     let tutorialActionEntity = TutorialAction(hero: ghost)
-    self.scene.addChild(tutorialActionEntity.firstTapHand.node)
-    self.scene.addChild(tutorialActionEntity.secondTapHand.node)
+    if let tapSpriteComponent = tutorialActionEntity.component(ofType: SpriteComponent.self) {
+      self.scene.addChild(tapSpriteComponent.node)
+    }
     tutorialActionEntity.setupNextStep()
     
     self.tutorialEntiies.append(tutorialActionEntity)

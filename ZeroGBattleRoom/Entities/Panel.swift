@@ -13,7 +13,7 @@ import GameplayKit
 
 class Panel: GKEntity {
   
-  enum BeamArrangment: String {
+  enum BeamArrangment: Int {
     case top
     case bottom
     case both

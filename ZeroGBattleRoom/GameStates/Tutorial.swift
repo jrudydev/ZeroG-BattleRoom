@@ -11,8 +11,9 @@ import GameplayKit
 
 class Tutorial: GKState {
   
-  static private let teamUserDataKey = "team"
-  static private let stepUserDataKey = "step"
+  static let teamUserDataKey = "team"
+  static let stepUserDataKey = "step"
+  static let beamsUserDataKey = "beams"
   
   enum Step: Int {
     case tapLaunch = 1
@@ -29,14 +30,18 @@ class Tutorial: GKState {
     
     var startPosition: CGPoint {
       guard self.rawValue < Tutorial.startingPoints.count else { return .zero }
-    
-      return Tutorial.startingPoints[self.rawValue]
+      print(Tutorial.startingPoints)
+      return Tutorial.startingPoints[self.index]
     }
     
     var tapPosition: CGPoint {
       guard self.rawValue < Tutorial.tapPoints.count else { return .zero }
     
-      return Tutorial.tapPoints[self.rawValue]
+      return Tutorial.tapPoints[self.index]
+    }
+    
+    private var index: Int {
+      return self.rawValue - 1
     }
   }
   
@@ -101,9 +106,10 @@ class Tutorial: GKState {
     gridImage.zPosition = SpriteZPosition.simulation.rawValue
     
     self.scene.addChild(gridImage)
-    
-//    self.scene.entityManager.spawnTutorialPanels()
+  
+    self.scene.entityManager.loadTutorialLevel()
     self.scene.entityManager.spawnHeros(mapSize: AppConstants.Layout.tutorialBoundrySize)
+    self.repositionHero()
     
     let backButton = SKLabelNode(text: "Back")
     backButton.name = AppConstants.ComponentNames.backButtonName
@@ -118,8 +124,6 @@ class Tutorial: GKState {
 
     self.scene.entityManager.addInGameUIView(elements: [backButton])
     self.scene.entityManager.setupTutorial()
-
-    self.loadLevel()
   }
   
   override func willExit(to nextState: GKState) { }
@@ -130,25 +134,6 @@ class Tutorial: GKState {
   
   override func update(deltaTime seconds: TimeInterval) {
     self.repositionCamera()
-  }
-
-  private func loadLevel() {
-    guard let scene = SKScene(fileNamed: "TutorialScene") else { return }
-    
-    scene.enumerateChildNodes(withName: AppConstants.ComponentNames.wallPanelName) { wallNode, _  in
-      var team: Team? = nil
-      if let userData = wallNode.userData, let teamRawValue = userData[Self.teamUserDataKey] as? Int {
-        team = Team(rawValue: teamRawValue)
-      }
-      
-      guard let panel = self.scene.entityManager.panelFactory.panelSegment(beamConfig: .none, number: 1, team: team).first,
-        let panelShapeComponent = panel.component(ofType: ShapeComponent.self) else { return }
-      
-      panelShapeComponent.node.position = wallNode.position
-      panelShapeComponent.node.zRotation = wallNode.zRotation
-      
-      self.scene.addChild(panelShapeComponent.node)
-    }
   }
 }
 
@@ -189,5 +174,12 @@ extension Tutorial {
       let cameraPosY = topEdge - frameTopEdge
       camera.position.y = spriteComponent.node.position.y < 0 ? -cameraPosY : cameraPosY
     }
+  }
+  
+  private func repositionHero(){
+    guard let hero = self.scene.entityManager.playerEntites[0] as? General,
+      let spriteComponent = hero.component(ofType: SpriteComponent.self) else { return }
+    
+    spriteComponent.node.position = Tutorial.Step.tapLaunch.startPosition
   }
 }
