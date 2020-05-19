@@ -53,24 +53,15 @@ class TutorialAction: GKEntity {
   
   @discardableResult
   func setupNextStep() -> Tutorial.Step? {
-    var thisStep: Tutorial.Step? = .tapLaunch
-    if let currentStep = self.currentStep {
-      thisStep = currentStep.nextStep
+    if self.currentStep == nil {
+      self.currentStep = .tapLaunch
+    } else {
+      self.currentStep = self.currentStep?.nextStep
     }
     
-    guard let nextStep = thisStep else { return nil }
+    self.setupTutorialAnimation()
     
-    self.currentStep = nextStep
-    
-    switch self.currentStep {
-    case .tapLaunch:
-      self.setupTutorialAnimation(step: nextStep)
-//    case .swipeLaunch: break
-//    case .rotateThrow: break
-    default: break
-    }
-    
-    return nextStep
+    return self.currentStep
   }
   
   func stopAllAnimations() {
@@ -96,53 +87,59 @@ class TutorialAction: GKEntity {
     }
   }
   
-  private func setupTutorialAnimation(step: Tutorial.Step) {
-    guard let spriteComponent = self.ghost.component(ofType: SpriteComponent.self),
+  private func setupTutorialAnimation() {
+    guard let step = self.currentStep,
+      let spriteComponent = self.ghost.component(ofType: SpriteComponent.self),
       let physicsComponent = self.ghost.component(ofType: PhysicsComponent.self),
-      let launchComponent = self.ghost.component(ofType: LaunchComponent.self) else { return }
+      let launchComponent = self.ghost.component(ofType: LaunchComponent.self),
+      let tapSpriteComponent = self.component(ofType: SpriteComponent.self) else { return }
       
     self.stopAllAnimations()
     self.showTutorial()
     
-    let mapSize = AppConstants.Layout.tutorialBoundrySize
-    let startPosY = -mapSize.height / 2 + AppConstants.Layout.wallSize.width / 4
-    spriteComponent.node.position = CGPoint(x: 0.0, y: startPosY)
-    
-    let prepareAction = SKAction.run {
-      launchComponent.launchInfo.lastTouchBegan = .zero
-      self.ghost.updateLaunchComponents(touchPosition: .zero)
-    }
-    
-    let launchAction = SKAction.run {
-      self.ghost.launch()
+    switch step {
+    case .tapLaunch:
+      tapSpriteComponent.node.position = step.tapPosition
+      spriteComponent.node.position = step.startPosition
       
-      ShapeFactory.shared.spawnSpinnyNodeAt(pos: .zero)
-    }
+      let prepareAction = SKAction.run {
+        launchComponent.launchInfo.lastTouchBegan = step.tapPosition
+        self.ghost.updateLaunchComponents(touchPosition: .zero)
+      }
+      
+      let launchAction = SKAction.run {
+        self.ghost.launch()
+        
+        ShapeFactory.shared.spawnSpinnyNodeAt(pos: .zero)
+      }
 
-    let resetAction = SKAction.run {
-      spriteComponent.node.position = CGPoint(x: 0.0, y: startPosY)
-      spriteComponent.node.zRotation = 0.0
-      physicsComponent.physicsBody.velocity = .zero
-      physicsComponent.physicsBody.angularVelocity = .zero
+      let resetAction = SKAction.run {
+        spriteComponent.node.position = step.startPosition
+        spriteComponent.node.zRotation = 0.0
+        physicsComponent.physicsBody.velocity = .zero
+        physicsComponent.physicsBody.angularVelocity = .zero
+      }
+      
+      let launchSequence = SKAction.repeatForever(SKAction.sequence([
+        SKAction.wait(forDuration: 2.0),
+        prepareAction,
+        SKAction.wait(forDuration: 2.0),
+        launchAction,
+        SKAction.wait(forDuration: 4.0),
+        resetAction]))
+      
+      let tapSequece = SKAction.repeatForever(SKAction.sequence([
+        SKAction.fadeOut(withDuration: 0.0),
+        SKAction.wait(forDuration: 2.0),
+        SKAction.fadeIn(withDuration: 0.5),
+        SKAction.wait(forDuration: 1.5),
+        SKAction.fadeOut(withDuration: 0.5),
+        SKAction.wait(forDuration: 3.5)]))
+      
+      let runGroup = SKAction.group([launchSequence, tapSequece])
+      self.firstTapHand.node.run(runGroup)
+    default:
+      break
     }
-    
-    let launchSequence = SKAction.repeatForever(SKAction.sequence([
-      SKAction.wait(forDuration: 2.0),
-      prepareAction,
-      SKAction.wait(forDuration: 2.0),
-      launchAction,
-      SKAction.wait(forDuration: 4.0),
-      resetAction]))
-    
-    let tapSequece = SKAction.repeatForever(SKAction.sequence([
-      SKAction.fadeOut(withDuration: 0.0),
-      SKAction.wait(forDuration: 2.0),
-      SKAction.fadeIn(withDuration: 0.5),
-      SKAction.wait(forDuration: 1.5),
-      SKAction.fadeOut(withDuration: 0.5),
-      SKAction.wait(forDuration: 3.5)]))
-    
-    let runGroup = SKAction.group([launchSequence, tapSequece])
-    self.firstTapHand.node.run(runGroup)
   }
 }

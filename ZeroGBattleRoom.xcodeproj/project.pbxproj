@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		930D65E4244C8C93009F05A0 /* BeamableProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 930D65E3244C8C93009F05A0 /* BeamableProtocol.swift */; };
 		930D65E6244EA717009F05A0 /* InterfaceComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 930D65E5244EA717009F05A0 /* InterfaceComponent.swift */; };
+		933F8BE524710B8300DB32D0 /* TutorialScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 933F8BE424710B8300DB32D0 /* TutorialScene.sks */; };
 		93470D7B244F4C2D0005A807 /* ThrowableProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93470D7A244F4C2D0005A807 /* ThrowableProtocol.swift */; };
 		9347C8AD24314AD60099AE53 /* game-over.wav in Resources */ = {isa = PBXBuildFile; fileRef = 9347C8A824314AD50099AE53 /* game-over.wav */; };
 		9347C8AE24314AD60099AE53 /* paddleBlip.wav in Resources */ = {isa = PBXBuildFile; fileRef = 9347C8A924314AD50099AE53 /* paddleBlip.wav */; };
@@ -81,6 +82,7 @@
 /* Begin PBXFileReference section */
 		930D65E3244C8C93009F05A0 /* BeamableProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeamableProtocol.swift; sourceTree = "<group>"; };
 		930D65E5244EA717009F05A0 /* InterfaceComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterfaceComponent.swift; sourceTree = "<group>"; };
+		933F8BE424710B8300DB32D0 /* TutorialScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = TutorialScene.sks; sourceTree = "<group>"; };
 		93470D7A244F4C2D0005A807 /* ThrowableProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThrowableProtocol.swift; sourceTree = "<group>"; };
 		9347C8A824314AD50099AE53 /* game-over.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = "game-over.wav"; sourceTree = "<group>"; };
 		9347C8A924314AD50099AE53 /* paddleBlip.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = paddleBlip.wav; sourceTree = "<group>"; };
@@ -253,6 +255,7 @@
 				93A55F2524308D1E0027E83E /* Constants.swift */,
 				93FEBDAC242EE0CF006CCBFB /* GameScene.sks */,
 				93FEBDAE242EE0CF006CCBFB /* Actions.sks */,
+				933F8BE424710B8300DB32D0 /* TutorialScene.sks */,
 				93FEBDB4242EE0CF006CCBFB /* Main.storyboard */,
 				93FEBDB7242EE0D2006CCBFB /* Assets.xcassets */,
 				93FEBDB9242EE0D2006CCBFB /* LaunchScreen.storyboard */,
@@ -437,6 +440,7 @@
 			files = (
 				9347C8AF24314AD60099AE53 /* BambooBreak.wav in Resources */,
 				93FEBDB6242EE0CF006CCBFB /* Main.storyboard in Resources */,
+				933F8BE524710B8300DB32D0 /* TutorialScene.sks in Resources */,
 				93FEBDAD242EE0CF006CCBFB /* GameScene.sks in Resources */,
 				9347C8B124314AD60099AE53 /* game-won.mp3 in Resources */,
 				9347C8B524315D030099AE53 /* BallTrail.sks in Resources */,

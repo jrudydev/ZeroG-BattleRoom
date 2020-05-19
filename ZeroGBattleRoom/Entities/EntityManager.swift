@@ -67,8 +67,9 @@ class EntityManager {
     return nil
   }
   
+  var panelFactory = PanelFactory()
+  
   private var resourceNode : SKShapeNode?
-  private var panelFactory = PanelFactory()
   
   unowned let scene: GameScene
   
@@ -554,16 +555,25 @@ extension EntityManager {
     }
   }
   
-  func setupTutorial(hero: General) {
-    guard self.playerEntites.count >= 2,
+  func setupTutorial() {
+    guard let hero = self.playerEntites[1] as? General,
+      let heroAliasComponent = hero.component(ofType: AliasComponent.self),
       let ghost = self.playerEntites[1] as? General,
-      let spriteComponent = ghost.component(ofType: SpriteComponent.self) else { return }
+      let ghostAliasComponent = ghost.component(ofType: AliasComponent.self),
+      let spriteComponent = ghost.component(ofType: SpriteComponent.self),
+      let physicsComponent = ghost.component(ofType: PhysicsComponent.self) else { return }
     
+    heroAliasComponent.node.text = ""
+    ghostAliasComponent.node.text = ""
+    
+    ghost.switchToState(.moving)
     spriteComponent.node.alpha = 0.5
+    physicsComponent.physicsBody.collisionBitMask = PhysicsCategoryMask.package
     
-    let tutorialActionEntity = TutorialAction(hero: hero)
+    let tutorialActionEntity = TutorialAction(hero: ghost)
     self.scene.addChild(tutorialActionEntity.firstTapHand.node)
     self.scene.addChild(tutorialActionEntity.secondTapHand.node)
+    tutorialActionEntity.setupNextStep()
     
     self.tutorialEntiies.append(tutorialActionEntity)
   }

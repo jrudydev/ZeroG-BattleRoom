@@ -137,7 +137,7 @@ extension GameScene {
   override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
     if touches.count == 2 {
       switch self.gameState.currentState {
-      case is Playing:
+      case is Playing, is Tutorial:
         var touchesArray = [UITouch]()
         for (_, touch) in touches.enumerated() {
           touchesArray.append(touch)

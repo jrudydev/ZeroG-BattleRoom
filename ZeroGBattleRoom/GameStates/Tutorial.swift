@@ -11,6 +11,9 @@ import GameplayKit
 
 class Tutorial: GKState {
   
+  static private let teamUserDataKey = "team"
+  static private let stepUserDataKey = "step"
+  
   enum Step: Int {
     case tapLaunch = 1
 //    case swipeLaunch
@@ -23,9 +26,55 @@ class Tutorial: GKState {
 //      case .rotateThrow: return nil
       }
     }
+    
+    var startPosition: CGPoint {
+      guard self.rawValue < Tutorial.startingPoints.count else { return .zero }
+    
+      return Tutorial.startingPoints[self.rawValue]
+    }
+    
+    var tapPosition: CGPoint {
+      guard self.rawValue < Tutorial.tapPoints.count else { return .zero }
+    
+      return Tutorial.tapPoints[self.rawValue]
+    }
   }
   
   unowned let scene: GameScene
+  
+  static var startingPoints: [CGPoint] = {
+    guard let scene = SKScene(fileNamed: "TutorialScene") else { return [] }
+    
+    var points = [SKNode]()
+    scene.enumerateChildNodes(withName: AppConstants.ComponentNames.tutorialStartPointName) {
+      startNode, _  in
+      
+      points.append(startNode)
+    }
+    return points.sorted { n1, n2 in
+      let n1StepValue = n1.userData![stepUserDataKey] as! Int
+      let n2StepValue = n2.userData![stepUserDataKey] as! Int
+
+      return n1StepValue < n2StepValue
+    }.map { $0.position }
+  }()
+  
+  static var tapPoints: [CGPoint] = {
+    guard let scene = SKScene(fileNamed: "TutorialScene") else { return [] }
+    
+    var points = [SKNode]()
+    scene.enumerateChildNodes(withName: AppConstants.ComponentNames.tutorialTapPointName) {
+      startNode, _  in
+      
+      points.append(startNode)
+    }
+    return points.sorted { n1, n2 in
+      let n1StepValue = n1.userData![stepUserDataKey] as! Int
+      let n2StepValue = n2.userData![stepUserDataKey] as! Int
+
+      return n1StepValue < n2StepValue
+    }.map { $0.position }
+  }()
   
   init(scene: SKScene) {
     self.scene = scene as! GameScene
@@ -47,13 +96,13 @@ class Tutorial: GKState {
     gridImage.name = AppConstants.ComponentNames.gridImageName
     gridImage.aspectFillToSize(fillSize: mapSize)
     
-    let widthDiff = (gridImage.size.width - UIScreen.main.bounds.width) / 2
+    let widthDiff = (gridImage.size.width - mapSize.width) / 2
     gridImage.position = CGPoint(x: gridImage.position.x +  widthDiff, y: gridImage.position.y)
     gridImage.zPosition = SpriteZPosition.simulation.rawValue
     
     self.scene.addChild(gridImage)
     
-    self.scene.entityManager.spawnTutorialPanels()
+//    self.scene.entityManager.spawnTutorialPanels()
     self.scene.entityManager.spawnHeros(mapSize: AppConstants.Layout.tutorialBoundrySize)
     
     let backButton = SKLabelNode(text: "Back")
@@ -68,8 +117,9 @@ class Tutorial: GKState {
     backButton.isUserInteractionEnabled = false
 
     self.scene.entityManager.addInGameUIView(elements: [backButton])
-    
-    self.setupPlayers()
+    self.scene.entityManager.setupTutorial()
+
+    self.loadLevel()
   }
   
   override func willExit(to nextState: GKState) { }
@@ -83,31 +133,21 @@ class Tutorial: GKState {
   }
 
   private func loadLevel() {
-    guard let scene = SKScene(fileNamed: "") else { return }
+    guard let scene = SKScene(fileNamed: "TutorialScene") else { return }
     
     scene.enumerateChildNodes(withName: AppConstants.ComponentNames.wallPanelName) { wallNode, _  in
-//      if let wall = self.scene.entitityManager.wallNodeCopy {
-//        wall.position = wallNode.position
-//        wall.zRotation = wallNode.zRotation
-//        self.scene.addChild(wall)
-//      }
-    }
-  }
-  
-  private func setupPlayers() {
-    for entity in self.scene.entityManager.playerEntites {
-      guard let hero = entity as? General,
-        let aliasComponent = hero.component(ofType: AliasComponent.self) else { continue }
+      var team: Team? = nil
+      if let userData = wallNode.userData, let teamRawValue = userData[Self.teamUserDataKey] as? Int {
+        team = Team(rawValue: teamRawValue)
+      }
       
-      aliasComponent.node.text = ""
-    }
-    
-    if let ghost = self.scene.entityManager.playerEntites[1] as? General,
-      let ghostPhysicsComponent = ghost.component(ofType: PhysicsComponent.self) {
+      guard let panel = self.scene.entityManager.panelFactory.panelSegment(beamConfig: .none, number: 1, team: team).first,
+        let panelShapeComponent = panel.component(ofType: ShapeComponent.self) else { return }
       
-      ghostPhysicsComponent.physicsBody.collisionBitMask = PhysicsCategoryMask.package
-      ghost.switchToState(.moving)
-      self.scene.entityManager.setupTutorial(hero: ghost)
+      panelShapeComponent.node.position = wallNode.position
+      panelShapeComponent.node.zRotation = wallNode.zRotation
+      
+      self.scene.addChild(panelShapeComponent.node)
     }
   }
 }

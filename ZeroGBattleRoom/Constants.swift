@@ -50,6 +50,10 @@ struct AppConstants {
     static let rotationCircleName = "rotation-circle"
     static let ingameUIViewName = "ingame-ui-view"
     static let spinnyNodeName = "spinny-node"
+    
+    static let tutorialStartPointName = "start-point"
+    static let tutorialTapPointName = "tap-point"
+    
   }
   
   struct Touch {

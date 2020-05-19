@@ -1,11 +1,11 @@
 {
   "images" : [
     {
+      "filename" : "tap.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "tap.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
