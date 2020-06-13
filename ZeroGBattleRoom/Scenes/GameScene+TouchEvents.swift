@@ -12,10 +12,15 @@ import GameKit
 
 extension GameScene {
   func touchDown(atPoint pos : CGPoint) {
+    if self.gameState.currentState is Tutorial,
+      let tutorialAction = self.entityManager.tutorialEntities.first as? TutorialAction,
+      let tutorialStep = tutorialAction.currentStep,
+      tutorialStep == .pinchZoom { return }
+    
     self.numberOfTouches += 1
     
     guard let hero = self.entityManager.hero as? General,
-      let herpSpriteComponent = hero.component(ofType: SpriteComponent.self),
+      let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
       let launchComponent = hero.component(ofType: LaunchComponent.self) else { return }
 
     guard self.numberOfTouches <= 1 else {
@@ -23,7 +28,7 @@ extension GameScene {
       return
     }
     
-    let heroDistanceVector = herpSpriteComponent.node.position.vectorTo(point: pos)
+    let heroDistanceVector = heroSpriteComponent.node.position.vectorTo(point: pos)
     guard heroDistanceVector.length() > AppConstants.Touch.maxSwipeDistance else {
       launchComponent.hide()
       return
@@ -34,6 +39,11 @@ extension GameScene {
   }
   
   func touchMoved(toPoint pos : CGPoint) {
+    if self.gameState.currentState is Tutorial,
+      let tutorialAction = self.entityManager.tutorialEntities.first as? TutorialAction,
+      let tutorialStep = tutorialAction.currentStep,
+      tutorialStep == .pinchZoom { return }
+    
     switch self.gameState.currentState {
     case is Playing:
       if let hero = self.entityManager.hero as? General {
@@ -44,13 +54,19 @@ extension GameScene {
   }
     
   func touchUp(atPoint pos : CGPoint) {
+    if self.gameState.currentState is Tutorial,
+      let tutorialAction = self.entityManager.tutorialEntities.first as? TutorialAction,
+      let tutorialStep = tutorialAction.currentStep {
+      
+      if tutorialStep == .pinchZoom { return } else {
+        tutorialAction.stopAllAnimations()
+      }
+    }
+    
     switch self.gameState.currentState {
     case is WaitingForTap:
       self.handleWaitingForTap(pos: pos)
     case is Tutorial, is Playing:
-      if let tutorialAction = self.entityManager.tutorialEntiies.first as? TutorialAction {
-        tutorialAction.stopAllAnimations()
-      }
       self.handleRestartTap(pos: pos)
       self.handlePlayerLaunch(pos: pos)
     case is GameOver:

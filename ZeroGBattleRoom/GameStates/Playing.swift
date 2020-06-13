@@ -50,7 +50,7 @@ class Playing: GKState {
     backButton.zPosition = SpriteZPosition.menu.rawValue
     backButton.isUserInteractionEnabled = false
 
-    self.scene.entityManager.addInGameUIView(elements: [backButton])
+    self.scene.entityManager.addInGameUIView(element: backButton)
   }
   
   override func willExit(to nextState: GKState) {

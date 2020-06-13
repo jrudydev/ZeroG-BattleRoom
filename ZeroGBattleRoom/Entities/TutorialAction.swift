@@ -12,9 +12,11 @@ import GameplayKit
  
 
 class TutorialAction: GKEntity {
+  unowned let hero: General
   unowned let ghost: General
+  unowned let sticker: SKSpriteNode
   
-  private var currentStep: Tutorial.Step? = nil
+  var currentStep: Tutorial.Step? = nil
   private var stepFinished = false {
     didSet {
       guard stepFinished,
@@ -26,15 +28,16 @@ class TutorialAction: GKEntity {
     }
   }
   
-  init(hero: General) {
-    let tapComponent = SpriteComponent(texture: SKTexture(imageNamed: "tap"))
-    tapComponent.node.position = Tutorial.Step.tapLaunch.tapPosition
-    tapComponent.node.anchorPoint = CGPoint(x: 0.35, y: 0.9)
-    
-    self.ghost = hero
+  init(hero: General, ghost: General, sticker: SKSpriteNode) {
+    self.hero = hero
+    self.ghost = ghost
+    self.sticker = sticker
 
     super.init()
     
+    let tapComponent = SpriteComponent(texture: SKTexture(imageNamed: "tap"))
+    tapComponent.node.position = Tutorial.Step.tapLaunch.tapPosition
+    tapComponent.node.anchorPoint = CGPoint(x: 0.35, y: 0.9)
     tapComponent.node.zPosition = SpriteZPosition.menu.rawValue
     self.addComponent(tapComponent)
   }
@@ -81,7 +84,9 @@ class TutorialAction: GKEntity {
       ghostSpriteComponent.node.alpha = 0.5
     }
   }
-  
+}
+
+extension TutorialAction {
   private func setupTutorialAnimation() {
     guard let step = self.currentStep,
       let spriteComponent = self.ghost.component(ofType: SpriteComponent.self),
@@ -91,37 +96,35 @@ class TutorialAction: GKEntity {
       
     self.stopAllAnimations()
     self.showTutorial()
+  
+    self.repositionSprites(pos: step.startPosition,
+                           rotation: step.startRotation,
+                           tapPos: step.tapPosition)
     
-    let heroPosition = step.startPosition
-    let tapPosition = step.tapPosition
+    let prepareLaunch = SKAction.run {
+      launchComponent.launchInfo.lastTouchBegan = step.tapPosition
+      self.ghost.updateLaunchComponents(touchPosition: step.tapPosition)
+    }
+    
+    let launchGhost = SKAction.run {
+      self.ghost.launch()
+      ShapeFactory.shared.spawnSpinnyNodeAt(pos: step.tapPosition)
+    }
+    
+    let resetAction = SKAction.run {
+      spriteComponent.node.position = step.startPosition
+      spriteComponent.node.zRotation = 0.0
+      physicsComponent.physicsBody.velocity = .zero
+      physicsComponent.physicsBody.angularVelocity = .zero
+    }
+    
     switch step {
     case .tapLaunch:
-      tapSpriteComponent.node.position = tapPosition
-      spriteComponent.node.position = heroPosition
-      
-      let prepareAction = SKAction.run {
-        launchComponent.launchInfo.lastTouchBegan = tapPosition
-        self.ghost.updateLaunchComponents(touchPosition: tapPosition)
-      }
-      
-      let launchAction = SKAction.run {
-        self.ghost.launch()
-        
-        ShapeFactory.shared.spawnSpinnyNodeAt(pos: tapPosition)
-      }
-
-      let resetAction = SKAction.run {
-        spriteComponent.node.position = heroPosition
-        spriteComponent.node.zRotation = 0.0
-        physicsComponent.physicsBody.velocity = .zero
-        physicsComponent.physicsBody.angularVelocity = .zero
-      }
-      
       let launchSequence = SKAction.repeatForever(SKAction.sequence([
         SKAction.wait(forDuration: 2.0),
-        prepareAction,
+        prepareLaunch,
         SKAction.wait(forDuration: 2.0),
-        launchAction,
+        launchGhost,
         SKAction.wait(forDuration: 4.0),
         resetAction]))
       
@@ -135,8 +138,83 @@ class TutorialAction: GKEntity {
       
       let runGroup = SKAction.group([launchSequence, tapSequece])
       tapSpriteComponent.node.run(runGroup)
-    default:
-      break
+      sticker.run(SKAction.fadeOut(withDuration: 0.0))
+    case .pinchZoom:
+      let zoomSteps = 30
+      let zoomLevel: CGFloat = 1.5
+      let zoomTimeInterval: TimeInterval = 0.05
+      let pinchOutAction = SKAction.run {
+        NotificationCenter.default.post(name: .resizeView, object: zoomLevel)
+      }
+      let pinchOutSequnce = SKAction.sequence([
+        pinchOutAction,
+        SKAction.wait(forDuration: zoomTimeInterval)])
+      let pinchOut = SKAction.repeat(pinchOutSequnce, count: zoomSteps)
+      
+      let pinchInAction = SKAction.run {
+        NotificationCenter.default.post(name: .resizeView, object: zoomLevel * -1.0)
+      }
+      let pinchInSequnce = SKAction.sequence([
+        pinchInAction,
+        SKAction.wait(forDuration: zoomTimeInterval)])
+      let pinchIn = SKAction.repeat(pinchInSequnce, count: zoomSteps)
+      
+      let pinchSequence = SKAction.repeatForever(SKAction.sequence([
+        SKAction.wait(forDuration: 4.0),
+        pinchOut,
+        SKAction.wait(forDuration: 2.0),
+        pinchIn,
+        SKAction.wait(forDuration: 3.0)]))
+      
+      let tapAction = SKAction.repeatForever(SKAction.sequence([
+        SKAction.fadeOut(withDuration: 0.0),
+        SKAction.wait(forDuration: 2.0),
+        SKAction.fadeIn(withDuration: 0.5),
+        SKAction.wait(forDuration: 1.5),
+        SKAction.setTexture(SKTexture(imageNamed: "pinch-in")),
+        SKAction.wait(forDuration: 3.5),
+        SKAction.setTexture(SKTexture(imageNamed: "pinch-out")),
+        SKAction.wait(forDuration: 2.0),
+        SKAction.fadeOut(withDuration: 0.5),
+        SKAction.wait(forDuration: 2.0)]))
+      
+      let runGroup = SKAction.group([pinchSequence, tapAction])
+      sticker.run(runGroup)
+    case .swipeLaunch:
+      let launchSequence = SKAction.repeatForever(SKAction.sequence([
+        SKAction.wait(forDuration: 2.0),
+        prepareLaunch,
+        SKAction.wait(forDuration: 2.0),
+        launchGhost,
+        SKAction.wait(forDuration: 4.0),
+        resetAction]))
+      
+      let swipeAction = SKAction.repeatForever(SKAction.sequence([
+        SKAction.fadeOut(withDuration: 0.0),
+        SKAction.wait(forDuration: 2.0),
+        SKAction.fadeIn(withDuration: 0.5),
+        SKAction.move(by: CGVector(dx: 50.0, dy: 0.0), duration: 1.5),
+        SKAction.wait(forDuration: 1.5),
+        SKAction.fadeOut(withDuration: 0.5),
+        SKAction.wait(forDuration: 3.5)
+      ]))
+
+      let runGroup = SKAction.group([launchSequence, swipeAction])
+      tapSpriteComponent.node.run(runGroup)
+    }
+  }
+  
+  private func repositionSprites(pos: CGPoint, rotation: CGFloat, tapPos: CGPoint) {
+    guard let heroSpriteComponent = self.hero.component(ofType: SpriteComponent.self),
+      let spriteComponent = self.ghost.component(ofType: SpriteComponent.self),
+      let tapSpriteComponent = self.component(ofType: SpriteComponent.self) else { return }
+      
+    DispatchQueue.main.async {
+      tapSpriteComponent.node.position = tapPos
+      spriteComponent.node.position = pos
+      spriteComponent.node.zRotation = rotation
+      heroSpriteComponent.node.position = pos
+      heroSpriteComponent.node.zRotation = rotation
     }
   }
 }

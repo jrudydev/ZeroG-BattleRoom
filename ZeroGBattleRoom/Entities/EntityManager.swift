@@ -29,7 +29,7 @@ class EntityManager {
   ]
   var resourcesEntities = [GKEntity]()
   var wallEntities = [GKEntity]()
-  var tutorialEntiies = [GKEntity]()
+  var tutorialEntities = [GKEntity]()
   var uiEntities = Set<GKEntity>()
   var entities = Set<GKEntity>()
   var toRemove = Set<GKEntity>()
@@ -481,9 +481,9 @@ extension EntityManager {
   
   // MARK: - Handle UI Elements
   
-  func addInGameUIView(elements: [SKNode]) {
+  func addInGameUIView(element: SKNode) {
     let scaledComponent = ScaledContainer(name: AppConstants.ComponentNames.ingameUIViewName,
-                                          elements: elements)
+                                          element: element)
     
     self.scene.cam!.addChild(scaledComponent.node)
     
@@ -584,8 +584,8 @@ extension EntityManager {
     }
   }
   
-  func setupTutorial() {
-    guard let hero = self.playerEntites[1] as? General,
+  func setupTutorial(sticker: SKSpriteNode) {
+    guard let hero = self.playerEntites[0] as? General,
       let heroAliasComponent = hero.component(ofType: AliasComponent.self),
       let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
       let ghost = self.playerEntites[1] as? General,
@@ -602,12 +602,12 @@ extension EntityManager {
     ghostSpriteComponent.node.alpha = 0.5
     ghostPhysicsComponent.physicsBody.collisionBitMask = PhysicsCategoryMask.package
     
-    let tutorialActionEntity = TutorialAction(hero: ghost)
+    let tutorialActionEntity = TutorialAction(hero: hero, ghost: ghost, sticker: sticker)
     if let tapSpriteComponent = tutorialActionEntity.component(ofType: SpriteComponent.self) {
       self.scene.addChild(tapSpriteComponent.node)
     }
     tutorialActionEntity.setupNextStep()
     
-    self.tutorialEntiies.append(tutorialActionEntity)
+    self.tutorialEntities.append(tutorialActionEntity)
   }
 }

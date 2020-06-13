@@ -17,21 +17,29 @@ class Tutorial: GKState {
   
   enum Step: Int {
     case tapLaunch = 1
-//    case swipeLaunch
+    case pinchZoom
+    case swipeLaunch
 //    case rotateThrow
     
     var nextStep: Step? {
       switch self {
-      case .tapLaunch: return nil // .swipeLaunch
-//      case .swipeLaunch: return .rotateThrow
+      case .tapLaunch: return .pinchZoom
+      case .pinchZoom: return .swipeLaunch
+      case .swipeLaunch: return nil //.rotateThrow
 //      case .rotateThrow: return nil
       }
     }
     
     var startPosition: CGPoint {
       guard self.rawValue < Tutorial.startingPoints.count else { return .zero }
-      print(Tutorial.startingPoints)
       return Tutorial.startingPoints[self.index]
+    }
+    
+    var startRotation: CGFloat {
+      switch self {
+      case .pinchZoom: return -1.6
+      default: return 0.0
+      }
     }
     
     var tapPosition: CGPoint {
@@ -121,9 +129,15 @@ class Tutorial: GKState {
     backButton.position = CGPoint(x: newPosX, y: newPosY)
     backButton.zPosition = SpriteZPosition.menu.rawValue
     backButton.isUserInteractionEnabled = false
+    
+    let tapSticker = SKSpriteNode(imageNamed: "pinch-out")
+    tapSticker.name = AppConstants.ComponentNames.tutorialTapStickerName
+    tapSticker.position = CGPoint(x: 50.0, y: -100.0)
+    tapSticker.zPosition = SpriteZPosition.menu.rawValue
 
-    self.scene.entityManager.addInGameUIView(elements: [backButton])
-    self.scene.entityManager.setupTutorial()
+    self.scene.entityManager.addInGameUIView(element: backButton)
+    self.scene.entityManager.addInGameUIView(element: tapSticker)
+    self.scene.entityManager.setupTutorial(sticker: tapSticker)
   }
   
   override func willExit(to nextState: GKState) { }
