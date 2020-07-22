@@ -201,11 +201,16 @@ extension GameScene {
   
   override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
     self.numberOfTouches = 0
-    
+
+    // Check if the hero did not launch
     if let hero = self.entityManager.hero as? General,
       let launchComponent = hero.component(ofType: LaunchComponent.self),
       launchComponent.launchInfo.lastTouchBegan == nil,
       hero.isBeamed {
+      
+      if let launchLineNode = launchComponent.node.childNode(withName: AppConstants.ComponentNames.launchLineName) as? SKShapeNode {
+        launchLineNode.alpha = LaunchComponent.targetLineAlpha
+      }
       
       self.showTutorialIfNeeded(excludedSteps: [.pinchZoom])
     }
