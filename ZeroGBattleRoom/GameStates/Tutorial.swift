@@ -37,7 +37,7 @@ class Tutorial: GKState {
     
     var startRotation: CGFloat {
       switch self {
-      case .pinchZoom: return -1.6
+      case .pinchZoom, .swipeLaunch: return -1.6
       default: return 0.0
       }
     }
@@ -133,10 +133,17 @@ class Tutorial: GKState {
     let tapSticker = SKSpriteNode(imageNamed: "pinch-out")
     tapSticker.name = AppConstants.ComponentNames.tutorialTapStickerName
     tapSticker.position = CGPoint(x: 50.0, y: -100.0)
-    tapSticker.zPosition = SpriteZPosition.menu.rawValue
+    tapSticker.zPosition = SpriteZPosition.inGameUI.rawValue
 
+//    let stepIndecatorBG = SKShapeNode(rectOf: UIScreen.main.bounds.size)
+//    stepIndecatorBG.fillColor = UIColor.black.withAlphaComponent(20.0)
+//    stepIndecatorBG.strokeColor = UIColor.black
+//    stepIndecatorBG.zPosition = SpriteZPosition.menu.rawValue
+    
     self.scene.entityManager.addInGameUIView(element: backButton)
     self.scene.entityManager.addInGameUIView(element: tapSticker)
+//    self.scene.entityManager.addInGameUIView(element: stepIndecatorBG)
+    
     self.scene.entityManager.setupTutorial(sticker: tapSticker)
   }
   

@@ -13,7 +13,7 @@ import GameplayKit
 
 class General: GKEntity, BeamableProtocol {
   
-  private let defaultImpulseMagnitude: CGFloat = 2.0
+  private let defaultImpulseMagnitude: CGFloat = 1.0
   private let defaultLaunchRotation: CGFloat = 10.0
   private let defaultThrowMagnitude: CGFloat = 5.0
   

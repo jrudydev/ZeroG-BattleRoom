@@ -217,7 +217,9 @@ extension GameScene: SKPhysicsContactDelegate {
 //      }
       impulseComponent.isOnCooldown = false
       
-      self.run(SoundManager.shared.blipSound)
+      if hero != self.entityManager.playerEntites[1] {
+        self.run(SoundManager.shared.blipSound)
+      }
     }
   }
 }

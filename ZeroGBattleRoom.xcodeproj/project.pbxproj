@@ -24,6 +24,7 @@
 		9347C8C32431EB7D0099AE53 /* SnapshotManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9347C8C22431EB7D0099AE53 /* SnapshotManager.swift */; };
 		934A5F302433221700A3D232 /* MultiplayerNetworking+Messages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A5F2F2433221700A3D232 /* MultiplayerNetworking+Messages.swift */; };
 		934D2C2D2459A3B000AA7803 /* TutorialAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934D2C2C2459A3AF00AA7803 /* TutorialAction.swift */; };
+		934D6E4024A18B0F0082404B /* StepIndicatorComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934D6E3F24A18B0F0082404B /* StepIndicatorComponent.swift */; };
 		935C3D04245B4149006B0DF7 /* ShapeFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 935C3D03245B4149006B0DF7 /* ShapeFactory.swift */; };
 		937614C124555F9C004D4CF8 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937614C024555F9C004D4CF8 /* NetworkError.swift */; };
 		937911212439E4A500CEC9C6 /* AliasComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 937911202439E4A500CEC9C6 /* AliasComponent.swift */; };
@@ -97,6 +98,7 @@
 		9347C8C22431EB7D0099AE53 /* SnapshotManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnapshotManager.swift; sourceTree = "<group>"; };
 		934A5F2F2433221700A3D232 /* MultiplayerNetworking+Messages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MultiplayerNetworking+Messages.swift"; sourceTree = "<group>"; };
 		934D2C2C2459A3AF00AA7803 /* TutorialAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialAction.swift; sourceTree = "<group>"; };
+		934D6E3F24A18B0F0082404B /* StepIndicatorComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepIndicatorComponent.swift; sourceTree = "<group>"; };
 		935C3D03245B4149006B0DF7 /* ShapeFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShapeFactory.swift; sourceTree = "<group>"; };
 		937614C024555F9C004D4CF8 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
 		937911202439E4A500CEC9C6 /* AliasComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AliasComponent.swift; sourceTree = "<group>"; };
@@ -243,6 +245,7 @@
 				93873A1B2439DC1D00A6E59A /* TrailComponent.swift */,
 				930D65E5244EA717009F05A0 /* InterfaceComponent.swift */,
 				93E61FEB246A262F0038F168 /* DeliveredComponent.swift */,
+				934D6E3F24A18B0F0082404B /* StepIndicatorComponent.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -471,6 +474,7 @@
 				934A5F302433221700A3D232 /* MultiplayerNetworking+Messages.swift in Sources */,
 				93873A102438ACC000A6E59A /* Package.swift in Sources */,
 				93A55EF324307D280027E83E /* MultiplayerNetworkingProtocol.swift in Sources */,
+				934D6E4024A18B0F0082404B /* StepIndicatorComponent.swift in Sources */,
 				93A0779D243C982200D52205 /* Panel.swift in Sources */,
 				93873A122438B82900A6E59A /* ShapeComponents.swift in Sources */,
 				93873A142438B87600A6E59A /* PhysicsComponent.swift in Sources */,

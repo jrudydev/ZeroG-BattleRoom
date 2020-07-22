@@ -16,6 +16,8 @@ class TutorialAction: GKEntity {
   unowned let ghost: General
   unowned let sticker: SKSpriteNode
   
+  var isShowingStep = false
+  
   var currentStep: Tutorial.Step? = nil
   private var stepFinished = false {
     didSet {
@@ -47,47 +49,57 @@ class TutorialAction: GKEntity {
   }
   
   @discardableResult
-  func setupNextStep() -> Tutorial.Step? {
+  public func setupNextStep() -> Tutorial.Step? {
+    self.isShowingStep = true
+    
     if self.currentStep == nil {
       self.currentStep = .tapLaunch
     } else {
       self.currentStep = self.currentStep?.nextStep
     }
     
-    self.setupTutorialAnimation()
+    if let currentStep = self.currentStep {
+      self.setupTutorialAnimation()
+      self.repositionSprites(pos: currentStep.startPosition,
+                             rotation: currentStep.startRotation,
+                             tapPos: currentStep.tapPosition)
+    }
     
     return self.currentStep
   }
   
-  func stopAllAnimations() {
-    guard let tapSpriteComponent = self.component(ofType: SpriteComponent.self) else { return }
-    
-    tapSpriteComponent.node.removeAllActions()
-  
-    self.hideTutorial()
-  }
-  
   private func hideTutorial() {
-    guard let tapSpriteComponent = self.component(ofType: SpriteComponent.self) else { return }
-    
+    guard let tapSpriteComponent = self.component(ofType: SpriteComponent.self),
+      let ghostSpriteComponent = self.ghost.component(ofType: SpriteComponent.self) else { return }
+
     tapSpriteComponent.node.alpha = 0.0
-    if let ghostSpriteComponent = self.ghost.component(ofType: SpriteComponent.self) {
-      ghostSpriteComponent.node.alpha = 0.0
-    }
+    ghostSpriteComponent.node.alpha = 0.0
+    self.sticker.alpha = 0.0
   }
-  
+
   private func showTutorial() {
-    guard let tapSpriteComponent = self.component(ofType: SpriteComponent.self) else { return }
-    
+    guard let tapSpriteComponent = self.component(ofType: SpriteComponent.self),
+      let ghostSpriteComponent = self.ghost.component(ofType: SpriteComponent.self) else { return }
+
     tapSpriteComponent.node.alpha = 1.0
-    if let ghostSpriteComponent = self.ghost.component(ofType: SpriteComponent.self) {
-      ghostSpriteComponent.node.alpha = 0.5
-    }
+    ghostSpriteComponent.node.alpha = 0.5
+    self.sticker.alpha = 1.0
   }
 }
 
 extension TutorialAction {
-  private func setupTutorialAnimation() {
+  public func stopAllAnimations() {
+    guard let tapSpriteComponent = self.component(ofType: SpriteComponent.self),
+      let ghostSpriteComponent = self.ghost.component(ofType: SpriteComponent.self) else { return }
+    
+    tapSpriteComponent.node.removeAllActions()
+    ghostSpriteComponent.node.removeAllActions()
+    self.sticker.removeAllActions()
+  
+    self.hideTutorial()
+  }
+  
+  public func setupTutorialAnimation() {
     guard let step = self.currentStep,
       let spriteComponent = self.ghost.component(ofType: SpriteComponent.self),
       let physicsComponent = self.ghost.component(ofType: PhysicsComponent.self),
@@ -96,10 +108,6 @@ extension TutorialAction {
       
     self.stopAllAnimations()
     self.showTutorial()
-  
-    self.repositionSprites(pos: step.startPosition,
-                           rotation: step.startRotation,
-                           tapPos: step.tapPosition)
     
     let prepareLaunch = SKAction.run {
       launchComponent.launchInfo.lastTouchBegan = step.tapPosition
@@ -180,6 +188,7 @@ extension TutorialAction {
       
       let runGroup = SKAction.group([pinchSequence, tapAction])
       sticker.run(runGroup)
+      tapSpriteComponent.node.run(SKAction.fadeOut(withDuration: 0.0))
     case .swipeLaunch:
       let launchSequence = SKAction.repeatForever(SKAction.sequence([
         SKAction.wait(forDuration: 2.0),
@@ -201,6 +210,7 @@ extension TutorialAction {
 
       let runGroup = SKAction.group([launchSequence, swipeAction])
       tapSpriteComponent.node.run(runGroup)
+      sticker.run(SKAction.fadeOut(withDuration: 0.0))
     }
   }
   

@@ -11,23 +11,46 @@ import SpriteKit
 import GameKit
 
 extension GameScene {
+  private func hideTutorialIfNeeded(excludedSteps: [Tutorial.Step] = []) {
+    if self.gameState.currentState is Tutorial,
+      let tutorialAction = self.entityManager.tutorialEntities.first as? TutorialAction,
+      let tutorialStep = tutorialAction.currentStep {
+      
+      guard !excludedSteps.contains(tutorialStep) else { return }
+      
+      tutorialAction.stopAllAnimations()
+    }
+  }
+  
+  private func showTutorialIfNeeded(excludedSteps: [Tutorial.Step] = []) {
+    if self.gameState.currentState is Tutorial,
+      let tutorialAction = self.entityManager.tutorialEntities.first as? TutorialAction,
+      let tutorialStep = tutorialAction.currentStep {
+      
+      guard !excludedSteps.contains(tutorialStep) else { return }
+      
+      tutorialAction.setupTutorialAnimation()
+    }
+  }
+}
+
+extension GameScene {
   func touchDown(atPoint pos : CGPoint) {
+    self.numberOfTouches += 1
+    
     if self.gameState.currentState is Tutorial,
       let tutorialAction = self.entityManager.tutorialEntities.first as? TutorialAction,
       let tutorialStep = tutorialAction.currentStep,
       tutorialStep == .pinchZoom { return }
     
-    self.numberOfTouches += 1
+    self.hideTutorialIfNeeded(excludedSteps: [.pinchZoom])
     
     guard let hero = self.entityManager.hero as? General,
       let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
       let launchComponent = hero.component(ofType: LaunchComponent.self) else { return }
 
-    guard self.numberOfTouches <= 1 else {
-      launchComponent.hide()
-      return
-    }
-    
+    guard self.numberOfTouches <= 1 else { launchComponent.hide(); return }
+   
     let heroDistanceVector = heroSpriteComponent.node.position.vectorTo(point: pos)
     guard heroDistanceVector.length() > AppConstants.Touch.maxSwipeDistance else {
       launchComponent.hide()
@@ -39,13 +62,8 @@ extension GameScene {
   }
   
   func touchMoved(toPoint pos : CGPoint) {
-    if self.gameState.currentState is Tutorial,
-      let tutorialAction = self.entityManager.tutorialEntities.first as? TutorialAction,
-      let tutorialStep = tutorialAction.currentStep,
-      tutorialStep == .pinchZoom { return }
-    
     switch self.gameState.currentState {
-    case is Playing:
+    case is Playing, is Tutorial:
       if let hero = self.entityManager.hero as? General {
         hero.updateLaunchComponents(touchPosition: pos)
       }
@@ -54,15 +72,6 @@ extension GameScene {
   }
     
   func touchUp(atPoint pos : CGPoint) {
-    if self.gameState.currentState is Tutorial,
-      let tutorialAction = self.entityManager.tutorialEntities.first as? TutorialAction,
-      let tutorialStep = tutorialAction.currentStep {
-      
-      if tutorialStep == .pinchZoom { return } else {
-        tutorialAction.stopAllAnimations()
-      }
-    }
-    
     switch self.gameState.currentState {
     case is WaitingForTap:
       self.handleWaitingForTap(pos: pos)
@@ -107,13 +116,13 @@ extension GameScene {
       if let impulseComponent = hero.component(ofType: ImpulseComponent.self),
         !impulseComponent.isOnCooldown {
         
-        hero.impulseTo(location: pos) { sprite, velocity, angularVelocity in
-          self.multiplayerNetworking.sendMove(start: sprite.position,
-                                              rotation: sprite.zRotation,
-                                              velocity: velocity,
-                                              angularVelocity: angularVelocity,
-                                              wasLaunch: false)
-        }
+//        hero.impulseTo(location: pos) { sprite, velocity, angularVelocity in
+//          self.multiplayerNetworking.sendMove(start: sprite.position,
+//                                              rotation: sprite.zRotation,
+//                                              velocity: velocity,
+//                                              angularVelocity: angularVelocity,
+//                                              wasLaunch: false)
+//        }
       } else if let spriteComponent = hero.component(ofType: SpriteComponent.self) {
 //        let throwPoint = self.convert(CGPoint(x: 0.0, y: 1.0), from: spriteComponent.node)
 //        hero.throwResourceAt(point: throwPoint)
@@ -152,6 +161,17 @@ extension GameScene {
   
   override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
     if touches.count == 2 {
+      if self.gameState.currentState is Tutorial,
+        let tutorialAction = self.entityManager.tutorialEntities.first as? TutorialAction,
+        let tutorialStep = tutorialAction.currentStep {
+        
+        if tutorialStep == .pinchZoom {
+          tutorialAction.setupNextStep()
+        } else if tutorialStep == .tapLaunch {
+          return
+        }
+      }
+      
       switch self.gameState.currentState {
       case is Playing, is Tutorial:
         var touchesArray = [UITouch]()
@@ -181,6 +201,14 @@ extension GameScene {
   
   override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
     self.numberOfTouches = 0
+    
+    if let hero = self.entityManager.hero as? General,
+      let launchComponent = hero.component(ofType: LaunchComponent.self),
+      launchComponent.launchInfo.lastTouchBegan == nil,
+      hero.isBeamed {
+      
+      self.showTutorialIfNeeded(excludedSteps: [.pinchZoom])
+    }
     
     for t in touches { self.touchUp(atPoint: t.location(in: self)) }
   }
