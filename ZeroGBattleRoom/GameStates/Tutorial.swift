@@ -19,31 +19,33 @@ class Tutorial: GKState {
     case tapLaunch = 1
     case pinchZoom
     case swipeLaunch
-//    case rotateThrow
+    case rotateThrow
     
     var nextStep: Step? {
       switch self {
       case .tapLaunch: return .pinchZoom
       case .pinchZoom: return .swipeLaunch
-      case .swipeLaunch: return nil //.rotateThrow
-//      case .rotateThrow: return nil
+      case .swipeLaunch: return .rotateThrow
+      case .rotateThrow: return nil
       }
     }
     
     var startPosition: CGPoint {
-      guard self.rawValue < Tutorial.startingPoints.count else { return .zero }
+      guard self.index <= Tutorial.startingPoints.count else { return .zero }
+      
       return Tutorial.startingPoints[self.index]
     }
     
     var startRotation: CGFloat {
       switch self {
       case .pinchZoom, .swipeLaunch: return -1.6
+      case .rotateThrow: return 3.14
       default: return 0.0
       }
     }
     
     var tapPosition: CGPoint {
-      guard self.rawValue < Tutorial.tapPoints.count else { return .zero }
+      guard self.index <= Tutorial.startingPoints.count else { return .zero }
     
       return Tutorial.tapPoints[self.index]
     }

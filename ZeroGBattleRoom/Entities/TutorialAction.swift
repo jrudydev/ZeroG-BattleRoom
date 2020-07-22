@@ -225,6 +225,39 @@ extension TutorialAction {
       let runGroup = SKAction.group([launchSequence, swipeAction, touchAction])
       tapSpriteComponent.node.run(runGroup)
       sticker.run(SKAction.fadeOut(withDuration: 0.0))
+    case .rotateThrow:
+      let launchSequence = SKAction.repeatForever(SKAction.sequence([
+        SKAction.wait(forDuration: 2.0),
+        prepareLaunch,
+        SKAction.wait(forDuration: 3.5),
+        launchGhost,
+        SKAction.wait(forDuration: 4.0),
+        resetAction]))
+      
+      let swipeAction = SKAction.repeatForever(SKAction.sequence([
+        SKAction.fadeOut(withDuration: 0.0),
+        SKAction.wait(forDuration: 2.0),
+        SKAction.fadeIn(withDuration: 0.5),
+        SKAction.move(by: CGVector(dx: -50.0, dy: 0.0), duration: 1.5),
+        SKAction.wait(forDuration: 1.5),
+        SKAction.fadeOut(withDuration: 0.5),
+        SKAction.wait(forDuration: 3.5)
+      ]))
+    
+      let touchUpdateAction = SKAction.sequence([
+        SKAction.wait(forDuration: 0.1),
+        SKAction.run {
+          self.ghost.updateLaunchComponents(touchPosition: tapSpriteComponent.node.position)
+        }])
+      let touchAction = SKAction.repeatForever(SKAction.sequence([
+        SKAction.wait(forDuration: 2.5),
+        SKAction.repeat(touchUpdateAction, count: 15),
+        SKAction.wait(forDuration: 5.5)
+      ]))
+
+      let runGroup = SKAction.group([launchSequence, swipeAction, touchAction])
+      tapSpriteComponent.node.run(runGroup)
+      sticker.run(SKAction.fadeOut(withDuration: 0.0))
     }
   }
   
