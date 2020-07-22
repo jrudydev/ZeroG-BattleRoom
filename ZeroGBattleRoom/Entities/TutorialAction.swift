@@ -78,11 +78,9 @@ class TutorialAction: GKEntity {
   }
 
   private func showTutorial() {
-    guard let tapSpriteComponent = self.component(ofType: SpriteComponent.self),
-      let ghostSpriteComponent = self.ghost.component(ofType: SpriteComponent.self) else { return }
+    guard let tapSpriteComponent = self.component(ofType: SpriteComponent.self) else { return }
 
     tapSpriteComponent.node.alpha = 1.0
-    ghostSpriteComponent.node.alpha = 0.5
     self.sticker.alpha = 1.0
   }
 }
@@ -112,16 +110,15 @@ extension TutorialAction {
     let prepareLaunch = SKAction.run {
       launchComponent.launchInfo.lastTouchBegan = step.tapPosition
       self.ghost.updateLaunchComponents(touchPosition: step.tapPosition)
-      spriteComponent.node.alpha = 0.0
     }
     
     let launchGhost = SKAction.run {
       self.ghost.launch()
       ShapeFactory.shared.spawnSpinnyNodeAt(pos: step.tapPosition)
-      spriteComponent.node.alpha = 0.5
     }
     
     let resetAction = SKAction.run {
+      spriteComponent.node.alpha = 0.0
       spriteComponent.node.position = step.startPosition
       spriteComponent.node.zRotation = 0.0
       tapSpriteComponent.node.position = step.tapPosition
@@ -142,6 +139,9 @@ extension TutorialAction {
       let tapSequece = SKAction.repeatForever(SKAction.sequence([
         SKAction.fadeOut(withDuration: 0.0),
         SKAction.wait(forDuration: 2.0),
+        SKAction.run {
+          spriteComponent.node.alpha = 0.5
+        },
         SKAction.fadeIn(withDuration: 0.5),
         SKAction.wait(forDuration: 1.5),
         SKAction.fadeOut(withDuration: 0.5),
@@ -204,6 +204,9 @@ extension TutorialAction {
       let swipeAction = SKAction.repeatForever(SKAction.sequence([
         SKAction.fadeOut(withDuration: 0.0),
         SKAction.wait(forDuration: 2.0),
+        SKAction.run {
+          spriteComponent.node.alpha = 0.5
+        },
         SKAction.fadeIn(withDuration: 0.5),
         SKAction.move(by: CGVector(dx: 50.0, dy: -20.0), duration: 1.5),
         SKAction.wait(forDuration: 1.5),
@@ -237,6 +240,9 @@ extension TutorialAction {
       let swipeAction = SKAction.repeatForever(SKAction.sequence([
         SKAction.fadeOut(withDuration: 0.0),
         SKAction.wait(forDuration: 2.0),
+        SKAction.run {
+          spriteComponent.node.alpha = 0.5
+        },
         SKAction.fadeIn(withDuration: 0.5),
         SKAction.move(by: CGVector(dx: -50.0, dy: 0.0), duration: 1.5),
         SKAction.wait(forDuration: 1.5),
