@@ -15,21 +15,21 @@ extension GameScene {
     if self.gameState.currentState is Tutorial,
       let tutorialAction = self.entityManager.tutorialEntities.first as? TutorialAction,
       let tutorialStep = tutorialAction.currentStep {
-      
+
       guard !excludedSteps.contains(tutorialStep) else { return }
-      
-      tutorialAction.stopAllAnimations()
+
+      self.stopAllTutorialAnimations()
     }
   }
-  
+
   private func showTutorialIfNeeded(excludedSteps: [Tutorial.Step] = []) {
     if self.gameState.currentState is Tutorial,
       let tutorialAction = self.entityManager.tutorialEntities.first as? TutorialAction,
       let tutorialStep = tutorialAction.currentStep {
-      
+
       guard !excludedSteps.contains(tutorialStep) else { return }
-      
-      tutorialAction.setupTutorialAnimation()
+
+      self.setupHintAnimations(step: tutorialStep)
     }
   }
 }

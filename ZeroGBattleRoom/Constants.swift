@@ -53,6 +53,7 @@ struct AppConstants {
     static let tutorialStartPointName = "start-point"
     static let tutorialTapPointName = "tap-point"
     static let tutorialTapStickerName = "tap-sticker"
+    static let tutorialPinchStickerName = "pinch-sticker"
   }
   
   struct ButtonNames {

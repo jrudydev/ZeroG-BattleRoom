@@ -129,10 +129,10 @@ class Tutorial: GKState {
     backButton.zPosition = SpriteZPosition.menu.rawValue
     backButton.isUserInteractionEnabled = false
     
-    let tapSticker = SKSpriteNode(imageNamed: "pinch-out")
-    tapSticker.name = AppConstants.ComponentNames.tutorialTapStickerName
-    tapSticker.position = CGPoint(x: 50.0, y: -100.0)
-    tapSticker.zPosition = SpriteZPosition.inGameUI.rawValue
+    let pinchSticker = SKSpriteNode(imageNamed: "pinch-out")
+    pinchSticker.name = AppConstants.ComponentNames.tutorialPinchStickerName
+    pinchSticker.position = CGPoint(x: 50.0, y: -100.0)
+    pinchSticker.zPosition = SpriteZPosition.inGameUI.rawValue
     
     let tapThrow = SKSpriteNode(imageNamed: "throw")
     tapThrow.name = AppConstants.ButtonNames.throwButtonName
@@ -145,11 +145,11 @@ class Tutorial: GKState {
 //    stepIndecatorBG.zPosition = SpriteZPosition.menu.rawValue
     
     self.scene.entityManager.addInGameUIView(element: backButton)
-    self.scene.entityManager.addInGameUIView(element: tapSticker)
+    self.scene.entityManager.addInGameUIView(element: pinchSticker)
     self.scene.entityManager.addInGameUIView(element: tapThrow)
 //    self.scene.entityManager.addInGameUIView(element: stepIndecatorBG)
     
-    self.scene.entityManager.setupTutorial(sticker: tapSticker)
+    self.scene.entityManager.setupTutorial()
   }
   
   override func willExit(to nextState: GKState) { }

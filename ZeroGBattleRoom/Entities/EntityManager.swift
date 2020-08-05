@@ -482,8 +482,7 @@ extension EntityManager {
   // MARK: - Handle UI Elements
   
   func addInGameUIView(element: SKNode) {
-    let scaledComponent = ScaledContainer(name: AppConstants.ComponentNames.ingameUIViewName,
-                                          element: element)
+    let scaledComponent = ScaledContainer(element: element)
     
     self.scene.cam!.addChild(scaledComponent.node)
     
@@ -584,7 +583,7 @@ extension EntityManager {
     }
   }
   
-  func setupTutorial(sticker: SKSpriteNode) {
+  func setupTutorial() {
     guard let hero = self.playerEntites[0] as? General,
       let heroAliasComponent = hero.component(ofType: AliasComponent.self),
       let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
@@ -602,7 +601,7 @@ extension EntityManager {
     ghostSpriteComponent.node.alpha = 0.5
     ghostPhysicsComponent.physicsBody.collisionBitMask = PhysicsCategoryMask.package
     
-    let tutorialActionEntity = TutorialAction(hero: hero, ghost: ghost, sticker: sticker)
+    let tutorialActionEntity = TutorialAction(delegate: self.scene)
     if let tapSpriteComponent = tutorialActionEntity.component(ofType: SpriteComponent.self) {
       self.scene.addChild(tapSpriteComponent.node)
     }

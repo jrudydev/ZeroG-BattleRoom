@@ -15,9 +15,9 @@ class ScaledContainer: GKEntity {
   
   let node: SKNode
 
-  init(name: String, element: SKNode) {
+  init(element: SKNode) {
     let node = SKNode()
-    node.name = name
+    node.name = element.name
     self.node = node
     
     super.init()
