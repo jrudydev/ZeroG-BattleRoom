@@ -40,7 +40,7 @@ extension GameScene: TutorialActionDelegate {
       let launchComponent = ghost.component(ofType: LaunchComponent.self),
       let tapSticker = self.childNode(withName: AppConstants.ComponentNames.tutorialTapStickerName),
       let scaledUIContainer = self.cam?.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName),
-      let pinchSticker = scaledUIContainer.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName else { return }
+      let pinchSticker = scaledUIContainer.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName) else { return }
     
     self.stopAllTutorialAnimations()
     self.showTutorial()
