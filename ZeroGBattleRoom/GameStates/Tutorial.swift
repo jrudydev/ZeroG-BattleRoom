@@ -138,6 +138,7 @@ class Tutorial: GKState {
     tapThrow.name = AppConstants.ButtonNames.throwButtonName
     tapThrow.alignMidRight()
     tapThrow.zPosition = SpriteZPosition.inGameUI.rawValue
+    tapThrow.alpha = 0.5
 
 //    let stepIndecatorBG = SKShapeNode(rectOf: UIScreen.main.bounds.size)
 //    stepIndecatorBG.fillColor = UIColor.black.withAlphaComponent(20.0)

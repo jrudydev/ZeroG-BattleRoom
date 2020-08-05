@@ -73,6 +73,14 @@ class HandsComponent: GKComponent {
     }
   }
   
+  var hasFreeHand: Bool {
+    return self.leftHandSlot == nil || (self.rightHandSlot == nil && self.isOffHandEnabled)
+  }
+  
+  var hasResourceInHand: Bool {
+    return self.leftHandSlot != nil || self.rightHandSlot != nil
+  }
+  
   var isImpacted = false {
     didSet {
       guard self.isImpacted == true else { return }
@@ -121,9 +129,6 @@ class HandsComponent: GKComponent {
     return false
   }
   
-  func hasFreeHand() -> Bool {
-    return self.leftHandSlot == nil || (self.rightHandSlot == nil && self.isOffHandEnabled)
-  }
 }
 
 extension HandsComponent {

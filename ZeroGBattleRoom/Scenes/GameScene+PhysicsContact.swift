@@ -35,7 +35,7 @@ extension GameScene: SKPhysicsContactDelegate {
     if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
       secondBody.categoryBitMask == PhysicsCategoryMask.package {
 
-      self.handleHeroPackackageCollision(firstBody: firstBody, secondBody: secondBody)
+      self.handleHeroPackageCollision(firstBody: firstBody, secondBody: secondBody)
     }
     
     if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
@@ -78,7 +78,7 @@ extension GameScene: SKPhysicsContactDelegate {
 //    self.multiplayerNetworking.sendImpacted(senderIndex: 1)
   }
   
-  private func handleHeroPackackageCollision(firstBody: SKPhysicsBody, secondBody: SKPhysicsBody) {
+  private func handleHeroPackageCollision(firstBody: SKPhysicsBody, secondBody: SKPhysicsBody) {
     guard let heroNode = firstBody.node as? SKSpriteNode,
       let resourceNode = secondBody.node as? SKShapeNode else { return }
     
@@ -90,8 +90,15 @@ extension GameScene: SKPhysicsContactDelegate {
       let resourceShapeComponent = impactedResource.component(ofType: ShapeComponent.self),
       !heroHandsComponent.isImpacted else { return }
     
-    if heroHandsComponent.hasFreeHand() {
+    guard let scaledUIContainer = self.cam?.childNode(withName: AppConstants.ButtonNames.throwButtonName),
+      let throwButton = scaledUIContainer.childNode(withName: AppConstants.ButtonNames.throwButtonName) else { return }
+    
+    if heroHandsComponent.hasFreeHand {
       heroHandsComponent.grab(resource: impactedResource)
+      
+      // enable the throw button
+      throwButton.alpha = 1.0
+      
       if let resourceIndex = self.entityManager.indexForResource(shape: resourceShapeComponent.node),
         let heroIndex = self.entityManager.playerEntites.firstIndex(of: hero) {
       
@@ -103,6 +110,9 @@ extension GameScene: SKPhysicsContactDelegate {
       hero.updateResourcePositions()
     } else {
       hero.impactedAt(point: heroSpriteComponent.node.position)
+      
+      // disable the throw button
+      throwButton.alpha = 0.5
     }
     
     self.run(SoundManager.shared.blipPaddleSound)

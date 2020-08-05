@@ -132,7 +132,9 @@ class EntityManager {
     }
     self.toRemove.removeAll()
     
-    self.updateResourceVelocity()
+    if !(self.scene.gameState.currentState is Tutorial) {
+      self.updateResourceVelocity()
+    }
   }
   
   private func addToComponentSysetem(entity: GKEntity) {

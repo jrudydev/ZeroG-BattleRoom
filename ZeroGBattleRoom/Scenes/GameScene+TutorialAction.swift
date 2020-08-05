@@ -184,6 +184,9 @@ extension GameScene: TutorialActionDelegate {
       let movePosition = CGPoint(x: step.tapPosition.x + xMoveDelta,
                                  y: step.tapPosition.y + yMoveDelta)
       let launchSequence = SKAction.repeatForever(SKAction.sequence([
+        SKAction.run {
+          self.entityManager.spawnResource(position: step.tapPosition, velocity: .zero)
+        },
         SKAction.wait(forDuration: 2.0),
         prepareLaunch,
         SKAction.wait(forDuration: 3.5),
