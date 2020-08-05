@@ -41,7 +41,7 @@ class Playing: GKState {
     self.scene.entityManager.spawnDeposit()
 
     let backButton = SKLabelNode(text: "Back")
-    backButton.name = AppConstants.ComponentNames.backButtonName
+    backButton.name = AppConstants.ButtonNames.backButtonName
     backButton.fontSize = 30.0
     backButton.position = CGPoint(x: backButton.frame.width / 2, y: -backButton.frame.height / 2)
     let newPosX = backButton.position.x + -UIScreen.main.bounds.width / 2 + 20.0

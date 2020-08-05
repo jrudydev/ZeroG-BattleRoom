@@ -38,6 +38,8 @@ extension GameScene {
   func touchDown(atPoint pos : CGPoint) {
     self.numberOfTouches += 1
     
+    guard !self.nodeIsInGameButton(at: pos) else { return }
+    
     if self.gameState.currentState is Tutorial,
       let tutorialAction = self.entityManager.tutorialEntities.first as? TutorialAction,
       let tutorialStep = tutorialAction.currentStep,
@@ -62,6 +64,8 @@ extension GameScene {
   }
   
   func touchMoved(toPoint pos : CGPoint) {
+    guard !self.nodeIsInGameButton(at: pos) else { return }
+    
     switch self.gameState.currentState {
     case is Playing, is Tutorial:
       if let hero = self.entityManager.hero as? General {
@@ -76,8 +80,12 @@ extension GameScene {
     case is WaitingForTap:
       self.handleWaitingForTap(pos: pos)
     case is Tutorial, is Playing:
-      self.handleRestartTap(pos: pos)
-      self.handlePlayerLaunch(pos: pos)
+      if self.nodeIsInGameButton(at: pos) {
+        self.handleThrowTap(pos: pos)
+        self.handleRestartTap(pos: pos)
+      } else {
+        self.handlePlayerLaunch(pos: pos)
+      }
     case is GameOver:
       NotificationCenter.default.post(name: .restartGame, object: nil)
     default: break
@@ -85,49 +93,51 @@ extension GameScene {
   }
   
   private func handleWaitingForTap(pos: CGPoint) {
-    let touchedNode = self.atPoint(pos)
-    if let name = touchedNode.name, name == AppConstants.ComponentNames.tutorialLabelName {
+    let node = self.atPoint(pos)
+    if let name = node.name, name == AppConstants.ComponentNames.tutorialLabelName {
       self.gameState.enter(Tutorial.self)
     }
-    if let name = touchedNode.name, name == AppConstants.ComponentNames.localLabelName {
+    if let name = node.name, name == AppConstants.ComponentNames.localLabelName {
       self.gameState.enter(MatchFound.self)
     }
-    if let name = touchedNode.name, name == AppConstants.ComponentNames.onlineLabelName {
+    if let name = node.name, name == AppConstants.ComponentNames.onlineLabelName {
       NotificationCenter.default.post(name: .startMatchmaking, object: nil)
     }
   }
   
+  private func handleThrowTap(pos: CGPoint) {
+    let node = self.atPoint(pos)
+    if let name = node.name, name == AppConstants.ButtonNames.throwButtonName,
+      let hero = self.entityManager.hero as? General,
+      let spriteComponent = hero.component(ofType: SpriteComponent.self) {
+      
+      let throwPoint = self.convert(CGPoint(x: 0.0, y: 1.0), from: spriteComponent.node)
+      hero.throwResourceAt(point: throwPoint)
+    }
+  }
+  
   private func handleRestartTap(pos: CGPoint) {
-    let touchedNode = self.atPoint(pos)
-    if let name = touchedNode.name, name == AppConstants.ComponentNames.backButtonName {
+    let node = self.atPoint(pos)
+    if let name = node.name, name == AppConstants.ButtonNames.backButtonName {
       self.matchEnded()
       NotificationCenter.default.post(name: .restartGame, object: nil)
-      return
     }
+  }
+  
+  private func nodeIsInGameButton(at pos: CGPoint) -> Bool {
+    let node = self.atPoint(pos)
+    
+    guard let name = node.name else { return false }
+    guard !AppConstants.ButtonNames.all.contains(name) else { return true}
+    
+    return false
   }
   
   private func handlePlayerLaunch(pos: CGPoint) {
     guard self.entityManager.currentPlayerIndex != -1,
       let hero = self.entityManager.hero as? General else { return }
     
-    if case .beamed = hero.state {
-      self.launch(hero: hero)
-    } else  {
-      if let impulseComponent = hero.component(ofType: ImpulseComponent.self),
-        !impulseComponent.isOnCooldown {
-        
-//        hero.impulseTo(location: pos) { sprite, velocity, angularVelocity in
-//          self.multiplayerNetworking.sendMove(start: sprite.position,
-//                                              rotation: sprite.zRotation,
-//                                              velocity: velocity,
-//                                              angularVelocity: angularVelocity,
-//                                              wasLaunch: false)
-//        }
-      } else if let spriteComponent = hero.component(ofType: SpriteComponent.self) {
-//        let throwPoint = self.convert(CGPoint(x: 0.0, y: 1.0), from: spriteComponent.node)
-//        hero.throwResourceAt(point: throwPoint)
-      }
-    }
+    if case .beamed = hero.state { self.launch(hero: hero) }
     
     ShapeFactory.shared.removeAllSpinnyNodes()
   }
@@ -223,17 +233,6 @@ extension GameScene {
   }
 }
 
-//extension CGFloat {
-//  func fullRotation(isNegitive: Bool) -> CGFloat {
-//    guard !isNegitive else {
-//      let multiplyer: CGFloat = self < 0.0 ? -1.0 : 1.0
-//      return (CGFloat.pi - abs(self)) * multiplyer
-//    }
-//    
-//    return self
-//  }
-//}
-
 extension CGPoint {
   func vectorTo(point: CGPoint) -> CGVector {
     return CGVector(dx: point.x - self.x, dy: point.y - self.y)
@@ -263,13 +262,3 @@ extension CGPoint {
     return (self.y - point.y) / (self.x - point.x)
   }
 }
-
-//extension SKSpriteNode {
-//  func fullRotationTo(point: CGPoint) -> CGFloat {
-//    let moveVector = self.position.vectorTo(point: point)
-//    let moveRotation = moveVector.rotation - self.zRotation
-//    let isMovenNegitive = point.y < 0
-//
-//    return moveRotation.fullRotation(isNegitive: isMovenNegitive)
-//  }
-//}

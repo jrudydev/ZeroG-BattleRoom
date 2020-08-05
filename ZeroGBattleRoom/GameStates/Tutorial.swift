@@ -122,13 +122,10 @@ class Tutorial: GKState {
     self.repositionHero()
     
     let backButton = SKLabelNode(text: "Back")
-    backButton.name = AppConstants.ComponentNames.backButtonName
+    backButton.name = AppConstants.ButtonNames.backButtonName
     backButton.fontColor = .black
     backButton.fontSize = 30.0
-    backButton.position = CGPoint(x: backButton.frame.width / 2, y: -backButton.frame.height / 2)
-    let newPosX = backButton.position.x + -UIScreen.main.bounds.width / 2 + 20.0
-    let newPosY = backButton.position.y + UIScreen.main.bounds.height / 2 - 30.0
-    backButton.position = CGPoint(x: newPosX, y: newPosY)
+    backButton.alignTopLeft()
     backButton.zPosition = SpriteZPosition.menu.rawValue
     backButton.isUserInteractionEnabled = false
     
@@ -136,6 +133,11 @@ class Tutorial: GKState {
     tapSticker.name = AppConstants.ComponentNames.tutorialTapStickerName
     tapSticker.position = CGPoint(x: 50.0, y: -100.0)
     tapSticker.zPosition = SpriteZPosition.inGameUI.rawValue
+    
+    let tapThrow = SKSpriteNode(imageNamed: "throw")
+    tapThrow.name = AppConstants.ButtonNames.throwButtonName
+    tapThrow.alignMidRight()
+    tapThrow.zPosition = SpriteZPosition.inGameUI.rawValue
 
 //    let stepIndecatorBG = SKShapeNode(rectOf: UIScreen.main.bounds.size)
 //    stepIndecatorBG.fillColor = UIColor.black.withAlphaComponent(20.0)
@@ -144,6 +146,7 @@ class Tutorial: GKState {
     
     self.scene.entityManager.addInGameUIView(element: backButton)
     self.scene.entityManager.addInGameUIView(element: tapSticker)
+    self.scene.entityManager.addInGameUIView(element: tapThrow)
 //    self.scene.entityManager.addInGameUIView(element: stepIndecatorBG)
     
     self.scene.entityManager.setupTutorial(sticker: tapSticker)

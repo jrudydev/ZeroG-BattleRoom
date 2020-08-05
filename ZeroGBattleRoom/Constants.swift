@@ -29,7 +29,7 @@ struct AppConstants {
     static let tutorialLabelName = "local-label"
     static let onlineLabelName = "online-label"
     static let shopLabelName = "shop-label"
-    static let backButtonName = "back-button"
+    
     static let gameOverLabel = "game-over-label"
     static let matchFoundVSLabel = "match-found-vs-label"
     static let matchFoundPlayer1Label = "match-found-player1-label"
@@ -50,11 +50,21 @@ struct AppConstants {
     static let rotationCircleName = "rotation-circle"
     static let ingameUIViewName = "ingame-ui-view"
     static let spinnyNodeName = "spinny-node"
-    
     static let tutorialStartPointName = "start-point"
     static let tutorialTapPointName = "tap-point"
     static let tutorialTapStickerName = "tap-sticker"
+  }
+  
+  struct ButtonNames {
+    static let throwButtonName = "throw-button"
+    static let backButtonName = "back-button"
+    static let refreshButtonName = "refresh-button"
     
+    static let all = [
+      Self.throwButtonName,
+      Self.backButtonName,
+      Self.refreshButtonName
+    ]
   }
   
   struct Touch {

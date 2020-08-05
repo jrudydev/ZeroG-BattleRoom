@@ -69,7 +69,7 @@ class GameOver: GKState {
     }
     
     let mainMenuButton = SKLabelNode(text: "Main Menu")
-    mainMenuButton.name = AppConstants.ComponentNames.backButtonName
+    mainMenuButton.name = AppConstants.ButtonNames.backButtonName
     mainMenuButton.fontSize = 30.0
     mainMenuButton.position = CGPoint(x: 0.0, y: -100.0)
     mainMenuButton.zPosition = 101
