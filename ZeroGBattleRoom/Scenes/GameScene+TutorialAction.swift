@@ -183,10 +183,12 @@ extension GameScene: TutorialActionDelegate {
       let yMoveDelta: CGFloat = 0.0
       let movePosition = CGPoint(x: step.tapPosition.x + xMoveDelta,
                                  y: step.tapPosition.y + yMoveDelta)
+      
+      let spawnResource = SKAction.run {
+        self.entityManager.spawnResource(position: step.tapPosition, velocity: .zero)
+      }
+      
       let launchSequence = SKAction.repeatForever(SKAction.sequence([
-        SKAction.run {
-          self.entityManager.spawnResource(position: step.tapPosition, velocity: .zero)
-        },
         SKAction.wait(forDuration: 2.0),
         prepareLaunch,
         SKAction.wait(forDuration: 3.5),
@@ -221,7 +223,7 @@ extension GameScene: TutorialActionDelegate {
         SKAction.wait(forDuration: 5.5)
       ]))
 
-      let runGroup = SKAction.group([launchSequence, swipeAction, touchAction])
+      let runGroup = SKAction.group([spawnResource, launchSequence, swipeAction, touchAction])
       tapSticker.run(runGroup)
       pinchSticker.run(SKAction.fadeOut(withDuration: 0.0))
     }

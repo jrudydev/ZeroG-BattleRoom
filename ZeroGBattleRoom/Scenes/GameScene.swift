@@ -102,7 +102,6 @@ class GameScene: SKScene {
     
     self.entityManager = EntityManager(scene: self)
     
-    let _ = SoundManager.shared
     ShapeFactory.shared.gameScene = self
     self.setupGameMessage()
     

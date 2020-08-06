@@ -61,6 +61,8 @@ extension GameScene: SKPhysicsContactDelegate {
   }
   
   private func handleHeroHeroCollision(firstBody: SKPhysicsBody, secondBody: SKPhysicsBody) {
+    guard !(self.gameState.currentState is Tutorial) else { return }
+    
     guard let firstHeroNode = firstBody.node as? SKSpriteNode,
       let secondHeroNode = secondBody.node as? SKSpriteNode else { return }
     
