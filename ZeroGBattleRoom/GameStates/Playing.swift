@@ -51,11 +51,16 @@ class Playing: GKState {
     backButton.isUserInteractionEnabled = false
 
     self.scene.entityManager.addInGameUIView(element: backButton)
+    
+    self.scene.audioPlayer.play(effect: Audio.EffectFiles.startGame)
+    self.scene.audioPlayer.play(music: Audio.MusicFiles.level)
   }
   
   override func willExit(to nextState: GKState) {
     self.scene.entityManager.removeInGameUIView()
     NotificationCenter.default.post(name: .resizeView, object: -1000.0)
+    
+    self.scene.audioPlayer.pause(music: Audio.MusicFiles.level)
   }
   
   override func isValidNextState(_ stateClass: AnyClass) -> Bool {

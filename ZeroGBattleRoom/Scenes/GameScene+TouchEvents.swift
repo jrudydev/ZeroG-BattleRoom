@@ -121,6 +121,8 @@ extension GameScene {
       if !handsComponent.hasResourceInHand {
         throwButton.alpha = 0.5
       }
+      
+      self.audioPlayer.play(effect: Audio.EffectFiles.throwResource)
     }
   }
   
@@ -130,6 +132,8 @@ extension GameScene {
       self.matchEnded()
       NotificationCenter.default.post(name: .restartGame, object: nil)
     }
+    
+    self.audioPlayer.play(effect: Audio.EffectFiles.uiMenuSelect)
   }
   
   private func nodeIsInGameButton(at pos: CGPoint) -> Bool {

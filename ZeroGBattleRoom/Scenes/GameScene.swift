@@ -82,7 +82,15 @@ class GameScene: SKScene {
 //      self.gameState.enter(GameOver.self)
 //    }
 //  }
-//  
+//
+  
+  internal let audioPlayer: AudioPlayer = {
+    let player = AudioPlayer(music: Audio.MusicFiles.level)
+    player.sfxVolume = 0.5
+    player.musicVolume = 0.5
+    return player
+  }()
+  
   private var subscriptions = Set<AnyCancellable>()
   
   override func sceneDidLoad() {

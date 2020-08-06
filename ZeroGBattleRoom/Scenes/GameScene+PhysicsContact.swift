@@ -74,6 +74,8 @@ extension GameScene: SKPhysicsContactDelegate {
     firstHero.impactedAt(point: firstHeroSpriteComponent.node.position)
     secondHero.impactedAt(point: firstHeroSpriteComponent.node.position)
     
+    self.audioPlayer.play(effect: Audio.EffectFiles.playerCollision)
+    
 //    self.multiplayerNetworking.sendImpacted(senderIndex: 0)
 //    self.multiplayerNetworking.sendImpacted(senderIndex: 1)
   }
@@ -108,14 +110,18 @@ extension GameScene: SKPhysicsContactDelegate {
 //                               senderIndex: self.entityManager.currentPlayerIndex)
       }
       hero.updateResourcePositions()
+      
+      let effect = heroHandsComponent.rightHandSlot == nil ?
+        Audio.EffectFiles.collectResource1 : Audio.EffectFiles.collectResource1
+      self.audioPlayer.play(effect: effect)
     } else {
       hero.impactedAt(point: heroSpriteComponent.node.position)
       
       // disable the throw button
       throwButton.alpha = 0.5
+      
+      self.audioPlayer.play(effect: Audio.EffectFiles.collisionLoseResource)
     }
-    
-    self.run(SoundManager.shared.blipPaddleSound)
   }
   
   private func handleHeroDepositCollision(firstBody: SKPhysicsBody, secondBody: SKPhysicsBody) {
@@ -171,7 +177,7 @@ extension GameScene: SKPhysicsContactDelegate {
     
     ShapeFactory.shared.spawnDepositParticleEffect(pos: depositNode.position)
     
-    self.run(SoundManager.shared.bambooBreakSound)
+    self.audioPlayer.play(effect: Audio.EffectFiles.youScored)
   }
   
   private func handleHeroWallCollision(firstBody: SKPhysicsBody, secondBody: SKPhysicsBody) {
@@ -228,7 +234,7 @@ extension GameScene: SKPhysicsContactDelegate {
       impulseComponent.isOnCooldown = false
       
       if hero != self.entityManager.playerEntites[1] {
-        self.run(SoundManager.shared.blipSound)
+        self.audioPlayer.play(effect: Audio.EffectFiles.blipSound)
       }
     }
   }

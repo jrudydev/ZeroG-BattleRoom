@@ -90,6 +90,8 @@ class MatchFound: GKState {
     player2Label.position = CGPoint(x: 0.0, y: -100.0)
     player2Label.zPosition = SpriteZPosition.menuLabel.rawValue
     self.scene.addChild(player2Label)
+    
+    self.scene.audioPlayer.play(effect: Audio.EffectFiles.readyToLaunch)
   }
   
   override func willExit(to nextState: GKState) {

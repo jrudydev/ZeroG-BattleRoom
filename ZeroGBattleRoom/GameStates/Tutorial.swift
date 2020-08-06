@@ -151,9 +151,13 @@ class Tutorial: GKState {
 //    self.scene.entityManager.addInGameUIView(element: stepIndecatorBG)
     
     self.scene.entityManager.setupTutorial()
+    
+    self.scene.audioPlayer.play(music: Audio.MusicFiles.level)
   }
   
-  override func willExit(to nextState: GKState) { }
+  override func willExit(to nextState: GKState) {
+    self.scene.audioPlayer.pause(music: Audio.MusicFiles.level)
+  }
   
   override func isValidNextState(_ stateClass: AnyClass) -> Bool {
     return stateClass is GameOver.Type
