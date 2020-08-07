@@ -36,6 +36,7 @@ extension GameScene: TutorialActionDelegate {
   func setupHintAnimations(step: Tutorial.Step) {
     guard let ghost = self.entityManager.playerEntites[1] as? General,
       let ghostSpriteComponent = ghost.component(ofType: SpriteComponent.self),
+      let ghostHandsComponent = ghost.component(ofType: HandsComponent.self),
       let physicsComponent = ghost.component(ofType: PhysicsComponent.self),
       let launchComponent = ghost.component(ofType: LaunchComponent.self),
       let tapSticker = self.childNode(withName: AppConstants.ComponentNames.tutorialTapStickerName),
@@ -187,8 +188,17 @@ extension GameScene: TutorialActionDelegate {
       let spawnResource = SKAction.run {
         self.entityManager.spawnResource(position: step.tapPosition, velocity: .zero)
       }
+      let removeResource = SKAction.run {
+        if let package = ghostHandsComponent.leftHandSlot,
+          let packageShapeComponent = package.component(ofType: ShapeComponent.self) {
+
+          ghostHandsComponent.release(resource: package)
+          packageShapeComponent.node.removeFromParent()
+        }
+      }
       
       let launchSequence = SKAction.repeatForever(SKAction.sequence([
+        spawnResource,
         SKAction.wait(forDuration: 2.0),
         prepareLaunch,
         SKAction.wait(forDuration: 3.5),
@@ -197,7 +207,9 @@ extension GameScene: TutorialActionDelegate {
           ShapeFactory.shared.spawnSpinnyNodeAt(pos: movePosition)
         },
         SKAction.wait(forDuration: 4.0),
-        resetAction]))
+        removeResource,
+        resetAction
+      ]))
 
       let swipeAction = SKAction.repeatForever(SKAction.sequence([
         SKAction.fadeOut(withDuration: 0.0),
@@ -223,7 +235,7 @@ extension GameScene: TutorialActionDelegate {
         SKAction.wait(forDuration: 5.5)
       ]))
 
-      let runGroup = SKAction.group([spawnResource, launchSequence, swipeAction, touchAction])
+      let runGroup = SKAction.group([launchSequence, swipeAction, touchAction])
       tapSticker.run(runGroup)
       pinchSticker.run(SKAction.fadeOut(withDuration: 0.0))
     }
@@ -232,13 +244,23 @@ extension GameScene: TutorialActionDelegate {
   func stopAllTutorialAnimations() {
     guard let ghost = self.entityManager.playerEntites[1] as? General,
       let ghostSpriteComponent = ghost.component(ofType: SpriteComponent.self),
+      let ghostHandsComponent = ghost.component(ofType: HandsComponent.self),
       let tapSticker = self.childNode(withName: AppConstants.ComponentNames.tutorialTapStickerName),
-      let scaledUIContainer = self.cam?.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName),
-      let pinchSticker = scaledUIContainer.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName) else { return }
+      let pinchScaledContainer = self.cam?.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName),
+      let pinchSticker = pinchScaledContainer.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName),
+      let throwScaledContainer = self.cam?.childNode(withName: AppConstants.ButtonNames.throwButtonName),
+      let throwButton = throwScaledContainer.childNode(withName: AppConstants.ButtonNames.throwButtonName) else { return }
     
     tapSticker.removeAllActions()
     ghostSpriteComponent.node.removeAllActions()
     pinchSticker.removeAllActions()
+    
+    if let package = ghostHandsComponent.leftHandSlot {
+      ghostHandsComponent.release(resource: package)
+
+      throwButton.alpha = 0.5
+    }
+    self.entityManager.removeAllResourceEntities()
     
     self.hideTutorial()
   }

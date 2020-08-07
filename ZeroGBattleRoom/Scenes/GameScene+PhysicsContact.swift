@@ -152,7 +152,7 @@ extension GameScene: SKPhysicsContactDelegate {
     if let rightHandItem = handsComponent.rightHandSlot,
       let shapeComponent = rightHandItem.component(ofType: ShapeComponent.self) {
       
-      shapeComponent.node.removeFromParent()
+      handsComponent.release(resource: rightHandItem)
       shapeComponent.node.removeFromParent()
       
       deliveredComponent.resources.insert(rightHandItem)

@@ -114,6 +114,12 @@ class EntityManager {
     self.toRemove.insert(entity)
   }
   
+  func removeAllResourceEntities() {
+    for entity in self.resourcesEntities {
+      self.remove(entity)
+    }
+  }
+  
   func update(_ deltaTime: CFTimeInterval) {
     for entity in uiEntities {
       if let scaledComponent = entity as? ScaledContainer {
