@@ -80,7 +80,7 @@ extension GameScene {
     case is WaitingForTap:
       self.handleWaitingForTap(pos: pos)
     case is Tutorial, is Playing:
-      if self.nodeIsInGameButton(at: pos) {
+      if self.nodeIsInGameButton(at: pos) && self.atPoint(pos).alpha == 1.0 {
         self.handleThrowTap(pos: pos)
         self.handleRestartTap(pos: pos)
       } else {
