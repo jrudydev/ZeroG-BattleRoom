@@ -139,7 +139,19 @@ extension GameScene: SKPhysicsContactDelegate {
       let deliveredComponent = hero.component(ofType: DeliveredComponent.self),
       let depositComponent = deposit.component(ofType: DepositComponent.self),
       (handsComponent.leftHandSlot != nil || handsComponent.rightHandSlot != nil) else { return }
+    
+    // Check if game state is tutorial and set to complete
+    if self.gameState.currentState is Tutorial,
+      let tutorial = self.entityManager.tutorialEntities[0] as? TutorialAction {
       
+      let nextStep = tutorial.setupNextStep()
+      if nextStep == nil {
+        self.gameStatus = .tutorialDone
+        self.gameState.enter(GameOver.self)
+        return
+      }
+    }
+    
     if let lefthanditem = handsComponent.leftHandSlot,
       let shapeComponent = lefthanditem.component(ofType: ShapeComponent.self) {
       
@@ -178,7 +190,6 @@ extension GameScene: SKPhysicsContactDelegate {
     }
     
     ShapeFactory.shared.spawnDepositParticleEffect(pos: depositNode.position)
-    
     self.audioPlayer.play(effect: Audio.EffectFiles.youScored)
   }
   
@@ -204,40 +215,37 @@ extension GameScene: SKPhysicsContactDelegate {
       hero != self.entityManager.playerEntites[1],
       let tutorial = self.entityManager.tutorialEntities[0] as? TutorialAction {
       
-      guard let _ = tutorial.setupNextStep() else {
-        self.gameStatus = .tutorialDone
-        self.gameState.enter(GameOver.self)
-        return
-      }
-    } else {
-      physicsComponent.isEffectedByPhysics = false
-      
-      let isTopBeam = beam.position.y == abs(beam.position.y)
-      let convertedPosition = self.convert(beam.position, from: panelShapeComponent.node)
-      let rotation = isTopBeam ? panelShapeComponent.node.zRotation : panelShapeComponent.node.zRotation + CGFloat.pi
-      
-      DispatchQueue.main.async {
-        spriteComponent.node.position = convertedPosition
-        spriteComponent.node.zRotation = rotation
-      }
-      
-      hero.switchToState(.beamed)
-      if hero == self.entityManager.playerEntites[self.entityManager.currentPlayerIndex] {
-        let launchLineNode = launchComponent.node.childNode(withName: AppConstants.ComponentNames.launchLineName) as? SKShapeNode
-        launchLineNode?.alpha = LaunchComponent.targetLineAlpha
-      }
-      
-      hero.occupiedPanel = panel
-      tractorBeamComponent.isOccupied = true
-      
-//      if let index = self.entityManager.indexForWall(panel: panel) {
-//        self.multiplayerNetworking.sendWall(index: index, isOccupied: true)
-//      }
-      impulseComponent.isOnCooldown = false
-      
-      if hero != self.entityManager.playerEntites[1] {
-        self.audioPlayer.play(effect: Audio.EffectFiles.blipSound)
-      }
+      tutorial.setupNextStep()
+      return
+    }
+    
+    physicsComponent.isEffectedByPhysics = false
+    
+    let isTopBeam = beam.position.y == abs(beam.position.y)
+    let convertedPosition = self.convert(beam.position, from: panelShapeComponent.node)
+    let rotation = isTopBeam ? panelShapeComponent.node.zRotation : panelShapeComponent.node.zRotation + CGFloat.pi
+    
+    DispatchQueue.main.async {
+      spriteComponent.node.position = convertedPosition
+      spriteComponent.node.zRotation = rotation
+    }
+    
+    hero.switchToState(.beamed)
+    if hero == self.entityManager.playerEntites[self.entityManager.currentPlayerIndex] {
+      let launchLineNode = launchComponent.node.childNode(withName: AppConstants.ComponentNames.launchLineName) as? SKShapeNode
+      launchLineNode?.alpha = LaunchComponent.targetLineAlpha
+    }
+    
+    hero.occupiedPanel = panel
+    tractorBeamComponent.isOccupied = true
+    
+    //      if let index = self.entityManager.indexForWall(panel: panel) {
+    //        self.multiplayerNetworking.sendWall(index: index, isOccupied: true)
+    //      }
+    impulseComponent.isOnCooldown = false
+    
+    if hero != self.entityManager.playerEntites[1] {
+      self.audioPlayer.play(effect: Audio.EffectFiles.blipSound)
     }
   }
 }
