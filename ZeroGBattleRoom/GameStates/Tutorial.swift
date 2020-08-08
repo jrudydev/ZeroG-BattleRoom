@@ -52,9 +52,11 @@ class Tutorial: GKState {
     
     var midPosition: CGPoint {
       guard self.index <= Tutorial.startingPoints.count else { return .zero }
-       
-      return CGPoint(x: startPosition.x - tapPosition.x,
-                     y: startPosition.y - tapPosition.y)
+      
+      let diffPoint = CGPoint(x: startPosition.x - tapPosition.x,
+                              y: startPosition.y - tapPosition.y)
+      return CGPoint(x: tapPosition.x + diffPoint.x/2,
+                     y: tapPosition.y + diffPoint.y/2)
     }
     
     private var index: Int {
