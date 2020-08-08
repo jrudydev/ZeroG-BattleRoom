@@ -234,7 +234,13 @@ extension GameScene {
         launchLineNode.alpha = LaunchComponent.targetLineAlpha
       }
       
-      self.showTutorialIfNeeded(excludedSteps: [.pinchZoom])
+      if self.gameState.currentState is Tutorial,
+        let beam = hero.occupiedPanel,
+        let beamTeamComponent = beam.component(ofType: TeamComponent.self),
+        beamTeamComponent.team == .team1 {
+        
+        self.showTutorialIfNeeded(excludedSteps: [.pinchZoom])
+      }
     }
     
     for t in touches { self.touchUp(atPoint: t.location(in: self)) }

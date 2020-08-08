@@ -40,8 +40,6 @@ class General: GKEntity, BeamableProtocol {
     
     return deliveredComponent.resources.count
   }
-  
-  unowned var occupiedPanel: Panel? = nil
 
   init(imageName: String, team: Team) {
     super.init()
@@ -117,7 +115,7 @@ class General: GKEntity, BeamableProtocol {
   
   static let beamResetTime: Double = 0.5
   
-  unowned var beam: SKShapeNode? = nil
+  unowned var occupiedPanel: Panel? = nil
   
   var isBeamed: Bool {
     get {
