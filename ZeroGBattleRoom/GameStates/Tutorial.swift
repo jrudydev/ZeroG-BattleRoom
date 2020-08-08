@@ -126,8 +126,10 @@ class Tutorial: GKState {
   
     self.scene.entityManager.loadTutorialLevel()
     self.scene.entityManager.spawnHeros(mapSize: AppConstants.Layout.tutorialBoundrySize)
-    self.repositionHero()
+    self.scene.entityManager.spawnDeposit()
     
+    self.repositionHero()
+  
     let backButton = SKLabelNode(text: "Back")
     backButton.name = AppConstants.ButtonNames.backButtonName
     backButton.fontColor = .black
