@@ -50,6 +50,13 @@ class Tutorial: GKState {
       return Tutorial.tapPoints[self.index]
     }
     
+    var midPosition: CGPoint {
+      guard self.index <= Tutorial.startingPoints.count else { return .zero }
+       
+      return CGPoint(x: startPosition.x - tapPosition.x,
+                     y: startPosition.y - tapPosition.y)
+    }
+    
     private var index: Int {
       return self.rawValue - 1
     }

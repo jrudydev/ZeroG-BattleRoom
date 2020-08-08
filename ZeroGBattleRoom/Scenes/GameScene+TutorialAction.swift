@@ -43,7 +43,9 @@ extension GameScene: TutorialActionDelegate {
       let scaledUIContainer = self.cam?.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName),
       let pinchSticker = scaledUIContainer.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName) else { return }
     
+    self.entityManager.removeAllResourceEntities()
     self.stopAllTutorialAnimations()
+    
     self.showTutorial()
     self.repositionSprites(pos: step.startPosition,
                            rotation: step.startRotation,
@@ -186,7 +188,7 @@ extension GameScene: TutorialActionDelegate {
                                  y: step.tapPosition.y + yMoveDelta)
       
       let spawnResource = SKAction.run {
-        self.entityManager.spawnResource(position: step.tapPosition, velocity: .zero)
+        self.entityManager.spawnResource(position: step.midPosition, velocity: .zero)
       }
       let removeResource = SKAction.run {
         if let package = ghostHandsComponent.leftHandSlot,
@@ -255,12 +257,20 @@ extension GameScene: TutorialActionDelegate {
     ghostSpriteComponent.node.removeAllActions()
     pinchSticker.removeAllActions()
     
+    // Remove existing resource
     if let package = ghostHandsComponent.leftHandSlot {
       ghostHandsComponent.release(resource: package)
 
       throwButton.alpha = 0.5
     }
     self.entityManager.removeAllResourceEntities()
+    
+    // Add resource for fourth and final tutorial step
+    if let tutorialAction = self.entityManager.tutorialEntities.first as? TutorialAction,
+      let tutorialStep = tutorialAction.currentStep,
+      tutorialStep == .rotateThrow {
+      self.entityManager.spawnResource(position: tutorialStep.midPosition, velocity: .zero)
+    }
     
     self.hideTutorial()
   }
