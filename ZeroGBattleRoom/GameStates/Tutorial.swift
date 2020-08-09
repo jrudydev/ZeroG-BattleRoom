@@ -143,6 +143,7 @@ class Tutorial: GKState {
     let pinchSticker = SKSpriteNode(imageNamed: "pinch-out")
     pinchSticker.name = AppConstants.ComponentNames.tutorialPinchStickerName
     pinchSticker.position = CGPoint(x: 50.0, y: -100.0)
+    pinchSticker.anchorPoint = CGPoint(x: 0.2, y: 0.9)
     pinchSticker.zPosition = SpriteZPosition.inGameUI.rawValue
     
     let tapThrow = SKSpriteNode(imageNamed: "throw")

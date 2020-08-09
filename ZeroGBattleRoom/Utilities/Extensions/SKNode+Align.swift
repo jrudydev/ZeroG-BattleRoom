@@ -33,8 +33,10 @@ public extension SKNode {
   }
   
   func alignMidRight() {
-    self.position = CGPoint(x: self.frame.width / 2, y: -self.frame.height / 2)
-    let newPosX = -self.position.x + UIScreen.main.bounds.width / 2 - 20.0
-    self.position = CGPoint(x: newPosX, y: 250.0)
+    print(frame)
+    self.position = CGPoint(x: 100.0, y: 100.0)
+//    self.position = CGPoint(x: self.frame.width / 2, y: -self.frame.height / 2)
+//    let newPosX = -self.position.x + UIScreen.main.bounds.width / 2 - 20.0
+//    self.position = CGPoint(x: newPosX, y: 250.0)
   }
 }
