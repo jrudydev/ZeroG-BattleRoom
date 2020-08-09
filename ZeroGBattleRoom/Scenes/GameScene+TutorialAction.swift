@@ -51,6 +51,8 @@ extension GameScene: TutorialActionDelegate {
                            rotation: step.startRotation,
                            tapPos: step.tapPosition)
     
+    let initialWait = 1.0
+    
     let prepareLaunch = SKAction.run {
       launchComponent.launchInfo.lastTouchBegan = step.tapPosition
       ghost.updateLaunchComponents(touchPosition: step.tapPosition)
@@ -58,6 +60,10 @@ extension GameScene: TutorialActionDelegate {
 
     let launchGhost = SKAction.run {
       ghost.launch()
+    }
+    
+    let showGhost = SKAction.run {
+      ghostSpriteComponent.node.alpha = 0.5
     }
 
     let resetAction = SKAction.run {
@@ -71,27 +77,27 @@ extension GameScene: TutorialActionDelegate {
 
     switch step {
     case .tapLaunch:
+      let spawnSpinnyNode = SKAction.run {
+        ShapeFactory.shared.spawnSpinnyNodeAt(pos: step.tapPosition)
+      }
+      
       let launchSequence = SKAction.repeatForever(SKAction.sequence([
-        SKAction.wait(forDuration: 2.0),
+        SKAction.wait(forDuration: initialWait),
         prepareLaunch,
         SKAction.wait(forDuration: 2.0),
         launchGhost,
-        SKAction.run {
-          ShapeFactory.shared.spawnSpinnyNodeAt(pos: step.tapPosition)
-        },
-        SKAction.wait(forDuration: 4.0),
+        spawnSpinnyNode,
+        SKAction.wait(forDuration: 3.25),
         resetAction]))
 
       let tapSequece = SKAction.repeatForever(SKAction.sequence([
         SKAction.fadeOut(withDuration: 0.0),
-        SKAction.wait(forDuration: 2.0),
-        SKAction.run {
-          ghostSpriteComponent.node.alpha = 0.5
-        },
+        SKAction.wait(forDuration: initialWait),
+        showGhost,
         SKAction.fadeIn(withDuration: 0.5),
         SKAction.wait(forDuration: 1.5),
         SKAction.fadeOut(withDuration: 0.5),
-        SKAction.wait(forDuration: 3.5)]))
+        SKAction.wait(forDuration: 2.75)]))
 
       let runGroup = SKAction.group([launchSequence, tapSequece])
       tapSticker.run(runGroup)
@@ -100,6 +106,7 @@ extension GameScene: TutorialActionDelegate {
       let zoomSteps = 30
       let zoomLevel: CGFloat = 1.5
       let zoomTimeInterval: TimeInterval = 0.05
+      
       let pinchOutAction = SKAction.run {
         NotificationCenter.default.post(name: .resizeView, object: zoomLevel)
       }
@@ -117,15 +124,15 @@ extension GameScene: TutorialActionDelegate {
       let pinchIn = SKAction.repeat(pinchInSequnce, count: zoomSteps)
 
       let pinchSequence = SKAction.repeatForever(SKAction.sequence([
-        SKAction.wait(forDuration: 4.0),
+        SKAction.wait(forDuration: initialWait + 2.0),
         pinchOut,
         SKAction.wait(forDuration: 2.0),
         pinchIn,
-        SKAction.wait(forDuration: 3.0)]))
+        SKAction.wait(forDuration: 2.0)]))
 
       let tapAction = SKAction.repeatForever(SKAction.sequence([
         SKAction.fadeOut(withDuration: 0.0),
-        SKAction.wait(forDuration: 2.0),
+        SKAction.wait(forDuration: initialWait),
         SKAction.fadeIn(withDuration: 0.5),
         SKAction.wait(forDuration: 1.5),
         SKAction.setTexture(SKTexture(imageNamed: "pinch-in")),
@@ -133,7 +140,7 @@ extension GameScene: TutorialActionDelegate {
         SKAction.setTexture(SKTexture(imageNamed: "pinch-out")),
         SKAction.wait(forDuration: 2.0),
         SKAction.fadeOut(withDuration: 0.5),
-        SKAction.wait(forDuration: 2.0)]))
+        SKAction.wait(forDuration: 1.0)]))
 
       let runGroup = SKAction.group([pinchSequence, tapAction])
       pinchSticker.run(runGroup)
@@ -143,28 +150,29 @@ extension GameScene: TutorialActionDelegate {
       let yMoveDelta: CGFloat = -20.0
       let movePosition = CGPoint(x: step.tapPosition.x + xMoveDelta,
                                  y: step.tapPosition.y + yMoveDelta)
+      
+      let spawnSpinnyNode = SKAction.run {
+        ShapeFactory.shared.spawnSpinnyNodeAt(pos: movePosition)
+      }
+      
       let launchSequence = SKAction.repeatForever(SKAction.sequence([
-        SKAction.wait(forDuration: 2.0),
+        SKAction.wait(forDuration: initialWait),
         prepareLaunch,
         SKAction.wait(forDuration: 3.5),
         launchGhost,
-        SKAction.run {
-          ShapeFactory.shared.spawnSpinnyNodeAt(pos: movePosition)
-        },
-        SKAction.wait(forDuration: 4.0),
+        spawnSpinnyNode,
+        SKAction.wait(forDuration: 2.5),
         resetAction]))
 
       let swipeAction = SKAction.repeatForever(SKAction.sequence([
         SKAction.fadeOut(withDuration: 0.0),
-        SKAction.wait(forDuration: 2.0),
-        SKAction.run {
-          ghostSpriteComponent.node.alpha = 0.5
-        },
+        SKAction.wait(forDuration: initialWait),
+        showGhost,
         SKAction.fadeIn(withDuration: 0.5),
         SKAction.move(by: CGVector(dx: xMoveDelta, dy: yMoveDelta), duration: 1.5),
         SKAction.wait(forDuration: 1.5),
         SKAction.fadeOut(withDuration: 0.5),
-        SKAction.wait(forDuration: 3.5)
+        SKAction.wait(forDuration: 2.0)
       ]))
 
       let touchUpdateAction = SKAction.sequence([
@@ -173,7 +181,7 @@ extension GameScene: TutorialActionDelegate {
           ghost.updateLaunchComponents(touchPosition: tapSticker.position)
         }])
       let touchAction = SKAction.repeatForever(SKAction.sequence([
-        SKAction.wait(forDuration: 2.5),
+        SKAction.wait(forDuration: initialWait + 0.5),
         SKAction.repeat(touchUpdateAction, count: 15),
         SKAction.wait(forDuration: 5.5)
       ]))
@@ -182,6 +190,8 @@ extension GameScene: TutorialActionDelegate {
       tapSticker.run(runGroup)
       pinchSticker.run(SKAction.fadeOut(withDuration: 0.0))
     case .rotateThrow:
+      let swipeFrames = 15
+      let swipeFrameDuration = 0.1
       let xMoveDelta: CGFloat = -50.0
       let yMoveDelta: CGFloat = 0.0
       let movePosition = CGPoint(x: step.tapPosition.x + xMoveDelta,
@@ -189,6 +199,9 @@ extension GameScene: TutorialActionDelegate {
       
       let spawnResource = SKAction.run {
         self.entityManager.spawnResource(position: step.midPosition, velocity: .zero)
+      }
+      let spawnSpinnyNode = SKAction.run {
+        ShapeFactory.shared.spawnSpinnyNodeAt(pos: movePosition)
       }
       let removeResource = SKAction.run {
         if let package = ghostHandsComponent.leftHandSlot,
@@ -201,29 +214,26 @@ extension GameScene: TutorialActionDelegate {
       
       let launchSequence = SKAction.repeatForever(SKAction.sequence([
         spawnResource,
-        SKAction.wait(forDuration: 2.0),
+        SKAction.wait(forDuration: initialWait),
         prepareLaunch,
         SKAction.wait(forDuration: 3.5),
         launchGhost,
-        SKAction.run {
-          ShapeFactory.shared.spawnSpinnyNodeAt(pos: movePosition)
-        },
-        SKAction.wait(forDuration: 4.0),
+        spawnSpinnyNode,
+        SKAction.wait(forDuration: 6.0),
         removeResource,
         resetAction
       ]))
 
       let swipeAction = SKAction.repeatForever(SKAction.sequence([
         SKAction.fadeOut(withDuration: 0.0),
-        SKAction.wait(forDuration: 2.0),
-        SKAction.run {
-          ghostSpriteComponent.node.alpha = 0.5
-        },
+        SKAction.wait(forDuration: initialWait),
+        showGhost,
         SKAction.fadeIn(withDuration: 0.5),
-        SKAction.move(by: CGVector(dx: xMoveDelta, dy: yMoveDelta), duration: 1.5),
+        SKAction.move(by: CGVector(dx: xMoveDelta, dy: yMoveDelta),
+                      duration: Double(swipeFrames) * swipeFrameDuration),
         SKAction.wait(forDuration: 1.5),
         SKAction.fadeOut(withDuration: 0.5),
-        SKAction.wait(forDuration: 3.5)
+        SKAction.wait(forDuration: 5.5)
       ]))
 
       let touchUpdateAction = SKAction.sequence([
@@ -232,9 +242,9 @@ extension GameScene: TutorialActionDelegate {
           ghost.updateLaunchComponents(touchPosition: tapSticker.position)
         }])
       let touchAction = SKAction.repeatForever(SKAction.sequence([
-        SKAction.wait(forDuration: 2.5),
-        SKAction.repeat(touchUpdateAction, count: 15),
-        SKAction.wait(forDuration: 5.5)
+        SKAction.wait(forDuration: initialWait + 0.5),
+        SKAction.repeat(touchUpdateAction, count: swipeFrames),
+        SKAction.wait(forDuration: 7.5)
       ]))
 
       let runGroup = SKAction.group([launchSequence, swipeAction, touchAction])
