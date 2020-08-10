@@ -498,14 +498,14 @@ extension EntityManager {
     self.addToComponentSysetem(entity: scaledComponent)
   }
   
-  func removeInGameUIView() {
-    guard let inGameInterface = self.uiEntityWith(
-      nodeName: AppConstants.ComponentNames.ingameUIViewName) as? ScaledContainer else { return }
-    
-    inGameInterface.node.removeFromParent()
-    
-    self.uiEntities.remove(inGameInterface)
-    self.toRemove.insert(inGameInterface)
+  func removeInGameUIViewElements() {
+    for entity in self.uiEntities {
+      if let scalableElement = entity as? ScaledContainer {
+        self.toRemove.insert(scalableElement)
+      }
+    }
+  
+    self.uiEntities.removeAll()
   }
 }
 

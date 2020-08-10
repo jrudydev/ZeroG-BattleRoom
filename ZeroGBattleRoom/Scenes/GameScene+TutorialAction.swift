@@ -15,8 +15,7 @@ extension GameScene: TutorialActionDelegate {
     guard let ghost = self.entityManager.playerEntites[1] as? General,
       let ghostSpriteComponent = ghost.component(ofType: SpriteComponent.self),
       let tapSticker = self.childNode(withName: AppConstants.ComponentNames.tutorialTapStickerName),
-      let scaledUIContainer = self.cam?.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName),
-      let pinchSticker = scaledUIContainer.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName) else { return }
+      let pinchSticker = self.cam?.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName) else { return }
 
     ghostSpriteComponent.node.alpha = 0.0
     tapSticker.alpha = 0.0
@@ -25,8 +24,7 @@ extension GameScene: TutorialActionDelegate {
   
   private func showTutorial() {
     guard let tapSticker = self.childNode(withName: AppConstants.ComponentNames.tutorialTapStickerName),
-      let scaledUIContainer = self.cam?.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName),
-      let pinchSticker = scaledUIContainer.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName)
+      let pinchSticker = self.cam?.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName)
       else { return }
 
     tapSticker.alpha = 1.0
@@ -40,8 +38,8 @@ extension GameScene: TutorialActionDelegate {
       let physicsComponent = ghost.component(ofType: PhysicsComponent.self),
       let launchComponent = ghost.component(ofType: LaunchComponent.self),
       let tapSticker = self.childNode(withName: AppConstants.ComponentNames.tutorialTapStickerName),
-      let scaledUIContainer = self.cam?.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName),
-      let pinchSticker = scaledUIContainer.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName) else { return }
+      let pinchSticker = self.cam?.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName),
+      let throwHintSticker = self.cam?.childNode(withName: AppConstants.ComponentNames.tutorialThrowStickerName) else { return }
     
     self.entityManager.removeAllResourceEntities()
     self.stopAllTutorialAnimations()
@@ -261,19 +259,19 @@ extension GameScene: TutorialActionDelegate {
         SKAction.wait(forDuration: 7.5)
       ]))
       
-      let pinchStickerAction = SKAction.repeatForever(SKAction.sequence([
+      let hintStickerAction = SKAction.repeatForever(SKAction.sequence([
         SKAction.fadeOut(withDuration: 0.0),
-        SKAction.setTexture(SKTexture(imageNamed: "tap")),
         SKAction.wait(forDuration: 7.4),
         SKAction.fadeIn(withDuration: 0.5),
         SKAction.wait(forDuration: 0.5),
         SKAction.fadeOut(withDuration: 0.5),
-        SKAction.wait(forDuration: 1.9)
+        SKAction.wait(forDuration: 1.6)
       ]))
 
       let runGroup = SKAction.group([launchSequence, swipeAction, touchAction])
       tapSticker.run(runGroup)
-      pinchSticker.run(pinchStickerAction)
+      pinchSticker.run(SKAction.fadeOut(withDuration: 0.0))
+      throwHintSticker.run(hintStickerAction)
     }
   }
   
@@ -282,14 +280,14 @@ extension GameScene: TutorialActionDelegate {
       let ghostSpriteComponent = ghost.component(ofType: SpriteComponent.self),
       let ghostHandsComponent = ghost.component(ofType: HandsComponent.self),
       let tapSticker = self.childNode(withName: AppConstants.ComponentNames.tutorialTapStickerName),
-      let pinchScaledContainer = self.cam?.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName),
-      let pinchSticker = pinchScaledContainer.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName),
-      let throwScaledContainer = self.cam?.childNode(withName: AppConstants.ButtonNames.throwButtonName),
-      let throwButton = throwScaledContainer.childNode(withName: AppConstants.ButtonNames.throwButtonName) else { return }
+      let pinchSticker = self.cam?.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName),
+      let throwButton = self.cam?.childNode(withName: AppConstants.ButtonNames.throwButtonName),
+      let throwHintSticker = self.cam?.childNode(withName: AppConstants.ComponentNames.tutorialThrowStickerName)else { return }
     
     tapSticker.removeAllActions()
     ghostSpriteComponent.node.removeAllActions()
     pinchSticker.removeAllActions()
+    throwHintSticker.removeAllActions()
     
     // Remove existing resource
     if let package = ghostHandsComponent.leftHandSlot {

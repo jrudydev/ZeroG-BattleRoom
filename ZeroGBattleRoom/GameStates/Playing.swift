@@ -57,7 +57,7 @@ class Playing: GKState {
   }
   
   override func willExit(to nextState: GKState) {
-    self.scene.entityManager.removeInGameUIView()
+    self.scene.entityManager.removeInGameUIViewElements()
     NotificationCenter.default.post(name: .resizeView, object: -1000.0)
     
     self.scene.audioPlayer.pause(music: Audio.MusicFiles.level)

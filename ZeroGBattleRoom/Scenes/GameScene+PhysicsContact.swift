@@ -94,8 +94,7 @@ extension GameScene: SKPhysicsContactDelegate {
       let resourceShapeComponent = impactedResource.component(ofType: ShapeComponent.self),
       !heroHandsComponent.isImpacted else { return }
     
-    guard let scaledUIContainer = self.cam?.childNode(withName: AppConstants.ButtonNames.throwButtonName),
-      let throwButton = scaledUIContainer.childNode(withName: AppConstants.ButtonNames.throwButtonName) else { return }
+    guard let throwButton = self.cam?.childNode(withName: AppConstants.ButtonNames.throwButtonName) else { return }
     
     if heroHandsComponent.hasFreeHand {
       heroHandsComponent.grab(resource: impactedResource)

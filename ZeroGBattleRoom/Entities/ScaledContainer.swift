@@ -16,13 +16,10 @@ class ScaledContainer: GKEntity {
   let node: SKNode
 
   init(element: SKNode) {
-    let node = SKNode()
-    node.name = element.name
-    self.node = node
+    self.node = element
     
     super.init()
     
-    self.node.addChild(element)
     self.addComponent(InterfaceComponent(node: element))
   }
 

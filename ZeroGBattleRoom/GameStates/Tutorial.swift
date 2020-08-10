@@ -151,6 +151,13 @@ class Tutorial: GKState {
     tapThrow.alignMidRight()
     tapThrow.zPosition = SpriteZPosition.inGameUI.rawValue
     tapThrow.alpha = 0.5
+    
+    let throwHintSticker = SKSpriteNode(imageNamed: "tap")
+    throwHintSticker.name = AppConstants.ComponentNames.tutorialThrowStickerName
+    throwHintSticker.position = tapThrow.position
+    throwHintSticker.anchorPoint = CGPoint(x: 0.2, y: 0.9)
+    throwHintSticker.zPosition = SpriteZPosition.inGameUI2.rawValue
+    throwHintSticker.alpha = 0.0
 
 //    let stepIndecatorBG = SKShapeNode(rectOf: UIScreen.main.bounds.size)
 //    stepIndecatorBG.fillColor = UIColor.black.withAlphaComponent(20.0)
@@ -160,6 +167,7 @@ class Tutorial: GKState {
     self.scene.entityManager.addInGameUIView(element: backButton)
     self.scene.entityManager.addInGameUIView(element: pinchSticker)
     self.scene.entityManager.addInGameUIView(element: tapThrow)
+    self.scene.entityManager.addInGameUIView(element: throwHintSticker)
 //    self.scene.entityManager.addInGameUIView(element: stepIndecatorBG)
     
     self.scene.entityManager.setupTutorial()

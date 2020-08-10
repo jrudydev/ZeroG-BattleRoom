@@ -111,8 +111,7 @@ extension GameScene {
       let hero = self.entityManager.hero as? General,
       let spriteComponent = hero.component(ofType: SpriteComponent.self),
       let handsComponent = hero.component(ofType: HandsComponent.self),
-      let scaledUIContainer = self.cam?.childNode(withName: AppConstants.ButtonNames.throwButtonName),
-      let throwButton = scaledUIContainer.childNode(withName: AppConstants.ButtonNames.throwButtonName),
+      let throwButton = self.cam?.childNode(withName: AppConstants.ButtonNames.throwButtonName),
       throwButton.alpha == 1.0 {
       
       let throwPoint = self.convert(CGPoint(x: 0.0, y: 1.0), from: spriteComponent.node)

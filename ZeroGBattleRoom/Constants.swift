@@ -48,12 +48,17 @@ struct AppConstants {
     static let targetRightChevronName = "target-right-chevron-name"
     static let magnitudePilarName = "magnitude-pilar"
     static let rotationCircleName = "rotation-circle"
-    static let ingameUIViewName = "ingame-ui-view"
     static let spinnyNodeName = "spinny-node"
+    
     static let tutorialStartPointName = "start-point"
     static let tutorialTapPointName = "tap-point"
     static let tutorialTapStickerName = "tap-sticker"
     static let tutorialPinchStickerName = "pinch-sticker"
+    static let tutorialThrowStickerName = "throw-sticker"
+  }
+  
+  struct StickerNames {
+    
   }
   
   struct ButtonNames {
