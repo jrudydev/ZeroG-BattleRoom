@@ -21,6 +21,7 @@ class Deposit: GKEntity {
     
     let shapeNode = SKShapeNode(circleOfRadius: Deposit.eventHorizon)
     shapeNode.name = AppConstants.ComponentNames.depositNodeName
+    shapeNode.fillColor = .black
     self.addComponent(ShapeComponent(node: shapeNode))
     let physicsBody = self.getPhysicsBody()
     self.addComponent(PhysicsComponent(physicsBody: physicsBody))
