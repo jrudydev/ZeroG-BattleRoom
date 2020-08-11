@@ -57,11 +57,8 @@ extension GameScene: TutorialActionDelegate {
     }
 
     let launchGhost = SKAction.run {
-      ghost.launch()
-    }
-    
-    let showGhost = SKAction.run {
       ghostSpriteComponent.node.alpha = 0.5
+      ghost.launch()
     }
 
     let resetAction = SKAction.run {
@@ -94,7 +91,6 @@ extension GameScene: TutorialActionDelegate {
       let tapSequece = SKAction.repeatForever(SKAction.sequence([
         SKAction.fadeOut(withDuration: 0.0),
         SKAction.wait(forDuration: initialWait),
-        showGhost,
         SKAction.fadeIn(withDuration: 0.5),
         SKAction.wait(forDuration: 1.5),
         SKAction.fadeOut(withDuration: 0.5),
@@ -169,7 +165,6 @@ extension GameScene: TutorialActionDelegate {
       let swipeAction = SKAction.repeatForever(SKAction.sequence([
         SKAction.fadeOut(withDuration: 0.0),
         SKAction.wait(forDuration: initialWait),
-        showGhost,
         SKAction.fadeIn(withDuration: 0.5),
         SKAction.move(by: CGVector(dx: xMoveDelta, dy: yMoveDelta), duration: 1.5),
         SKAction.wait(forDuration: 1.5),
@@ -192,12 +187,10 @@ extension GameScene: TutorialActionDelegate {
       tapSticker.run(runGroup)
       pinchSticker.run(SKAction.fadeOut(withDuration: 0.0))
     case .rotateThrow:
-      let swipeFrames = 15
-      let swipeFrameDuration = 0.1
-      let xMoveDelta: CGFloat = -50.0
-      let yMoveDelta: CGFloat = 0.0
-      let movePosition = CGPoint(x: step.tapPosition.x + xMoveDelta,
-                                 y: step.tapPosition.y + yMoveDelta)
+      let swipeFrames = 15, swipeFrameDuration = 0.1
+      let moveDelta = CGPoint(x: -50.0, y: 0.0)
+      let movePosition = CGPoint(x: step.tapPosition.x + moveDelta.x,
+                                 y: step.tapPosition.y + moveDelta.y)
       
       let spawnResource = SKAction.run {
         self.entityManager.spawnResource(position: step.midPosition, velocity: .zero)
@@ -240,9 +233,8 @@ extension GameScene: TutorialActionDelegate {
       let swipeAction = SKAction.repeatForever(SKAction.sequence([
         SKAction.fadeOut(withDuration: 0.0),
         SKAction.wait(forDuration: initialWait),
-        showGhost,
         SKAction.fadeIn(withDuration: 0.5),
-        SKAction.move(by: CGVector(dx: xMoveDelta, dy: yMoveDelta),
+        SKAction.move(by: CGVector(dx: moveDelta.x, dy: moveDelta.y),
                       duration: Double(swipeFrames) * swipeFrameDuration),
         SKAction.wait(forDuration: 1.5),
         SKAction.fadeOut(withDuration: 0.5),
@@ -270,8 +262,7 @@ extension GameScene: TutorialActionDelegate {
         SKAction.wait(forDuration: 1.6)
       ]))
 
-      let runGroup = SKAction.group([launchSequence, swipeAction, touchAction])
-      tapSticker.run(runGroup)
+      tapSticker.run(SKAction.group([launchSequence, swipeAction, touchAction]))
       pinchSticker.run(SKAction.fadeOut(withDuration: 0.0))
       throwHintSticker.run(hintStickerAction)
     }

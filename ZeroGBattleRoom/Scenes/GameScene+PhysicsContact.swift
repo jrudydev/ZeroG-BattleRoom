@@ -62,7 +62,8 @@ extension GameScene: SKPhysicsContactDelegate {
   
   public func handleDeposit(package: Package) {
     if self.gameState.currentState is Tutorial,
-      let tutorial = self.entityManager.tutorialEntities[0] as? TutorialAction {
+      let tutorial = self.entityManager.tutorialEntities[0] as? TutorialAction,
+      package.wasThrown {
 
       let nextStep = tutorial.setupNextStep()
       if nextStep == nil {
