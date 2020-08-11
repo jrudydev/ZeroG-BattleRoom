@@ -49,6 +49,7 @@ struct AppConstants {
     static let magnitudePilarName = "magnitude-pilar"
     static let rotationCircleName = "rotation-circle"
     static let spinnyNodeName = "spinny-node"
+    static let depositNodeName = "deposit-node"
     
     static let tutorialStartPointName = "start-point"
     static let tutorialTapPointName = "tap-point"

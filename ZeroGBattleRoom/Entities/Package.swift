@@ -13,6 +13,8 @@ import GameplayKit
 
 class Package: GKEntity {
   
+  static let maxSpeed: CGFloat = 400.0
+  
   let physicsBody: SKPhysicsBody
   
   var wasThrown = false

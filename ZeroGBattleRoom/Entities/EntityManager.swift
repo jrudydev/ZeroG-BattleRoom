@@ -115,9 +115,7 @@ class EntityManager {
   }
   
   func removeAllResourceEntities() {
-    for entity in self.resourcesEntities {
-      self.remove(entity)
-    }
+    self.resourcesEntities.removeAll()
   }
   
   func update(_ deltaTime: CFTimeInterval) {
@@ -138,9 +136,7 @@ class EntityManager {
     }
     self.toRemove.removeAll()
     
-    if !(self.scene.gameState.currentState is Tutorial) {
-      self.updateResourceVelocity()
-    }
+    self.updateResourceVelocity()
   }
   
   private func addToComponentSysetem(entity: GKEntity) {
@@ -150,26 +146,37 @@ class EntityManager {
   }
   
   private func updateResourceVelocity() {
-    let maxSpeed: CGFloat = 400.0
+    guard let deposit = self.scene.childNode(withName: AppConstants.ComponentNames.depositNodeName) else { return }
+  
     for resource in self.resourcesEntities {
-      guard let physicsComponent = resource.component(ofType: PhysicsComponent.self),
-        let package = resource as? Package,
-        !package.wasThrown else { return }
-      
-      let xSpeed = sqrt(physicsComponent.physicsBody.velocity.dy * physicsComponent.physicsBody.velocity.dx)
-      let ySpeed = sqrt(physicsComponent.physicsBody.velocity.dy * physicsComponent.physicsBody.velocity.dy)
-      
-      let speed = sqrt(physicsComponent.physicsBody.velocity.dx * physicsComponent.physicsBody.velocity.dx + physicsComponent.physicsBody.velocity.dy * physicsComponent.physicsBody.velocity.dy)
-      
-      if xSpeed <= 10.0 {
-        physicsComponent.randomImpulse(y: 0.0)
+      guard let package = resource as? Package,
+        let physicsComponent = package.component(ofType: PhysicsComponent.self),
+        let shapeComponent = package.component(ofType: ShapeComponent.self) else { return }
+    
+      let dx = deposit.position.x - shapeComponent.node.position.x
+      let dy = deposit.position.y - shapeComponent.node.position.y
+      let distanceToDeposit = sqrt(pow(dx, 2.0) + pow(dy, 2.0))
+
+      if distanceToDeposit < Deposit.eventHorizon {
+        self.scene.handleDeposit(package: package)
+      } else if distanceToDeposit < Deposit.pullDistance {
+        // Pull the resource
+      } else if !package.wasThrown && !(self.scene.gameState.currentState is Tutorial) {
+        let xSpeed = sqrt(physicsComponent.physicsBody.velocity.dy * physicsComponent.physicsBody.velocity.dx)
+        let ySpeed = sqrt(physicsComponent.physicsBody.velocity.dy * physicsComponent.physicsBody.velocity.dy)
+        
+        let speed = sqrt(physicsComponent.physicsBody.velocity.dx * physicsComponent.physicsBody.velocity.dx + physicsComponent.physicsBody.velocity.dy * physicsComponent.physicsBody.velocity.dy)
+        
+        if xSpeed <= 10.0 {
+          physicsComponent.randomImpulse(y: 0.0)
+        }
+        
+        if ySpeed <= 10.0 {
+          physicsComponent.randomImpulse(x: 0.0)
+        }
+        
+        physicsComponent.physicsBody.linearDamping = speed > Package.maxSpeed ? 0.4 : 0.0
       }
-      
-      if ySpeed <= 10.0 {
-        physicsComponent.randomImpulse(x: 0.0)
-      }
-      
-      physicsComponent.physicsBody.linearDamping = speed > maxSpeed ? 0.4 : 0.0
     }
   }
   
@@ -254,11 +261,10 @@ extension EntityManager {
     
     let resource = Package(shapeNode: resourceNode,
                            physicsBody: self.resourcePhysicsBody(frame: resourceNode.frame))
-    if let shapeComponent = resource.component(ofType: ShapeComponent.self),
-      let physicsComponent = resource.component(ofType: PhysicsComponent.self) {
+    if let physicsComponent = resource.component(ofType: PhysicsComponent.self) {
       
-      self.scene.addChild(shapeComponent.node)
-      shapeComponent.node.position = position
+      self.scene.addChild(resourceNode)
+      resourceNode.position = position
       DispatchQueue.main.async {
         if let vector = velocity {
           physicsComponent.physicsBody.velocity = vector

@@ -13,12 +13,14 @@ import GameplayKit
 
 class Deposit: GKEntity {
   
-  static let radius: CGFloat = 20.0
+  static let eventHorizon: CGFloat = 20.0
+  static let pullDistance: CGFloat = 50.0
   
   override init() {
     super.init()
     
-    let shapeNode = SKShapeNode(circleOfRadius: Deposit.radius)
+    let shapeNode = SKShapeNode(circleOfRadius: Deposit.eventHorizon)
+    shapeNode.name = AppConstants.ComponentNames.depositNodeName
     self.addComponent(ShapeComponent(node: shapeNode))
     let physicsBody = self.getPhysicsBody()
     self.addComponent(PhysicsComponent(physicsBody: physicsBody))
@@ -33,7 +35,7 @@ class Deposit: GKEntity {
   }
   
   private func getPhysicsBody() -> SKPhysicsBody {
-    let physicsBody = SKPhysicsBody(circleOfRadius: Deposit.radius)
+    let physicsBody = SKPhysicsBody(circleOfRadius: Deposit.eventHorizon)
    
     physicsBody.categoryBitMask = PhysicsCategoryMask.deposit
     physicsBody.contactTestBitMask = PhysicsCategoryMask.hero

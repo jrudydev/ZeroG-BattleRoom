@@ -219,6 +219,8 @@ extension GameScene: TutorialActionDelegate {
           ghostHandsComponent.release(resource: package)
           packageShapeComponent.node.removeFromParent()
         }
+        
+        self.entityManager.removeAllResourceEntities()
       }
       
       let launchSequence = SKAction.repeatForever(SKAction.sequence([

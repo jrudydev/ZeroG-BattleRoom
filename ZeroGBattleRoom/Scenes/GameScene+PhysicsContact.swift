@@ -60,6 +60,19 @@ extension GameScene: SKPhysicsContactDelegate {
     }
   }
   
+  public func handleDeposit(package: Package) {
+    if self.gameState.currentState is Tutorial,
+      let tutorial = self.entityManager.tutorialEntities[0] as? TutorialAction {
+
+      let nextStep = tutorial.setupNextStep()
+      if nextStep == nil {
+        self.gameStatus = .tutorialDone
+        self.gameState.enter(GameOver.self)
+        return
+      }
+    }
+  }
+  
   private func handleHeroHeroCollision(firstBody: SKPhysicsBody, secondBody: SKPhysicsBody) {
     guard !(self.gameState.currentState is Tutorial) else { return }
     
@@ -138,18 +151,6 @@ extension GameScene: SKPhysicsContactDelegate {
       let deliveredComponent = hero.component(ofType: DeliveredComponent.self),
       let depositComponent = deposit.component(ofType: DepositComponent.self),
       (handsComponent.leftHandSlot != nil || handsComponent.rightHandSlot != nil) else { return }
-    
-    // Check if game state is tutorial and set to complete
-    if self.gameState.currentState is Tutorial,
-      let tutorial = self.entityManager.tutorialEntities[0] as? TutorialAction {
-      
-      let nextStep = tutorial.setupNextStep()
-      if nextStep == nil {
-        self.gameStatus = .tutorialDone
-        self.gameState.enter(GameOver.self)
-        return
-      }
-    }
     
     if let lefthanditem = handsComponent.leftHandSlot,
       let shapeComponent = lefthanditem.component(ofType: ShapeComponent.self) {
