@@ -177,6 +177,7 @@ class Tutorial: GKState {
   
   override func willExit(to nextState: GKState) {
     self.scene.audioPlayer.pause(music: Audio.MusicFiles.level)
+    NotificationCenter.default.post(name: .resizeView, object: -1000.0)
   }
   
   override func isValidNextState(_ stateClass: AnyClass) -> Bool {
