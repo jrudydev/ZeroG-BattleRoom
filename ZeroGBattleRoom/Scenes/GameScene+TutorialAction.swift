@@ -52,12 +52,12 @@ extension GameScene: TutorialActionDelegate {
     let initialWait = 1.0
     
     let prepareLaunch = SKAction.run {
+      ghostSpriteComponent.node.alpha = 0.5
       launchComponent.launchInfo.lastTouchBegan = step.tapPosition
       ghost.updateLaunchComponents(touchPosition: step.tapPosition)
     }
 
     let launchGhost = SKAction.run {
-      ghostSpriteComponent.node.alpha = 0.5
       ghost.launch()
     }
 
