@@ -214,7 +214,7 @@ extension GameScene: SKPhysicsContactDelegate {
       let heroTeamComponent = hero.component(ofType: TeamComponent.self),
       panelTeamComponent.team != heroTeamComponent.team,
       self.gameState.currentState is Tutorial,
-      hero != self.entityManager.playerEntites[1],
+      hero !== self.entityManager.playerEntites[1],
       let tutorial = self.entityManager.tutorialEntities[0] as? TutorialAction {
       
       if let step = tutorial.setupNextStep(),
