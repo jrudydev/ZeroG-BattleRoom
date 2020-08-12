@@ -17,7 +17,7 @@ class Package: GKEntity {
   
   let physicsBody: SKPhysicsBody
   
-  var wasThrown = false
+  weak var wasThrownBy: General? = nil
   
   init(shapeNode: SKShapeNode, physicsBody: SKPhysicsBody) {
     self.physicsBody = physicsBody
@@ -49,5 +49,18 @@ extension Package {
     
     physicsComponent.physicsBody = self.physicsBody
     shapeComponent.node.physicsBody = self.physicsBody
+  }
+}
+
+extension Package {
+  func placeFor(tutorialStep: Tutorial.Step) {
+    if let shapeComponent = self.component(ofType: ShapeComponent.self),
+      let physicsComponent = self.component(ofType: PhysicsComponent.self) {
+      
+      DispatchQueue.main.async {
+        shapeComponent.node.position = tutorialStep.midPosition
+        physicsComponent.physicsBody.velocity = .zero
+      }
+    }
   }
 }

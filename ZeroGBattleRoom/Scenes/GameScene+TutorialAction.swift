@@ -35,13 +35,12 @@ extension GameScene: TutorialActionDelegate {
     guard let ghost = self.entityManager.playerEntites[1] as? General,
       let ghostSpriteComponent = ghost.component(ofType: SpriteComponent.self),
       let ghostHandsComponent = ghost.component(ofType: HandsComponent.self),
-      let physicsComponent = ghost.component(ofType: PhysicsComponent.self),
+      let ghostPhysicsComponent = ghost.component(ofType: PhysicsComponent.self),
       let launchComponent = ghost.component(ofType: LaunchComponent.self),
       let tapSticker = self.childNode(withName: AppConstants.ComponentNames.tutorialTapStickerName),
       let pinchSticker = self.cam?.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName),
       let throwHintSticker = self.cam?.childNode(withName: AppConstants.ComponentNames.tutorialThrowStickerName) else { return }
     
-    self.entityManager.removeAllResourceEntities()
     self.stopAllTutorialAnimations()
     
     self.showTutorial()
@@ -66,10 +65,13 @@ extension GameScene: TutorialActionDelegate {
       ghostSpriteComponent.node.position = step.startPosition
       ghostSpriteComponent.node.zRotation = step.startRotation
       tapSticker.position = step.tapPosition
-      physicsComponent.physicsBody.velocity = .zero
-      physicsComponent.physicsBody.angularVelocity = .zero
+      ghostPhysicsComponent.physicsBody.velocity = .zero
+      ghostPhysicsComponent.physicsBody.angularVelocity = .zero
       
-      self.entityManager.removeAllResourceEntities()
+      if self.entityManager.resourcesEntities.count > 0,
+        let package = self.entityManager.resourcesEntities[0] as? Package {
+        package.placeFor(tutorialStep: step)
+      }
     }
 
     switch step {
@@ -192,10 +194,6 @@ extension GameScene: TutorialActionDelegate {
       let movePosition = CGPoint(x: step.tapPosition.x + moveDelta.x,
                                  y: step.tapPosition.y + moveDelta.y)
       
-      let spawnResource = SKAction.run {
-        self.entityManager.spawnResource(position: step.midPosition, velocity: .zero)
-      }
-      
       let spawnSpinnyNode = SKAction.run {
         ShapeFactory.shared.spawnSpinnyNodeAt(pos: movePosition)
       }
@@ -205,20 +203,8 @@ extension GameScene: TutorialActionDelegate {
         ghost.throwResourceAt(point: throwPoint)
       }
       
-      let removeResource = SKAction.run {
-        if let package = ghostHandsComponent.leftHandSlot,
-          let packageShapeComponent = package.component(ofType: ShapeComponent.self) {
-
-          ghostHandsComponent.release(resource: package)
-          packageShapeComponent.node.removeFromParent()
-        }
-        
-        self.entityManager.removeAllResourceEntities()
-      }
-      
       let launchSequence = SKAction.repeatForever(SKAction.sequence([
         resetAction,
-        spawnResource,
         SKAction.wait(forDuration: initialWait),
         prepareLaunch,
         SKAction.wait(forDuration: 3.5),
@@ -227,7 +213,6 @@ extension GameScene: TutorialActionDelegate {
         SKAction.wait(forDuration: 3.4),
         throwResource,
         SKAction.wait(forDuration: 2.6),
-        removeResource
       ]))
 
       let swipeAction = SKAction.repeatForever(SKAction.sequence([
@@ -269,32 +254,40 @@ extension GameScene: TutorialActionDelegate {
   }
   
   func stopAllTutorialAnimations() {
-    guard let ghost = self.entityManager.playerEntites[1] as? General,
+    guard let hero = self.entityManager.hero as? General,
+      let ghost = self.entityManager.playerEntites[1] as? General,
       let ghostSpriteComponent = ghost.component(ofType: SpriteComponent.self),
       let ghostHandsComponent = ghost.component(ofType: HandsComponent.self),
+      let ghostPhysicsComponent = ghost.component(ofType: PhysicsComponent.self),
       let tapSticker = self.childNode(withName: AppConstants.ComponentNames.tutorialTapStickerName),
       let pinchSticker = self.cam?.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName),
       let throwButton = self.cam?.childNode(withName: AppConstants.ButtonNames.throwButtonName),
-      let throwHintSticker = self.cam?.childNode(withName: AppConstants.ComponentNames.tutorialThrowStickerName)else { return }
+      let throwHintSticker = self.cam?.childNode(withName: AppConstants.ComponentNames.tutorialThrowStickerName),
+      let tutorialAction = self.entityManager.tutorialEntities.first as? TutorialAction,
+      let tutorialStep = tutorialAction.currentStep,
+      hero.isBeamed else { return }
     
     tapSticker.removeAllActions()
     ghostSpriteComponent.node.removeAllActions()
     pinchSticker.removeAllActions()
     throwHintSticker.removeAllActions()
     
-    // Remove existing resource
-    if let package = ghostHandsComponent.leftHandSlot {
+//    ghostPhysicsComponent.physicsBody.contactTestBitMask = .zero
+    
+    // Reposition the resource when needed
+    if let package = ghostHandsComponent.leftHandSlot,
+      let shapeComponent = package.component(ofType: ShapeComponent.self) {
+
       ghostHandsComponent.release(resource: package)
+      shapeComponent.node.removeFromParent()
 
       throwButton.alpha = 0.5
-    }
-    self.entityManager.removeAllResourceEntities()
-    
-    // Add resource for fourth and final tutorial step
-    if let tutorialAction = self.entityManager.tutorialEntities.first as? TutorialAction,
-      let tutorialStep = tutorialAction.currentStep,
-      tutorialStep == .rotateThrow {
-      self.entityManager.spawnResource(position: tutorialStep.midPosition, velocity: .zero)
+
+      package.placeFor(tutorialStep: tutorialStep)
+      self.scene?.addChild(shapeComponent.node)
+    } else if self.entityManager.resourcesEntities.count > 0,
+      let package = self.entityManager.resourcesEntities[0] as? Package {
+      package.placeFor(tutorialStep: tutorialStep)
     }
     
     self.hideTutorial()

@@ -115,6 +115,12 @@ class EntityManager {
   }
   
   func removeAllResourceEntities() {
+    print("removing all resources")
+    for entity in self.resourcesEntities {
+      if let shapeComponent = entity.component(ofType: ShapeComponent.self) {
+        shapeComponent.node.removeFromParent()
+      }
+    }
     self.resourcesEntities.removeAll()
   }
   
@@ -161,7 +167,7 @@ class EntityManager {
         self.scene.handleDeposit(package: package)
       } else if distanceToDeposit < Deposit.pullDistance {
         // Pull the resource
-      } else if !package.wasThrown && !(self.scene.gameState.currentState is Tutorial) {
+      } else if package.wasThrownBy == nil && !(self.scene.gameState.currentState is Tutorial) {
         let xSpeed = sqrt(physicsComponent.physicsBody.velocity.dy * physicsComponent.physicsBody.velocity.dx)
         let ySpeed = sqrt(physicsComponent.physicsBody.velocity.dy * physicsComponent.physicsBody.velocity.dy)
         
@@ -601,6 +607,7 @@ extension EntityManager {
     guard let hero = self.playerEntites[0] as? General,
       let heroAliasComponent = hero.component(ofType: AliasComponent.self),
       let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
+      let heroPhysicsComponent = hero.component(ofType: PhysicsComponent.self),
       let ghost = self.playerEntites[1] as? General,
       let ghostAliasComponent = ghost.component(ofType: AliasComponent.self),
       let ghostSpriteComponent = ghost.component(ofType: SpriteComponent.self),
@@ -614,6 +621,7 @@ extension EntityManager {
     ghost.switchToState(.moving)
     ghostSpriteComponent.node.alpha = 0.5
     ghostPhysicsComponent.physicsBody.collisionBitMask = PhysicsCategoryMask.package
+    heroPhysicsComponent.physicsBody.collisionBitMask = PhysicsCategoryMask.package
     
     let tutorialActionEntity = TutorialAction(delegate: self.scene)
     if let tapSpriteComponent = tutorialActionEntity.component(ofType: SpriteComponent.self) {

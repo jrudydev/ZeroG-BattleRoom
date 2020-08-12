@@ -56,14 +56,15 @@ extension GameScene: SKPhysicsContactDelegate {
       guard let resourceNode = secondBody.node as? SKShapeNode,
         let impactedResource = self.entityManager.resourceWith(node: resourceNode) as? Package else { return }
       
-      impactedResource.wasThrown = false
+      impactedResource.wasThrownBy = nil
     }
   }
   
   public func handleDeposit(package: Package) {
     if self.gameState.currentState is Tutorial,
       let tutorial = self.entityManager.tutorialEntities[0] as? TutorialAction,
-      package.wasThrown {
+      let wasThrownBy = package.wasThrownBy,
+      wasThrownBy === self.entityManager.playerEntites[0] {
 
       let nextStep = tutorial.setupNextStep()
       if nextStep == nil {
@@ -216,7 +217,12 @@ extension GameScene: SKPhysicsContactDelegate {
       hero != self.entityManager.playerEntites[1],
       let tutorial = self.entityManager.tutorialEntities[0] as? TutorialAction {
       
-      tutorial.setupNextStep()
+      if let step = tutorial.setupNextStep(),
+        step == .rotateThrow {
+        
+        self.entityManager.spawnResource(position: step.midPosition, velocity: .zero)
+      }
+      
       return
     }
     

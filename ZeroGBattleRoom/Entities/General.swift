@@ -101,7 +101,7 @@ class General: GKEntity, BeamableProtocol {
       self.updateResourcePositions()
     }
   
-  private func getPhysicsBody() -> SKPhysicsBody {
+  func getPhysicsBody() -> SKPhysicsBody {
     // TODO: Send and handle a state parameter here
     let physicsBody = SKPhysicsBody(circleOfRadius: 10)
     physicsBody.categoryBitMask = PhysicsCategoryMask.hero
@@ -328,7 +328,7 @@ extension General: ThrowableProtocol {
         resourcePhysicsComponent.physicsBody.velocity = physicsComponent.physicsBody.velocity
         resourcePhysicsComponent.physicsBody.applyImpulse(throwVector * defaultThrowMagnitude)
         
-        rightResource.wasThrown = true
+        rightResource.wasThrownBy = self
       }
     } else if let leftResource = handsComponent.leftHandSlot {
         handsComponent.isImpacted = true
@@ -343,7 +343,7 @@ extension General: ThrowableProtocol {
           resourcePhysicsComponent.physicsBody.applyImpulse(throwVector)
         }
       
-        leftResource.wasThrown = true
+        leftResource.wasThrownBy = self
       }
     }
 }
