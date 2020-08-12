@@ -272,7 +272,8 @@ extension GameScene: TutorialActionDelegate {
     pinchSticker.removeAllActions()
     throwHintSticker.removeAllActions()
     
-//    ghostPhysicsComponent.physicsBody.contactTestBitMask = .zero
+    ghostSpriteComponent.node.position = tutorialStep.startPosition
+    ghostPhysicsComponent.physicsBody.velocity = .zero
     
     // Reposition the resource when needed
     if let package = ghostHandsComponent.leftHandSlot,
