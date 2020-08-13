@@ -323,7 +323,9 @@ extension EntityManager {
     let extraPanels = self.extraPanels()
     
     for entity in wallPanels + centerPanels + blinderPanels + extraPanels {
-      self.add(entity)
+      if let shapeNode = entity.component(ofType: ShapeComponent.self)?.node {
+        self.scene.addChild(shapeNode)
+      }
       self.wallEntities.append(entity)
     }
   }
