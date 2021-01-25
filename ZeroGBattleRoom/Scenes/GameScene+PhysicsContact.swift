@@ -68,7 +68,7 @@ extension GameScene: SKPhysicsContactDelegate {
 
       let nextStep = tutorial.setupNextStep()
       if nextStep == nil {
-        self.gameStatus = .tutorialDone
+        self.gameOverStatus = .tutorialDone
         self.gameState.enter(GameOver.self)
         return
       }

@@ -19,20 +19,20 @@ class GameOver: GKState {
   }
   
   override func didEnter(from previousState: GKState?) {
-    self.scene.physicsWorld.speed = 0.0
+    scene.physicsWorld.speed = 0.0
     SnapshotManager.shared.isSendingSnapshots = false
     
     let background = SKShapeNode(rectOf: UIScreen.main.bounds.size)
     background.fillColor = UIColor.black.withAlphaComponent(20.0)
     background.strokeColor = UIColor.black
     background.zPosition = 100
-    self.scene.cam!.addChild(background)
+    scene.cam!.addChild(background)
     
     let titlePosition = CGPoint(x: 0.0, y: UIScreen.main.bounds.height * 0.2)
     let actionSequence = SKAction.sequence([
       SKAction.scale(by: 0.0, duration: 0.0),
       SKAction.scale(to: 1.0, duration: 0.25)])
-    if self.scene.gameStatus == .disconnected {
+    if scene.gameOverStatus == .disconnected {
       let disconnectedSprite = SKSpriteNode(imageNamed: "disconnected")
       disconnectedSprite.position = titlePosition
       disconnectedSprite.zPosition = SpriteZPosition.menuLabel.rawValue
@@ -41,9 +41,9 @@ class GameOver: GKState {
       let labelHeight = labelWidth / disconnectedSprite.size.width * disconnectedSprite.size.height
       disconnectedSprite.size = CGSize(width: labelWidth, height: labelHeight)
       
-      self.scene.cam!.addChild(disconnectedSprite)
+      scene.cam!.addChild(disconnectedSprite)
       disconnectedSprite.run(actionSequence)
-    } else if self.scene.gameStatus == .tutorialDone {
+    } else if scene.gameOverStatus == .tutorialDone {
       let tutorialDoneSprite = SKSpriteNode(imageNamed: "tutorialdone")
       tutorialDoneSprite.position = titlePosition
       tutorialDoneSprite.zPosition = SpriteZPosition.menuLabel.rawValue
@@ -52,10 +52,10 @@ class GameOver: GKState {
       let labelHeight = labelWidth / tutorialDoneSprite.size.width * tutorialDoneSprite.size.height
       tutorialDoneSprite.size = CGSize(width: labelWidth, height: labelHeight)
 
-      self.scene.cam!.addChild(tutorialDoneSprite)
+      scene.cam!.addChild(tutorialDoneSprite)
       tutorialDoneSprite.run(actionSequence)
     } else {
-      let textureName = (self.scene.gameStatus == .gameWon) ? "gamewon" : "gameover"
+      let textureName = (scene.gameOverStatus == .gameWon) ? "gamewon" : "gameover"
       let gameOverSprite = SKSpriteNode(imageNamed: textureName)
       gameOverSprite.position = titlePosition
       gameOverSprite.zPosition = SpriteZPosition.menuLabel.rawValue
@@ -64,7 +64,7 @@ class GameOver: GKState {
       let labelHeight = labelWidth / gameOverSprite.size.width * gameOverSprite.size.height
       gameOverSprite.size = CGSize(width: labelWidth, height: labelHeight)
       
-      self.scene.cam!.addChild(gameOverSprite)
+      scene.cam!.addChild(gameOverSprite)
       gameOverSprite.run(actionSequence)
     }
     
@@ -75,7 +75,7 @@ class GameOver: GKState {
     mainMenuButton.zPosition = 101
     mainMenuButton.isUserInteractionEnabled = false
     
-    self.scene.cam!.addChild(mainMenuButton)
+    scene.cam!.addChild(mainMenuButton)
   }
   
   override func willExit(to nextState: GKState) { }

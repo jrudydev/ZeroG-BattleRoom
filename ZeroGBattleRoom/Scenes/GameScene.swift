@@ -57,9 +57,9 @@ class GameScene: SKScene {
     return player
   }()
   
-  var gameStatus: GameOverStatus = .gameLost {
+  var gameOverStatus: GameOverStatus = .gameLost {
     didSet {
-      self.gameState.enter(GameOver.self)
+      gameState.enter(GameOver.self)
     }
   }
   var tutorialAction: TutorialAction? { entityManager.tutorialEntities.first as? TutorialAction }
@@ -67,19 +67,19 @@ class GameScene: SKScene {
   
 //  var tutorialDone: Bool = false {
 //    didSet {
-//      self.gameState.enter(GameOver.self)
+//      gameState.enter(GameOver.self)
 //    }
 //  }
 //
 //  var gameWon: Bool = false {
 //    didSet {
-//      self.gameState.enter(GameOver.self)
+//      gameState.enter(GameOver.self)
 //    }
 //  }
 //
 //  var connectionDisconnect: Bool = false {
 //    didSet {
-//      self.gameState.enter(GameOver.self)
+//      gameState.enter(GameOver.self)
 //    }
 //  }
 //
@@ -98,18 +98,18 @@ class GameScene: SKScene {
   private var lastUpdateTime: TimeInterval = 0
   
   override func sceneDidLoad() {
-    self.lastUpdateTime = 0
+    lastUpdateTime = 0
     
-    let borderBody = SKPhysicsBody(edgeLoopFrom: self.frame)
+    let borderBody = SKPhysicsBody(edgeLoopFrom: frame)
     borderBody.friction = 0
     self.borderBody = borderBody
     
-    self.entityManager = EntityManager(scene: self)
+    entityManager = EntityManager(scene: self)
     
     ShapeFactory.shared.gameScene = self
-    self.setupGameMessage()
+    setupGameMessage()
     
-    self.gameState.enter(WaitingForTap.self)
+    gameState.enter(WaitingForTap.self)
     
     NotificationCenter.Publisher(center: .default, name: .motionShake, object: nil)
       .sink(receiveValue: { [weak self] notification in
@@ -118,8 +118,8 @@ class GameScene: SKScene {
           let spriteComponent = hero.component(ofType: SpriteComponent.self) else { return }
         
         hero.impactedAt(point: spriteComponent.node.position)
-//        self.multiplayerNetworking
-//          .sendImpacted(senderIndex: self.entityManager.currentPlayerIndex)
+//        multiplayerNetworking
+//          .sendImpacted(senderIndex: entityManager.currentPlayerIndex)
         
         spriteComponent.node.randomImpulse()
       })
@@ -127,24 +127,24 @@ class GameScene: SKScene {
   }
   
   override func update(_ currentTime: TimeInterval) {
-    if (self.lastUpdateTime == 0) {
-      self.lastUpdateTime = currentTime
+    if (lastUpdateTime == 0) {
+      lastUpdateTime = currentTime
     }
-    let deltaTime = currentTime - self.lastUpdateTime
-    self.entityManager.update(deltaTime)
+    let deltaTime = currentTime - lastUpdateTime
+    entityManager.update(deltaTime)
     
-    self.lastUpdateTime = currentTime
-    self.gameState.update(deltaTime: currentTime)
+    lastUpdateTime = currentTime
+    gameState.update(deltaTime: currentTime)
 
-    self.checkForGameOver()
+    checkForGameOver()
   }
   
   private func checkForGameOver() {
-    if self.entityManager.currentPlayerIndex == 0 {
-      guard self.entityManager.playerEntites.count > 0 else { return }
-      guard let winningTeam = self.entityManager.winningTeam else { return }
+    if entityManager.currentPlayerIndex == 0 {
+      guard entityManager.playerEntites.count > 0 else { return }
+      guard let winningTeam = entityManager.winningTeam else { return }
       
-      if let hero = self.entityManager.hero as? General,
+      if let hero = entityManager.hero as? General,
         let teamComponent = hero.component(ofType: TeamComponent.self) {
         
         var localDidWin = false
@@ -155,9 +155,9 @@ class GameScene: SKScene {
           localDidWin = teamComponent.team == .team2
         default: break
         }
-        self.multiplayerNetworking.sendGameEnd(player1Won: localDidWin)
+        multiplayerNetworking.sendGameEnd(player1Won: localDidWin)
         
-        self.gameStatus = localDidWin ? .gameWon : .gameLost
+        gameOverStatus = localDidWin ? .gameWon : .gameLost
       }
     }
   }
@@ -165,8 +165,8 @@ class GameScene: SKScene {
 
 extension GameScene {
   private func setupGameMessage() {
-    self.gameMessage = self.childNode(withName: "//gameMessage") as? SKLabelNode
-    if let gameMessage = self.gameMessage {
+    gameMessage = childNode(withName: "//gameMessage") as? SKLabelNode
+    if let gameMessage = gameMessage {
       gameMessage.name = AppConstants.ComponentNames.gameMessageName
       gameMessage.alpha = 0.0
 //      gameMessage.run(SKAction.fadeIn(withDuration: 2.0))
@@ -176,15 +176,15 @@ extension GameScene {
 
 extension GameScene: MultiplayerNetworkingProtocol {
   func matchEnded() {
-    self.gameStatus = .disconnected
-    self.gameState.enter(GameOver.self)
+    gameOverStatus = .disconnected
+    gameState.enter(GameOver.self)
     GameKitHelper.shared.match?.disconnect()
     GameKitHelper.shared.match = nil
   }
   
   func setPlayerAliases(playerAliases: [String]) {
     for (idx, alias) in playerAliases.enumerated() {
-      let entity = self.entityManager.playerEntites[idx]
+      let entity = entityManager.playerEntites[idx]
       if let aliasComponent = entity.component(ofType: AliasComponent.self) {
         aliasComponent.node.text = "\(alias) (0/\(resourcesNeededToWin))"
       }
@@ -197,7 +197,7 @@ extension GameScene: MultiplayerNetworkingProtocol {
                     velocity: CGVector,
                     angularVelocity: CGFloat,
                     wasLaunch: Bool) {
-    if let player = self.entityManager.playerEntites[index] as? General,
+    if let player = entityManager.playerEntites[index] as? General,
       let spriteComponent = player.component(ofType: SpriteComponent.self),
       let physicsComponent = player.component(ofType: PhysicsComponent.self),
       let impulseComponent = player.component(ofType: ImpulseComponent.self) {
@@ -231,7 +231,7 @@ extension GameScene: MultiplayerNetworkingProtocol {
                     velocity: CGVector,
                     angularVelocity: CGFloat,
                     resourceIndecies: [Int]) {
-    if let player = self.entityManager.playerEntites[index] as? General,
+    if let player = entityManager.playerEntites[index] as? General,
       let spriteComponent = player.component(ofType: SpriteComponent.self),
       let physicsComponent = player.component(ofType: PhysicsComponent.self) {
       
@@ -247,7 +247,7 @@ extension GameScene: MultiplayerNetworkingProtocol {
 //                      rotation: CGFloat,
 //                      velocity: CGVector,
 //                      angularVelocity: CGFloat) {
-//    if let package = self.entityManager.resourcesEntities[index] as? Package,
+//    if let package = entityManager.resourcesEntities[index] as? Package,
 //      let shapeComponent = package.component(ofType: ShapeComponent.self),
 //      let physicsComponent = package.component(ofType: PhysicsComponent.self) {
 //
@@ -263,7 +263,7 @@ extension GameScene: MultiplayerNetworkingProtocol {
                       rotation: CGFloat,
                       velocity: CGVector,
                       angularVelocity: CGFloat) {
-    if let package = self.entityManager.resourcesEntities[index] as? Package,
+    if let package = entityManager.resourcesEntities[index] as? Package,
       let shapeComponent = package.component(ofType: ShapeComponent.self),
       let physicsComponent = package.component(ofType: PhysicsComponent.self) {
       
@@ -276,14 +276,14 @@ extension GameScene: MultiplayerNetworkingProtocol {
   
   func syncPlayerResources(players: MultiplayerNetworking.SnapshotElementGroup) {
     for (idx, playerSnap) in players.enumerated() {
-      if let player = self.entityManager.playerEntites[idx] as? General,
+      if let player = entityManager.playerEntites[idx] as? General,
         let handsComponent = player.component(ofType: HandsComponent.self),
         let deliveredComponent = player.component(ofType: DeliveredComponent.self) {
         
         // Check the left hand
         if playerSnap.resourceIndecies.count >= 1 {
           let index = playerSnap.resourceIndecies[0]
-          let heldResource = self.entityManager.resourcesEntities[index] as! Package
+          let heldResource = entityManager.resourcesEntities[index] as! Package
           
           if let leftHandSlot = handsComponent.leftHandSlot {
             if heldResource != leftHandSlot {
@@ -300,7 +300,7 @@ extension GameScene: MultiplayerNetworkingProtocol {
         // Check the right hand
         if playerSnap.resourceIndecies.count >= 2 {
           let index = playerSnap.resourceIndecies[1]
-          let heldResource = self.entityManager.resourcesEntities[index] as! Package
+          let heldResource = entityManager.resourcesEntities[index] as! Package
           
           if let rightHandSlot = handsComponent.rightHandSlot {
             if heldResource != rightHandSlot {
@@ -317,11 +317,11 @@ extension GameScene: MultiplayerNetworkingProtocol {
         // Check scored resources
         var scoredResources = Set<Package>()
         for index in playerSnap.scoredResourceIndecies {
-          let resource = self.entityManager.resourcesEntities[index] as! Package
+          let resource = entityManager.resourcesEntities[index] as! Package
           
           guard let resourceShapeComponent = resource.component(ofType: ShapeComponent.self) else { return }
           
-          if self.entityManager.isScored(resource: resource) {
+          if entityManager.isScored(resource: resource) {
             resourceShapeComponent.node.removeFromParent()
           }
           
@@ -334,14 +334,14 @@ extension GameScene: MultiplayerNetworkingProtocol {
   }
   
   func syncResources(resources: MultiplayerNetworking.SnapshotElementGroup) {
-    for x in self.entityManager.resourcesEntities.count..<resources.count {
-      self.entityManager.spawnResource(position: resources[x].position,
+    for x in entityManager.resourcesEntities.count..<resources.count {
+      entityManager.spawnResource(position: resources[x].position,
                                        velocity: resources[x].velocity)
     }
   }
   
 //  func impactPlayerAt(senderIndex: Int) {
-//    if let hero = self.entityManager.playerEntites[senderIndex] as? General,
+//    if let hero = entityManager.playerEntites[senderIndex] as? General,
 //      let spriteComponent = hero.component(ofType: SpriteComponent.self),
 //      let heroHandsComponent = hero.component(ofType: HandsComponent.self),
 //      !heroHandsComponent.isImpacted {
@@ -352,16 +352,16 @@ extension GameScene: MultiplayerNetworkingProtocol {
 //  }
 //  
 //  func grabResourceAt(index: Int, playerIndex: Int, senderIndex: Int) {
-//    let senderEntity = self.entityManager.playerEntites[senderIndex]
-//    let playerEntity = self.entityManager.playerEntites[playerIndex]
+//    let senderEntity = entityManager.playerEntites[senderIndex]
+//    let playerEntity = entityManager.playerEntites[playerIndex]
 //    
 //    guard let playerHandsComponent = playerEntity.component(ofType: HandsComponent.self),
-//      let resource = self.entityManager.resourcesEntities[index] as? Package,
+//      let resource = entityManager.resourcesEntities[index] as? Package,
 //      let resourceShapeComponent = resource.component(ofType: ShapeComponent.self),
 //      !playerHandsComponent.isHolding(shapeComponent: resourceShapeComponent) else { return }
 //    
-//    if senderEntity == self.entityManager.playerEntites[0] {
-//      for player in self.entityManager.playerEntites {
+//    if senderEntity == entityManager.playerEntites[0] {
+//      for player in entityManager.playerEntites {
 //        guard player != playerEntity else { continue }
 //        guard let handsComponent = player.component(ofType: HandsComponent.self) else { continue }
 //
@@ -369,13 +369,13 @@ extension GameScene: MultiplayerNetworkingProtocol {
 //          // If so release and send correction back to client
 //          handsComponent.release(resource: resource)
 //
-////          self.multiplayerNetworking.sendAssignResource(index: index, playerIndex: playerIndex)
+////          multiplayerNetworking.sendAssignResource(index: index, playerIndex: playerIndex)
 //
 //          return
 //        }
 //      }
 //    } else {
-//      for player in self.entityManager.playerEntites {
+//      for player in entityManager.playerEntites {
 //        guard player != playerEntity else { continue }
 //        guard let handsComponent = player.component(ofType: HandsComponent.self) else { continue }
 //
@@ -390,29 +390,29 @@ extension GameScene: MultiplayerNetworkingProtocol {
 //  }
 //  
 //  func assignResourceAt(index: Int, playerIndex: Int) {
-//    guard let hero = self.entityManager.hero as? General,
+//    guard let hero = entityManager.hero as? General,
 //      let heroHandscomponent = hero.component(ofType: HandsComponent.self),
-//      let player = self.entityManager.playerEntites[playerIndex] as? General,
+//      let player = entityManager.playerEntites[playerIndex] as? General,
 //      let playerHandsComponent = player.component(ofType: HandsComponent.self),
-//      let package = self.entityManager.resourcesEntities[index] as? Package else { return }
+//      let package = entityManager.resourcesEntities[index] as? Package else { return }
 //    
 //    heroHandscomponent.release(resource: package)
 //    playerHandsComponent.grab(resource: package)
 //  }
 //  
 //  func syncWallAt(index: Int, isOccupied: Bool) {
-//    guard let beamComponent = self.entityManager.wallEntities[index].component(ofType: BeamComponent.self) else { return }
+//    guard let beamComponent = entityManager.wallEntities[index].component(ofType: BeamComponent.self) else { return }
 //    
 //    beamComponent.isOccupied = isOccupied
 //  }
   
   func gameOver(player1Won: Bool) {
-    self.gameStatus = !player1Won ? .gameWon : .gameLost
+    gameOverStatus = !player1Won ? .gameWon : .gameLost
   }
   
   func setCurrentPlayerAt(index: Int) {
-    self.entityManager.currentPlayerIndex = index
-    self.gameState.enter(MatchFound.self)
+    entityManager.currentPlayerIndex = index
+    gameState.enter(MatchFound.self)
   
     SnapshotManager.shared.isSendingSnapshots = true
   }
@@ -420,23 +420,23 @@ extension GameScene: MultiplayerNetworkingProtocol {
 
 extension GameScene: GameSceneProtocol {
   func viewResized(size: CGSize) {
-    self.viewportSize = size
+    viewportSize = size
   }
 }
 
 extension GameScene {
   func getPlayerAliasAt(index: Int) -> String {
     if index == 0 {
-      if self.multiplayerNetworking.playerAliases.count > 0 {
-        return self.multiplayerNetworking.playerAliases[0]
+      if multiplayerNetworking.playerAliases.count > 0 {
+        return multiplayerNetworking.playerAliases[0]
       } else {
         return "Player 1"
       }
     }
     
     if index == 1 {
-      if self.multiplayerNetworking.playerAliases.count > 1 {
-        return self.multiplayerNetworking.playerAliases[1]
+      if multiplayerNetworking.playerAliases.count > 1 {
+        return multiplayerNetworking.playerAliases[1]
       } else {
         return "MuskBot"
       }
