@@ -11,30 +11,7 @@ import SpriteKit
 import GameKit
 
 extension GameScene {
-  private func hideTutorialIfNeeded(excludedSteps: [Tutorial.Step] = []) {
-    if self.gameState.currentState is Tutorial,
-      let tutorialAction = self.entityManager.tutorialEntities.first as? TutorialAction,
-      let tutorialStep = tutorialAction.currentStep {
-
-      guard !excludedSteps.contains(tutorialStep) else { return }
-
-      self.stopAllTutorialAnimations()
-    }
-  }
-
-  private func showTutorialIfNeeded(excludedSteps: [Tutorial.Step] = []) {
-    if self.gameState.currentState is Tutorial,
-      let tutorialAction = self.entityManager.tutorialEntities.first as? TutorialAction,
-      let tutorialStep = tutorialAction.currentStep {
-
-      guard !excludedSteps.contains(tutorialStep) else { return }
-
-      self.setupHintAnimations(step: tutorialStep)
-    }
-  }
-}
-
-extension GameScene {
+  
   func touchDown(atPoint pos : CGPoint) {
     self.numberOfTouches += 1
     
@@ -190,9 +167,11 @@ extension GameScene {
 //      }
     }
   }
+  
 }
  
 extension GameScene {
+  
   override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
 //    if let label = self.gameMessage, label.alpha == 1.0 {
 //      label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
@@ -270,34 +249,25 @@ extension GameScene {
   override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
     for t in touches { self.touchUp(atPoint: t.location(in: self)) }
   }
+  
 }
 
-extension CGPoint {
-  func vectorTo(point: CGPoint) -> CGVector {
-    return CGVector(dx: point.x - self.x, dy: point.y - self.y)
+extension GameScene {
+  
+  private func hideTutorialIfNeeded(excludedSteps: [Tutorial.Step] = []) {
+    guard gameState.currentState is Tutorial else { return }
+    guard let tutorialStep = currentTutorialStep else { return }
+    guard !excludedSteps.contains(tutorialStep) else { return }
+
+    stopAllTutorialAnimations()
+  }
+
+  private func showTutorialIfNeeded(excludedSteps: [Tutorial.Step] = []) {
+    guard gameState.currentState is Tutorial else { return }
+    guard let tutorialStep = currentTutorialStep else { return }
+    guard !excludedSteps.contains(tutorialStep) else { return }
+    
+    setupHintAnimations(step: tutorialStep)
   }
   
-  func intersection(m1: CGFloat, P2: CGPoint, m2: CGFloat) -> CGPoint {
-    // Note: Point/slope form intersection equations
-    //
-    // Solve for x: m1(x - P1x) + P1y = m2(x - P2x) + P2y
-    // m1(x - P1x) = m2(x - P2x) + P2y - P1y
-    // m1(x) - m1(P1x) = m2(x) - m2(P2x) + P2y - P1y
-    // m1(x) = m2(x) - m2(P2x) + P2y - P1y + m1(P1x)
-    // m1(x) - m2(x) = -m2(P2x) + P2y - P1y + m1(P1x)
-    // x(m1 - m2) = -m2(P2x) + P2y - P1y + m1(P1x)
-    // x = (-m2(P2x) + P2y - P1y + m1(P1x)) / (m1 - m2)
-    //
-    // Solve for y: y = m(x - Px) + Py
-    
-    
-    let x = (-1 * m2 * P2.x + P2.y - self.y + m1 * self.x) / (m1 - m2)
-    let y = m1 * x - m1 * self.x + self.y
-    return CGPoint(x: x, y: y)
-  }
-  
-  func slopeTo(point: CGPoint) -> CGFloat {
-    // Note: Slope equation: m = (y - Py) / (x - Px)
-    return (self.y - point.y) / (self.x - point.x)
-  }
 }

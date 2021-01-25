@@ -13,8 +13,10 @@ import Combine
 
 
 extension Notification.Name {
+  
   static let restartGame = Notification.Name("restartGame")
   static let resizeView = Notification.Name("resizeView")
+  
 }
 
 
@@ -37,17 +39,6 @@ class GameScene: SKScene {
     Playing(scene: self),
     GameOver(scene: self)])
   
-  private var lastUpdateTime: TimeInterval = 0
-  var lastPinchMagnitude: CGFloat? = nil
-  var viewResized: ((CGSize) -> Void)?
-  var viewportSize: CGSize = UIScreen.main.bounds.size
-
-  var borderBody: SKPhysicsBody!
-  
-  var numberOfTouches = 0
-  var cam: SKCameraNode?
-  var gameMessage: SKLabelNode?
-  
   var multiplayerNetworking: MultiplayerNetworking! {
     didSet {
       SnapshotManager.shared.publisher
@@ -59,24 +50,33 @@ class GameScene: SKScene {
     }
   }
   
+  let audioPlayer: AudioPlayer = {
+    let player = AudioPlayer(music: Audio.MusicFiles.level)
+    player.sfxVolume = 0.5
+    player.musicVolume = 0.5
+    return player
+  }()
+  
   var gameStatus: GameOverStatus = .gameLost {
     didSet {
       self.gameState.enter(GameOver.self)
     }
   }
+  var tutorialAction: TutorialAction? { entityManager.tutorialEntities.first as? TutorialAction }
+  var currentTutorialStep: Tutorial.Step? { tutorialAction?.currentStep }
   
 //  var tutorialDone: Bool = false {
 //    didSet {
 //      self.gameState.enter(GameOver.self)
 //    }
 //  }
-//  
+//
 //  var gameWon: Bool = false {
 //    didSet {
 //      self.gameState.enter(GameOver.self)
 //    }
 //  }
-//  
+//
 //  var connectionDisconnect: Bool = false {
 //    didSet {
 //      self.gameState.enter(GameOver.self)
@@ -84,14 +84,18 @@ class GameScene: SKScene {
 //  }
 //
   
-  internal let audioPlayer: AudioPlayer = {
-    let player = AudioPlayer(music: Audio.MusicFiles.level)
-    player.sfxVolume = 0.5
-    player.musicVolume = 0.5
-    return player
-  }()
+  var lastPinchMagnitude: CGFloat? = nil
+  var viewResized: ((CGSize) -> Void)?
+  var viewportSize: CGSize = UIScreen.main.bounds.size
+
+  var borderBody: SKPhysicsBody!
+  
+  var numberOfTouches = 0
+  var cam: SKCameraNode?
+  var gameMessage: SKLabelNode?
   
   private var subscriptions = Set<AnyCancellable>()
+  private var lastUpdateTime: TimeInterval = 0
   
   override func sceneDidLoad() {
     self.lastUpdateTime = 0
