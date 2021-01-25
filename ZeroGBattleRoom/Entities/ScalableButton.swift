@@ -12,14 +12,14 @@ import GameKit
 
 class ScalableButton: GKEntity {
   
-  let node: SKEffectNode
+  let node: SKNode
 
-  init(effect: SKEffectNode) {
-    self.node = effect
+  init(node: SKNode) {
+    self.node = node
     
     super.init()
     
-    self.addComponent(InterfaceComponent(node: effect))
+    self.addComponent(InterfaceComponent(node: node))
   }
 
   required init?(coder: NSCoder) {

@@ -13,6 +13,7 @@ import GameplayKit
 
 let numberOfSpawnedResources = 10
 let resourcesNeededToWin = 3
+let minDriftVelocity: CGFloat = 5.0
 
 
 class EntityManager {
@@ -124,6 +125,12 @@ class EntityManager {
     self.resourcesEntities.removeAll()
   }
   
+  private func addToComponentSysetem(entity: GKEntity) {
+    for componentSystem in self.componentSystems {
+      componentSystem.addComponent(foundIn: entity)
+    }
+  }
+  
   func update(_ deltaTime: CFTimeInterval) {
     for entity in uiEntities {
       if let scaledComponent = entity as? ScaledContainer {
@@ -142,13 +149,22 @@ class EntityManager {
     }
     self.toRemove.removeAll()
     
+    self.updateUIElements()
     self.updateResourceVelocity()
   }
   
-  private func addToComponentSysetem(entity: GKEntity) {
-    for componentSystem in self.componentSystems {
-      componentSystem.addComponent(foundIn: entity)
-    }
+  private func updateUIElements() {
+    guard let restartButton = self.scene.cam?.childNode(withName: AppConstants.ButtonNames.refreshButtonName) else { return }
+    
+    guard let hero = self.playerEntites[0] as? General,
+      let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
+      let physicsBody = heroSpriteComponent.node.physicsBody,
+      !hero.isBeamed else { return }
+    
+    let absDx = abs(physicsBody.velocity.dx)
+    let absDy = abs(physicsBody.velocity.dy)
+    let notMoving = absDx < minDriftVelocity && absDy < minDriftVelocity
+//    restartButton.alpha = notMoving ? 1.0 : 0.0
   }
   
   private func updateResourceVelocity() {
@@ -501,9 +517,91 @@ extension EntityManager {
 
 extension EntityManager {
   
-  // MARK: - Handle UI Elements
+  // MARK: - UI Setup Methods
   
-  func addInGameUIView(element: SKNode) {
+  func addUIElements() {
+    self.setupBackButton()
+    self.setupRestartButton()
+    
+    if self.scene.gameState.currentState is Tutorial {
+      self.addTutorialStickers()
+    }
+  }
+  
+  private func addTutorialStickers() {
+    let tapSticker = SKSpriteNode(imageNamed: "throw")
+    tapSticker.name = AppConstants.ButtonNames.throwButtonName
+    tapSticker.alignMidRight()
+    tapSticker.zPosition = SpriteZPosition.inGameUI.rawValue
+    tapSticker.alpha = 0.5
+    
+    let throwTapSticker = SKSpriteNode(imageNamed: "tap")
+    throwTapSticker.name = AppConstants.ComponentNames.tutorialThrowStickerName
+    throwTapSticker.zPosition = SpriteZPosition.inGameUI2.rawValue
+    throwTapSticker.anchorPoint = CGPoint(x: 0.2, y: 0.9)
+    throwTapSticker.alignMidRight()
+    throwTapSticker.alpha = 0.0
+    
+    let pinchSticker = SKSpriteNode(imageNamed: "pinch-out")
+    pinchSticker.name = AppConstants.ComponentNames.tutorialPinchStickerName
+    pinchSticker.position = CGPoint(x: 50.0, y: -100.0)
+    pinchSticker.anchorPoint = CGPoint(x: 0.2, y: 0.9)
+    pinchSticker.zPosition = SpriteZPosition.inGameUI.rawValue
+    
+    self.addInGameUIViews(elements: [tapSticker, throwTapSticker, pinchSticker])
+  }
+  
+  func removeUIElements() {
+    self.removeInGameUIViewElements()
+  }
+  
+  private func setupBackButton() {
+    let backButton = SKShapeNode(rect: AppConstants.Layout.buttonRect,
+                                 cornerRadius: AppConstants.Layout.buttonCornerRadius)
+    backButton.name = AppConstants.ButtonNames.backButtonName
+    backButton.zPosition = SpriteZPosition.menu.rawValue
+    backButton.fillColor = AppConstants.UIColors.buttonBackground
+    backButton.strokeColor = AppConstants.UIColors.buttonForeground
+    backButton.alignTopLeft()
+    
+    let imageNode = SKSpriteNode(imageNamed: "back-white")
+    imageNode.name = AppConstants.ButtonNames.backButtonName
+    imageNode.zPosition = SpriteZPosition.menuLabel.rawValue
+    imageNode.scale(to: backButton.frame.size)
+    imageNode.color = AppConstants.UIColors.buttonForeground
+    imageNode.colorBlendFactor = 1
+    backButton.addChild(imageNode)
+  
+    self.addInGameUIView(element: backButton)
+  }
+  
+  private func setupRestartButton() {
+    let restartButton = SKShapeNode(rect: AppConstants.Layout.buttonRect,
+                                    cornerRadius: AppConstants.Layout.buttonCornerRadius)
+    restartButton.name = AppConstants.ButtonNames.refreshButtonName
+    restartButton.zPosition = SpriteZPosition.menu.rawValue
+    restartButton.fillColor = AppConstants.UIColors.buttonBackground
+    restartButton.strokeColor = AppConstants.UIColors.buttonForeground
+    restartButton.alignMidBottom()
+    
+    let imageNode = SKSpriteNode(imageNamed: "refresh-white")
+    imageNode.name = AppConstants.ButtonNames.refreshButtonName
+    imageNode.zPosition = SpriteZPosition.menuLabel.rawValue
+    imageNode.scale(to: restartButton.frame.size)
+    imageNode.color = AppConstants.UIColors.buttonForeground
+    imageNode.colorBlendFactor = 1
+    restartButton.addChild(imageNode)
+  
+    self.addInGameUIView(element: restartButton)
+  }
+  
+  private func addInGameUIViews(elements: [SKNode]) {
+    for element in elements {
+      self.addInGameUIView(element: element)
+    }
+  }
+  
+  private func addInGameUIView(element: SKNode) {
     let scaledComponent = ScaledContainer(element: element)
     
     self.scene.cam!.addChild(scaledComponent.node)
@@ -512,7 +610,7 @@ extension EntityManager {
     self.addToComponentSysetem(entity: scaledComponent)
   }
   
-  func removeInGameUIViewElements() {
+  private func removeInGameUIViewElements() {
     for entity in self.uiEntities {
       if let scalableElement = entity as? ScaledContainer {
         self.toRemove.insert(scalableElement)

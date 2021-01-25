@@ -39,25 +39,15 @@ class Playing: GKState {
     self.scene.entityManager.spawnResources()
     self.scene.entityManager.spawnHeros(mapSize: AppConstants.Layout.boundarySize)
     self.scene.entityManager.spawnDeposit()
-
-    let backButton = SKLabelNode(text: "Back")
-    backButton.name = AppConstants.ButtonNames.backButtonName
-    backButton.fontSize = 30.0
-    backButton.position = CGPoint(x: backButton.frame.width / 2, y: -backButton.frame.height / 2)
-    let newPosX = backButton.position.x + -UIScreen.main.bounds.width / 2 + 20.0
-    let newPosY = backButton.position.y + UIScreen.main.bounds.height / 2 - 30.0
-    backButton.position = CGPoint(x: newPosX, y: newPosY)
-    backButton.zPosition = SpriteZPosition.menu.rawValue
-    backButton.isUserInteractionEnabled = false
-
-    self.scene.entityManager.addInGameUIView(element: backButton)
+    
+    self.scene.entityManager.addUIElements()
     
     self.scene.audioPlayer.play(effect: Audio.EffectFiles.startGame)
     self.scene.audioPlayer.play(music: Audio.MusicFiles.level)
   }
   
   override func willExit(to nextState: GKState) {
-    self.scene.entityManager.removeInGameUIViewElements()
+    self.scene.entityManager.removeUIElements()
     NotificationCenter.default.post(name: .resizeView, object: -1000.0)
     
     self.scene.audioPlayer.pause(music: Audio.MusicFiles.level)

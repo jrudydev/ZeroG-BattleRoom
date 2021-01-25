@@ -38,4 +38,8 @@ public extension SKNode {
 //    let newPosX = -self.position.x + UIScreen.main.bounds.width / 2 - 20.0
 //    self.position = CGPoint(x: newPosX, y: 250.0)
   }
+  
+  func alignMidBottom() {
+    self.position = CGPoint(x: 0.0, y: -self.frame.height / 2 - 100.0)
+  }
 }

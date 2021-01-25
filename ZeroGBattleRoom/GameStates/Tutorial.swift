@@ -132,42 +132,43 @@ class Tutorial: GKState {
     
     self.repositionHero()
   
-    let backButton = SKLabelNode(text: "Back")
-    backButton.name = AppConstants.ButtonNames.backButtonName
-    backButton.fontColor = .black
-    backButton.fontSize = 30.0
-    backButton.alignTopLeft()
-    backButton.zPosition = SpriteZPosition.menu.rawValue
-    backButton.isUserInteractionEnabled = false
+//    let backButton = SKLabelNode(text: "Back")
+//    backButton.name = AppConstants.ButtonNames.backButtonName
+//    backButton.fontColor = .black
+//    backButton.fontSize = 30.0
+//    backButton.alignTopLeft()
+//    backButton.zPosition = SpriteZPosition.menu.rawValue
+//    backButton.isUserInteractionEnabled = false
     
-    let pinchSticker = SKSpriteNode(imageNamed: "pinch-out")
-    pinchSticker.name = AppConstants.ComponentNames.tutorialPinchStickerName
-    pinchSticker.position = CGPoint(x: 50.0, y: -100.0)
-    pinchSticker.anchorPoint = CGPoint(x: 0.2, y: 0.9)
-    pinchSticker.zPosition = SpriteZPosition.inGameUI.rawValue
+//    let pinchSticker = SKSpriteNode(imageNamed: "pinch-out")
+//    pinchSticker.name = AppConstants.ComponentNames.tutorialPinchStickerName
+//    pinchSticker.position = CGPoint(x: 50.0, y: -100.0)
+//    pinchSticker.anchorPoint = CGPoint(x: 0.2, y: 0.9)
+//    pinchSticker.zPosition = SpriteZPosition.inGameUI.rawValue
     
-    let tapThrow = SKSpriteNode(imageNamed: "throw")
-    tapThrow.name = AppConstants.ButtonNames.throwButtonName
-    tapThrow.alignMidRight()
-    tapThrow.zPosition = SpriteZPosition.inGameUI.rawValue
-    tapThrow.alpha = 0.5
+//    let tapThrow = SKSpriteNode(imageNamed: "throw")
+//    tapThrow.name = AppConstants.ButtonNames.throwButtonName
+//    tapThrow.alignMidRight()
+//    tapThrow.zPosition = SpriteZPosition.inGameUI.rawValue
+//    tapThrow.alpha = 0.5
     
-    let throwHintSticker = SKSpriteNode(imageNamed: "tap")
-    throwHintSticker.name = AppConstants.ComponentNames.tutorialThrowStickerName
-    throwHintSticker.position = tapThrow.position
-    throwHintSticker.anchorPoint = CGPoint(x: 0.2, y: 0.9)
-    throwHintSticker.zPosition = SpriteZPosition.inGameUI2.rawValue
-    throwHintSticker.alpha = 0.0
+//    let throwHintSticker = SKSpriteNode(imageNamed: "tap")
+//    throwHintSticker.name = AppConstants.ComponentNames.tutorialThrowStickerName
+//    throwHintSticker.position = tapThrow.position
+//    throwHintSticker.anchorPoint = CGPoint(x: 0.2, y: 0.9)
+//    throwHintSticker.zPosition = SpriteZPosition.inGameUI2.rawValue
+//    throwHintSticker.alpha = 0.0
 
 //    let stepIndecatorBG = SKShapeNode(rectOf: UIScreen.main.bounds.size)
 //    stepIndecatorBG.fillColor = UIColor.black.withAlphaComponent(20.0)
 //    stepIndecatorBG.strokeColor = UIColor.black
 //    stepIndecatorBG.zPosition = SpriteZPosition.menu.rawValue
     
-    self.scene.entityManager.addInGameUIView(element: backButton)
-    self.scene.entityManager.addInGameUIView(element: pinchSticker)
-    self.scene.entityManager.addInGameUIView(element: tapThrow)
-    self.scene.entityManager.addInGameUIView(element: throwHintSticker)
+    self.scene.entityManager.addUIElements()
+//    self.scene.entityManager.addInGameUIView(element: backButton)
+//    self.scene.entityManager.addInGameUIView(element: pinchSticker)
+//    self.scene.entityManager.addInGameUIView(element: tapThrow)
+//    self.scene.entityManager.addInGameUIView(element: throwHintSticker)
 //    self.scene.entityManager.addInGameUIView(element: stepIndecatorBG)
     
     self.scene.entityManager.setupTutorial()

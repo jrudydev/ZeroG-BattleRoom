@@ -10,14 +10,24 @@ import Foundation
 import SpriteKit
 
 struct AppConstants {
+  struct UIColors {
+    static let buttonBackground = UIColor(named: "BtnBackground") ?? .gray
+    static let buttonForeground = /*UIColor(named: "BtnForegroundGreen") ??*/ UIColor.white
+  }
+  
   struct Layout {
-    static var mapSize = CGSize(width: 2000, height: 3000)
-    static var boundarySize = CGSize(width:  1000, height: 1600)
-    static var tutorialBoundrySize = CGSize(width: 100.0, height: 400.0)
-    static var wallSize = CGSize(width: 100, height: 20)
+    static let mapSize = CGSize(width: 2000, height: 3000)
+    static let boundarySize = CGSize(width:  1000, height: 1600)
+    static let tutorialBoundrySize = CGSize(width: 100.0, height: 400.0)
+    static let wallSize = CGSize(width: 100, height: 20)
     static var wallCornerRadius: CGFloat {
       return wallSize.width * 0.1
     }
+    static let buttonWidth: CGFloat = 50.0
+    static let buttonCornerRadius: CGFloat = 10.0
+    static let buttonOrigin = CGPoint(x: -buttonWidth/2, y:  -buttonWidth/2)
+    static let buttonSize = CGSize(width: buttonWidth, height: buttonWidth)
+    static let buttonRect = CGRect(origin: buttonOrigin, size: buttonSize)
   }
   
   struct ComponentNames {
@@ -67,7 +77,7 @@ struct AppConstants {
     static let backButtonName = "back-button"
     static let refreshButtonName = "refresh-button"
     
-    static let all = [
+    static let all: Set<String> = [
       Self.throwButtonName,
       Self.backButtonName,
       Self.refreshButtonName

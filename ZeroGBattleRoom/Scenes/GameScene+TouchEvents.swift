@@ -38,7 +38,8 @@ extension GameScene {
   func touchDown(atPoint pos : CGPoint) {
     self.numberOfTouches += 1
     
-    guard !self.nodeIsInGameButton(at: pos) else { return }
+    let node = self.atPoint(pos)
+    guard !self.isInGameButton(node: node) else { return }
     
     if self.gameState.currentState is Tutorial,
       let tutorialAction = self.entityManager.tutorialEntities.first as? TutorialAction,
@@ -64,7 +65,16 @@ extension GameScene {
   }
   
   func touchMoved(toPoint pos : CGPoint) {
-    guard !self.nodeIsInGameButton(at: pos) else { return }
+    let node = self.atPoint(pos)
+    guard !self.isInGameButton(node: node) else {
+      if let hero = self.entityManager.hero as? General,
+        let launchComponent = hero.component(ofType: LaunchComponent.self) {
+        launchComponent.launchInfo.lastTouchBegan = nil
+        launchComponent.hide()
+      }
+      
+      return
+    }
     
     switch self.gameState.currentState {
     case is Playing, is Tutorial:
@@ -80,9 +90,11 @@ extension GameScene {
     case is WaitingForTap:
       self.handleWaitingForTap(pos: pos)
     case is Tutorial, is Playing:
-      if self.nodeIsInGameButton(at: pos) && self.atPoint(pos).alpha == 1.0 {
-        self.handleThrowTap(pos: pos)
-        self.handleRestartTap(pos: pos)
+      let node = self.atPoint(pos)
+      if self.isInGameButton(node: node) && node.alpha == 1.0 {
+        self.handleThrowTap(node: node)
+        self.handleBackTap(node: node)
+        self.handleRestartTap(node: node)
       } else {
         self.handlePlayerLaunch(pos: pos)
       }
@@ -105,8 +117,7 @@ extension GameScene {
     }
   }
   
-  private func handleThrowTap(pos: CGPoint) {
-    let node = self.atPoint(pos)
+  private func handleThrowTap(node: SKNode) {
     if let name = node.name, name == AppConstants.ButtonNames.throwButtonName,
       let hero = self.entityManager.hero as? General,
       let spriteComponent = hero.component(ofType: SpriteComponent.self),
@@ -125,19 +136,29 @@ extension GameScene {
     }
   }
   
-  private func handleRestartTap(pos: CGPoint) {
-    let node = self.atPoint(pos)
+  private func handleBackTap(node: SKNode) {
     if let name = node.name, name == AppConstants.ButtonNames.backButtonName {
       self.matchEnded()
       NotificationCenter.default.post(name: .restartGame, object: nil)
+      
+      self.audioPlayer.play(effect: Audio.EffectFiles.uiMenuSelect)
     }
-    
-    self.audioPlayer.play(effect: Audio.EffectFiles.uiMenuSelect)
   }
   
-  private func nodeIsInGameButton(at pos: CGPoint) -> Bool {
-    let node = self.atPoint(pos)
-    
+  private func handleRestartTap(node: SKNode) {
+    if let name = node.name,
+      name == AppConstants.ButtonNames.refreshButtonName,
+      self.gameState.currentState is Tutorial,
+      let tutorialAction = self.entityManager.tutorialEntities.first as? TutorialAction,
+      let tutorialStep = tutorialAction.currentStep {
+
+      self.setupHintAnimations(step: tutorialStep)
+      
+//      self.audioPlayer.play(effect: Audio.EffectFiles.uiMenuSelect)
+    }
+  }
+  
+  private func isInGameButton(node: SKNode) -> Bool {
     guard let name = node.name else { return false }
     guard !AppConstants.ButtonNames.all.contains(name) else { return true}
     
@@ -148,9 +169,10 @@ extension GameScene {
     guard self.entityManager.currentPlayerIndex != -1,
       let hero = self.entityManager.hero as? General else { return }
     
-    if case .beamed = hero.state { self.launch(hero: hero) }
-    
-    ShapeFactory.shared.removeAllSpinnyNodes()
+    if case .beamed = hero.state {
+      ShapeFactory.shared.removeAllSpinnyNodes()
+      self.launch(hero: hero)
+    }
   }
   
   private func launch(hero: General) {

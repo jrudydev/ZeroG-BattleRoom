@@ -118,9 +118,7 @@ class General: GKEntity, BeamableProtocol {
   unowned var occupiedPanel: Panel? = nil
   
   var isBeamed: Bool {
-    get {
-      return self.state == .beamed
-    }
+    return self.state == .beamed
   }
   var isBeamable: Bool = true
   
