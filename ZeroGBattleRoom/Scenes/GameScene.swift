@@ -42,7 +42,9 @@ class GameScene: SKScene {
   var multiplayerNetworking: MultiplayerNetworking! {
     didSet {
       SnapshotManager.shared.publisher
-        .sink { elements in
+        .sink { [weak self] elements in
+          guard let self = self else { return }
+          
           self.multiplayerNetworking.sendSnapshot(elements)
         }
         .store(in: &subscriptions)
@@ -146,27 +148,24 @@ class GameScene: SKScene {
   }
   
   private func checkForGameOver() {
-    if entityManager.currentPlayerIndex == 0 {
-      guard entityManager.playerEntites.count > 0 else { return }
-      guard let winningTeam = entityManager.winningTeam else { return }
+    guard entityManager.isHost else { return }
+    guard let winningTeam = entityManager.winningTeam else { return }
+    guard let hero = entityManager.hero as? General,
+          let teamComponent = hero.component(ofType: TeamComponent.self) else { return }
       
-      if let hero = entityManager.hero as? General,
-        let teamComponent = hero.component(ofType: TeamComponent.self) {
-        
-        var localDidWin = false
-        switch winningTeam {
-        case .team1:
-          localDidWin = teamComponent.team == .team1
-        case .team2:
-          localDidWin = teamComponent.team == .team2
-        default: break
-        }
-        multiplayerNetworking.sendGameEnd(player1Won: localDidWin)
-        
-        gameOverStatus = localDidWin ? .gameWon : .gameLost
-      }
+    var localDidWin = false
+    switch winningTeam {
+    case .team1:
+      localDidWin = teamComponent.team == .team1
+    case .team2:
+      localDidWin = teamComponent.team == .team2
+    default: break
     }
+    multiplayerNetworking.sendGameEnd(player1Won: localDidWin)
+    
+    gameOverStatus = localDidWin ? .gameWon : .gameLost
   }
+  
 }
 
 extension GameScene {

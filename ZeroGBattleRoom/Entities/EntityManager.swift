@@ -36,6 +36,7 @@ class EntityManager {
   var toRemove = Set<GKEntity>()
   
   var currentPlayerIndex = 0
+  var isHost: Bool { currentPlayerIndex == 0 }
   
   var hero: GKEntity? {
     guard self.playerEntites.count > 0 else { return nil }
@@ -270,10 +271,10 @@ extension EntityManager {
   }
   
   func spawnResources() {
-    if self.currentPlayerIndex == 0 {
-      for _ in 0..<numberOfSpawnedResources {
-        self.spawnResource()
-      }
+    guard isHost else { return }
+    
+    for _ in 0..<numberOfSpawnedResources {
+      self.spawnResource()
     }
   }
   
@@ -311,7 +312,7 @@ extension EntityManager {
     physicsBody.categoryBitMask = PhysicsCategoryMask.package
   
     // Make sure resources are only colliding on the designated host device
-    if self.scene.entityManager.currentPlayerIndex == 0 {
+    if isHost {
       physicsBody.contactTestBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.wall
       physicsBody.collisionBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.package
     } else {

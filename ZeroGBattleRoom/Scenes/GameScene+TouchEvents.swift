@@ -12,21 +12,18 @@ import GameKit
 
 extension GameScene {
   
+  // MARK: Touch Down
+  
   func touchDown(atPoint pos : CGPoint) {
     numberOfTouches += 1
 
     guard !isInGameButton(node: atPoint(pos)) else { return }
-    guard currentTutorialStep != .pinchZoom else { return }
-    
-    hideTutorialIfNeeded(excludedSteps: [.pinchZoom])
-    
+    guard isPinchZoom(step: currentTutorialStep) else { return }
     guard let hero = entityManager.hero as? General,
-      let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
-      let launchComponent = hero.component(ofType: LaunchComponent.self) else { return }
+          let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
+          let launchComponent = hero.component(ofType: LaunchComponent.self) else { return }
     guard numberOfTouches <= 1 else { launchComponent.hide(); return }
-   
-    let heroDistanceVector = heroSpriteComponent.node.position.vectorTo(point: pos)
-    guard heroDistanceVector.length() > AppConstants.Touch.maxSwipeDistance else {
+    guard maxSwipeDistance(tapPos: pos, heroPos: heroSpriteComponent.node.position) else {
       launchComponent.hide()
       return
     }
@@ -35,17 +32,23 @@ extension GameScene {
     hero.updateLaunchComponents(touchPosition: pos)
   }
   
+  private func isPinchZoom(step: Tutorial.Step?) -> Bool {
+    guard let step = step else { return false }
+    guard step != .pinchZoom else { return false }
+    
+    hideTutorialIfNeeded(excludedSteps: [.pinchZoom])
+    
+    return true
+  }
+  
+  private func maxSwipeDistance(tapPos: CGPoint, heroPos: CGPoint) -> Bool {
+    heroPos.vectorTo(point: tapPos).length() > AppConstants.Touch.maxSwipeDistance
+  }
+  
+  // MARK: Touch Moved
+  
   func touchMoved(toPoint pos : CGPoint) {
-    let node = atPoint(pos)
-    guard !isInGameButton(node: node) else {
-      if let hero = entityManager.hero as? General,
-        let launchComponent = hero.component(ofType: LaunchComponent.self) {
-        launchComponent.launchInfo.lastTouchBegan = nil
-        launchComponent.hide()
-      }
-      
-      return
-    }
+    guard !isInGameButton(node: atPoint(pos)) else { handleMovedOverButton(); return }
     
     switch gameState.currentState {
     case is Playing, is Tutorial:
@@ -55,6 +58,16 @@ extension GameScene {
     default: break
     }
   }
+  
+  func handleMovedOverButton() {
+    guard let hero = entityManager.hero as? General,
+          let launchComponent = hero.component(ofType: LaunchComponent.self) else { return }
+      
+    launchComponent.launchInfo.lastTouchBegan = nil
+    launchComponent.hide()
+  }
+  
+  // MARK: Touch Up
     
   func touchUp(atPoint pos : CGPoint) {
     switch gameState.currentState {
@@ -76,55 +89,53 @@ extension GameScene {
   }
   
   private func handleWaitingForTap(pos: CGPoint) {
-    let node = atPoint(pos)
-    if let name = node.name, name == AppConstants.ComponentNames.tutorialLabelName {
+    guard let name = atPoint(pos).name else { return }
+
+    switch name {
+    case AppConstants.ComponentNames.tutorialLabelName:
       gameState.enter(Tutorial.self)
-    }
-    if let name = node.name, name == AppConstants.ComponentNames.localLabelName {
+    case AppConstants.ComponentNames.localLabelName:
       gameState.enter(MatchFound.self)
-    }
-    if let name = node.name, name == AppConstants.ComponentNames.onlineLabelName {
+    case AppConstants.ComponentNames.onlineLabelName:
       NotificationCenter.default.post(name: .startMatchmaking, object: nil)
+    default: break
     }
   }
   
   private func handleThrowTap(node: SKNode) {
-    if let name = node.name, name == AppConstants.ButtonNames.throwButtonName,
-      let hero = entityManager.hero as? General,
-      let spriteComponent = hero.component(ofType: SpriteComponent.self),
-      let handsComponent = hero.component(ofType: HandsComponent.self),
-      let throwButton = cam?.childNode(withName: AppConstants.ButtonNames.throwButtonName),
-      throwButton.alpha == 1.0 {
+    guard let name = node.name, name == AppConstants.ButtonNames.throwButtonName,
+          let hero = entityManager.hero as? General,
+          let spriteComponent = hero.component(ofType: SpriteComponent.self),
+          let handsComponent = hero.component(ofType: HandsComponent.self),
+          let throwButton = cam?.childNode(withName: AppConstants.ButtonNames.throwButtonName),
+          throwButton.alpha == 1.0 else { return }
       
-      let throwPoint = convert(CGPoint(x: 0.0, y: 1.0), from: spriteComponent.node)
-      hero.throwResourceAt(point: throwPoint)
-      
-      if !handsComponent.hasResourceInHand {
-        throwButton.alpha = 0.5
-      }
-      
-      audioPlayer.play(effect: Audio.EffectFiles.throwResource)
+    let throwPoint = convert(CGPoint(x: 0.0, y: 1.0), from: spriteComponent.node)
+    hero.throwResourceAt(point: throwPoint)
+    
+    if !handsComponent.hasResourceInHand {
+      throwButton.alpha = 0.5
     }
+    
+    audioPlayer.play(effect: Audio.EffectFiles.throwResource)
   }
   
   private func handleBackTap(node: SKNode) {
-    if let name = node.name, name == AppConstants.ButtonNames.backButtonName {
-      matchEnded()
-      NotificationCenter.default.post(name: .restartGame, object: nil)
+    guard let name = node.name, name == AppConstants.ButtonNames.backButtonName else { return }
       
-      audioPlayer.play(effect: Audio.EffectFiles.uiMenuSelect)
-    }
+    matchEnded()
+    NotificationCenter.default.post(name: .restartGame, object: nil)
+    
+    audioPlayer.play(effect: Audio.EffectFiles.uiMenuSelect)
   }
   
   private func handleRestartTap(node: SKNode) {
-    if let name = node.name,
-      name == AppConstants.ButtonNames.refreshButtonName,
-      let tutorialStep = tutorialAction?.currentStep {
+    guard let name = node.name, name == AppConstants.ButtonNames.refreshButtonName,
+          let tutorialStep = tutorialAction?.currentStep else { return }
 
-      setupHintAnimations(step: tutorialStep)
-      
-//      audioPlayer.play(effect: Audio.EffectFiles.uiMenuSelect)
-    }
+    setupHintAnimations(step: tutorialStep)
+    
+//    audioPlayer.play(effect: Audio.EffectFiles.uiMenuSelect)
   }
   
   private func isInGameButton(node: SKNode) -> Bool {
@@ -136,17 +147,16 @@ extension GameScene {
   
   private func handlePlayerLaunch(pos: CGPoint) {
     guard entityManager.currentPlayerIndex != -1,
-      let hero = entityManager.hero as? General else { return }
+          let hero = entityManager.hero as? General,
+          case .beamed = hero.state else { return }
     
-    if case .beamed = hero.state {
-      ShapeFactory.shared.removeAllSpinnyNodes()
-      launch(hero: hero)
-    }
+    ShapeFactory.shared.removeAllSpinnyNodes()
+    launch(hero: hero)
   }
   
   private func launch(hero: General) {
     guard let heroLaunchComponent = hero.component(ofType: LaunchComponent.self),
-      heroLaunchComponent.launchInfo.lastTouchBegan != nil else { return }
+          heroLaunchComponent.launchInfo.lastTouchBegan != nil else { return }
     
     hero.launch() { sprite, velocity, angularVelocity, vacatedPanel in
       self.multiplayerNetworking.sendMove(start: sprite.position,
