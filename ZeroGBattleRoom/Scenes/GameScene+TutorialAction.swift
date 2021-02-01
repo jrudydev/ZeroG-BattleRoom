@@ -263,8 +263,7 @@ extension GameScene: TutorialActionDelegate {
       let pinchSticker = self.cam?.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName),
       let throwButton = self.cam?.childNode(withName: AppConstants.ButtonNames.throwButtonName),
       let throwHintSticker = self.cam?.childNode(withName: AppConstants.ComponentNames.tutorialThrowStickerName),
-      let tutorialAction = self.entityManager.tutorialEntities.first as? TutorialAction,
-      let tutorialStep = tutorialAction.currentStep else { return }
+      let tutorialStep = tutorialAction?.currentStep else { return }
     
     tapSticker.removeAllActions()
     ghostSpriteComponent.node.removeAllActions()

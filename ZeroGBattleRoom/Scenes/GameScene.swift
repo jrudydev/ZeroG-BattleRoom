@@ -62,7 +62,11 @@ class GameScene: SKScene {
       gameState.enter(GameOver.self)
     }
   }
-  var tutorialAction: TutorialAction? { entityManager.tutorialEntities.first as? TutorialAction }
+  var tutorialAction: TutorialAction? {
+    guard gameState.currentState is Tutorial else { return nil }
+    
+    return entityManager.tutorialEntities.first as? TutorialAction
+  }
   var currentTutorialStep: Tutorial.Step? { tutorialAction?.currentStep }
   
 //  var tutorialDone: Bool = false {
