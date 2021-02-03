@@ -174,6 +174,8 @@ extension GameScene {
  
 extension GameScene {
   
+  // MARK: Touches Began
+  
   override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
 //    if let label = gameMessage, label.alpha == 1.0 {
 //      label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
@@ -183,68 +185,81 @@ extension GameScene {
     for t in touches { touchDown(atPoint: t.location(in: self)) }
   }
   
+  // MARK: TouchesMoved
+  
   override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-    if touches.count == 2 {
-      if let tutorialStep = tutorialAction?.currentStep {
-        
-        if tutorialStep == .pinchZoom {
-          tutorialAction?.setupNextStep()
-        } else if tutorialStep == .tapLaunch {
-          return
-        }
-      }
-      
-      switch gameState.currentState {
-      case is Playing, is Tutorial:
-        var touchesArray = [UITouch]()
-        for (_, touch) in touches.enumerated() {
-          touchesArray.append(touch)
-        }
-        let view = UIView(frame: UIScreen.main.bounds)
-        let firstTouch = touchesArray[0].location(in: view)
-        let secondTouch = touchesArray[1].location(in: view)
-        
-        let magnitude = sqrt(abs(secondTouch.x - firstTouch.x) + abs(secondTouch.y - firstTouch.y))
-        
-        if let pinchMagnitude = lastPinchMagnitude {
-          let dt = pinchMagnitude - magnitude
-          NotificationCenter.default.post(name: .resizeView, object: dt)
-        } else {
-          NotificationCenter.default.post(name: .resizeView, object: 0.0)
-        }
-        
-        lastPinchMagnitude = magnitude
-      default: break
-      }
+    defer { for t in touches { touchMoved(toPoint: t.location(in: self)) } }
+    
+    guard touches.count == 2 else { return }
+    guard handleTutorialTouchMoved() else { return }
+    
+    switch gameState.currentState {
+    case is Playing, is Tutorial:
+      let touchesArray = Array(touches)
+      handlePinchToZoom(touches: touchesArray)
+    default: break
+    }
+  }
+  
+  private func handleTutorialTouchMoved() -> Bool {
+    guard let tutorialStep = currentTutorialStep else { return true }
+    guard tutorialStep != .tapLaunch else { return false }
+    
+    if tutorialStep == .pinchZoom {
+      tutorialAction?.setupNextStep()
     }
     
-    for t in touches { touchMoved(toPoint: t.location(in: self)) }
+    return true
   }
+  
+  private func handlePinchToZoom(touches: [UITouch]) {
+    let view = UIView(frame: UIScreen.main.bounds)
+    let firstTouch = touches[0].location(in: view)
+    let secondTouch = touches[1].location(in: view)
+    
+    let magnitude = sqrt(abs(secondTouch.x - firstTouch.x) + abs(secondTouch.y - firstTouch.y))
+    
+    if let pinchMagnitude = lastPinchMagnitude {
+      let dt = pinchMagnitude - magnitude
+      NotificationCenter.default.post(name: .resizeView, object: dt)
+    } else {
+      NotificationCenter.default.post(name: .resizeView, object: 0.0)
+    }
+    
+    lastPinchMagnitude = magnitude
+  }
+  
+  // MARK: Touches Ended
   
   override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
     numberOfTouches = 0
 
-    // Check if the hero did not launch
-    if let hero = entityManager.hero as? General,
-      let launchComponent = hero.component(ofType: LaunchComponent.self),
-      launchComponent.launchInfo.lastTouchBegan == nil,
-      hero.isBeamed {
-      
-      if let launchLineNode = launchComponent.node.childNode(withName: AppConstants.ComponentNames.launchLineName) as? SKShapeNode {
-        launchLineNode.alpha = LaunchComponent.targetLineAlpha
-      }
-      
-      if gameState.currentState is Tutorial,
-        let beam = hero.occupiedPanel,
-        let beamTeamComponent = beam.component(ofType: TeamComponent.self),
-        beamTeamComponent.team == .team1 {
-        
-        showTutorialIfNeeded(excludedSteps: [.pinchZoom])
-      }
-    }
+    handleHeroStillBeamed()
     
     for t in touches { touchUp(atPoint: t.location(in: self)) }
   }
+  
+  private func handleHeroStillBeamed() {
+    guard let hero = entityManager.hero as? General,
+          let launchComponent = hero.component(ofType: LaunchComponent.self),
+          launchComponent.launchInfo.lastTouchBegan == nil,
+          hero.isBeamed else { return }
+      
+      
+    if let launchLineNode = launchComponent.node.childNode(withName: AppConstants.ComponentNames.launchLineName) as? SKShapeNode {
+      launchLineNode.alpha = LaunchComponent.targetLineAlpha
+    }
+    
+    if gameState.currentState is Tutorial,
+      let beam = hero.occupiedPanel,
+      let beamTeamComponent = beam.component(ofType: TeamComponent.self),
+      beamTeamComponent.team == .team1 {
+      
+      showTutorialIfNeeded(excludedSteps: [.pinchZoom])
+    }
+  }
+  
+  // MARK: Touches Cancelled
   
   override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
     for t in touches { touchUp(atPoint: t.location(in: self)) }
