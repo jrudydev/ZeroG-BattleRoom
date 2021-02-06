@@ -697,29 +697,38 @@ extension EntityManager {
     guard let scene = SKScene(fileNamed: "TutorialScene") else { return }
     
     scene.enumerateChildNodes(withName: AppConstants.ComponentNames.wallPanelName) { wallNode, _  in
-      var team: Team? = nil
-      if let userData = wallNode.userData, let teamRawValue = userData[Tutorial.teamUserDataKey] as? Int {
-        team = Team(rawValue: teamRawValue)
-      }
-      
-      var config: Panel.BeamArrangment = .none
-      if let userData = wallNode.userData,
-        let beamsRawValue = userData[Tutorial.beamsUserDataKey] as? Int {
-        
-        config = Panel.BeamArrangment(rawValue: beamsRawValue)!
-      }
-      
-      guard let panel = self.scene.entityManager.panelFactory.panelSegment(beamConfig: config,
-                                                                           number: 1,
-                                                                           team: team).first,
-        let panelShapeComponent = panel.component(ofType: ShapeComponent.self) else { return }
+      guard let panelSegment = self.getPanelSegment(wallNode: wallNode),
+            let panelShapeComponent = panelSegment.component(ofType: ShapeComponent.self) else { return }
       
       panelShapeComponent.node.position = wallNode.position
       panelShapeComponent.node.zRotation = wallNode.zRotation
       
       self.scene.addChild(panelShapeComponent.node)
-      self.wallEntities.append(panel)
+      self.wallEntities.append(panelSegment)
     }
+  }
+  
+  private func getPanelSegment(wallNode: SKNode) -> GKEntity? {
+    let panelFactory = scene.entityManager.panelFactory
+    
+    var team: Team? = nil
+    if let userData = wallNode.userData,
+       let teamRawValue = userData[Tutorial.teamUserDataKey] as? Int {
+      team = Team(rawValue: teamRawValue)
+    }
+    
+    var config: Panel.BeamArrangment = .none
+    if let userData = wallNode.userData,
+      let beamsRawValue = userData[Tutorial.beamsUserDataKey] as? Int {
+      
+      config = Panel.BeamArrangment(rawValue: beamsRawValue)!
+    }
+  
+    guard let panelSegment = panelFactory.panelSegment(beamConfig: config,
+                                                       number: 1,
+                                                       team: team).first else { return nil}
+    
+    return panelSegment
   }
   
   func setupTutorial() {

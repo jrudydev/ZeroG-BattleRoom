@@ -56,7 +56,7 @@ class TutorialAction: GKEntity {
     isShowingStep = true
     
     if currentStep == nil {
-      currentStep = .rotateThrow
+      currentStep = .tapLaunch
     } else {
       currentStep = currentStep?.nextStep
     }
