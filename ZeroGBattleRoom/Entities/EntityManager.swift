@@ -14,7 +14,7 @@ import GameplayKit
 let numberOfSpawnedResources = 10
 let resourcesNeededToWin = 3
 let minDriftVelocity: CGFloat = 5.0
-
+let resourcePullDamper: CGFloat = 0.015
 
 class EntityManager {
   
@@ -182,8 +182,13 @@ class EntityManager {
 
       if distanceToDeposit < Deposit.eventHorizon {
         self.scene.handleDeposit(package: package)
-      } else if distanceToDeposit < Deposit.pullDistance {
-        // Pull the resource
+      } else if distanceToDeposit < Deposit.pullDistance && !isHeld(resource: package) {
+        let pullStength = (Deposit.pullDistance - distanceToDeposit) * resourcePullDamper
+        let moveX = deposit.position.x - shapeComponent.node.position.x
+        let moveY = deposit.position.y - shapeComponent.node.position.y
+        let moveVector = CGVector(dx:  moveX, dy: moveY)
+        let adjustedVector = moveVector.normalized() * pullStength
+        physicsComponent.physicsBody.applyImpulse(adjustedVector)
       } else if package.wasThrownBy == nil && !(self.scene.gameState.currentState is Tutorial) {
         let xSpeed = sqrt(physicsComponent.physicsBody.velocity.dy * physicsComponent.physicsBody.velocity.dx)
         let ySpeed = sqrt(physicsComponent.physicsBody.velocity.dy * physicsComponent.physicsBody.velocity.dy)
@@ -203,15 +208,28 @@ class EntityManager {
     }
   }
   
+  private func isHeld(resource: Package) -> Bool {
+    var isHeld = false
+    playerEntites.forEach { player in
+      guard isHeld == false else { return }
+      guard let hero = player as? General,
+            let heroHands = hero.component(ofType: HandsComponent.self),
+            let shape = resource.component(ofType: ShapeComponent.self) else { return }
+      
+      // NOTE: Why does isHolding(resource:) not match?
+      if heroHands.leftHandSlot != nil || heroHands.rightHandSlot != nil { isHeld = true}
+    }
+    
+    return isHeld
+  }
+  
   func isScored(resource: Package) -> Bool {
     var isScored = false
-    for player in self.playerEntites {
-      if let deliveredComponent = player.component(ofType: DeliveredComponent.self) {
-        if deliveredComponent.resources.contains(resource) {
-          isScored = true
-          break
-        }
-      }
+    playerEntites.forEach { player in
+      guard isScored == false else { return }
+      guard let deliveredComponent = player.component(ofType: DeliveredComponent.self) else { return }
+      
+      if deliveredComponent.resources.contains(resource) { isScored = true }
     }
     
     return isScored
@@ -714,8 +732,6 @@ extension EntityManager {
       let ghostSpriteComponent = ghost.component(ofType: SpriteComponent.self),
       let ghostPhysicsComponent = ghost.component(ofType: PhysicsComponent.self) else { return }
     
-    heroSpriteComponent.node.position = Tutorial.Step.tapLaunch.startPosition
-    
     heroAliasComponent.node.text = ""
     ghostAliasComponent.node.text = ""
     
@@ -728,7 +744,10 @@ extension EntityManager {
     if let tapSpriteComponent = tutorialActionEntity.component(ofType: SpriteComponent.self) {
       self.scene.addChild(tapSpriteComponent.node)
     }
-    tutorialActionEntity.setupNextStep()
+    
+    if let step = tutorialActionEntity.setupNextStep(), step == .rotateThrow {
+      spawnResource(position: step.midPosition, velocity: .zero)
+    }
     
     self.tutorialEntities.append(tutorialActionEntity)
   }

@@ -220,9 +220,7 @@ extension GameScene: SKPhysicsContactDelegate {
       hero !== self.entityManager.playerEntites[1],
       let tutorial = self.entityManager.tutorialEntities[0] as? TutorialAction {
       
-      if let step = tutorial.setupNextStep(),
-        step == .rotateThrow {
-        
+      if let step = tutorial.setupNextStep(), step == .rotateThrow {
         self.entityManager.spawnResource(position: step.midPosition, velocity: .zero)
       }
       

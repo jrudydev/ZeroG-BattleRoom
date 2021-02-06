@@ -14,7 +14,7 @@ import GameplayKit
 class Deposit: GKEntity {
   
   static let eventHorizon: CGFloat = 20.0
-  static let pullDistance: CGFloat = 50.0
+  static let pullDistance: CGFloat = 100.0
   
   override init() {
     super.init()
@@ -22,13 +22,13 @@ class Deposit: GKEntity {
     let shapeNode = SKShapeNode(circleOfRadius: Deposit.eventHorizon)
     shapeNode.name = AppConstants.ComponentNames.depositNodeName
     shapeNode.fillColor = .black
-    self.addComponent(ShapeComponent(node: shapeNode))
-    let physicsBody = self.getPhysicsBody()
-    self.addComponent(PhysicsComponent(physicsBody: physicsBody))
+    addComponent(ShapeComponent(node: shapeNode))
+    let physicsBody = getPhysicsBody()
+    addComponent(PhysicsComponent(physicsBody: physicsBody))
     
     shapeNode.physicsBody = physicsBody
 
-    self.addComponent(DepositComponent())
+    addComponent(DepositComponent())
   }
   
   required init?(coder: NSCoder) {

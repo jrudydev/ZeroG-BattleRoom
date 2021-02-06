@@ -31,9 +31,9 @@ class Tutorial: GKState {
     }
     
     var startPosition: CGPoint {
-      guard self.index <= Tutorial.startingPoints.count else { return .zero }
+      guard index <= Tutorial.startingPoints.count else { return .zero }
       
-      return Tutorial.startingPoints[self.index]
+      return Tutorial.startingPoints[index]
     }
     
     var startRotation: CGFloat {
@@ -45,13 +45,13 @@ class Tutorial: GKState {
     }
     
     var tapPosition: CGPoint {
-      guard self.index <= Tutorial.startingPoints.count else { return .zero }
+      guard index <= Tutorial.startingPoints.count else { return .zero }
     
-      return Tutorial.tapPoints[self.index]
+      return Tutorial.tapPoints[index]
     }
     
     var midPosition: CGPoint {
-      guard self.index <= Tutorial.startingPoints.count else { return .zero }
+      guard index <= Tutorial.startingPoints.count else { return .zero }
       
       let diffPoint = CGPoint(x: startPosition.x - tapPosition.x,
                               y: startPosition.y - tapPosition.y)
@@ -60,7 +60,7 @@ class Tutorial: GKState {
     }
     
     private var index: Int {
-      return self.rawValue - 1
+      return rawValue - 1
     }
   }
   
@@ -106,15 +106,15 @@ class Tutorial: GKState {
   }
   
   override func didEnter(from previousState: GKState?) {
-    self.setupCamera()
-    self.setupPhysics()
+    setupCamera()
+    setupPhysics()
     
     let mapSize = AppConstants.Layout.mapSize
     let origin = CGPoint(x: -mapSize.width / 2, y: -mapSize.height / 2)
     let whiteBackground = SKShapeNode(rect: CGRect(origin: origin, size: mapSize))
     whiteBackground.fillColor = .white
     whiteBackground.zPosition = SpriteZPosition.background.rawValue
-    self.scene.addChild(whiteBackground)
+    scene.addChild(whiteBackground)
     
     let gridImage = SKSpriteNode(imageNamed: "tron_grid")
     gridImage.name = AppConstants.ComponentNames.gridImageName
@@ -124,60 +124,21 @@ class Tutorial: GKState {
     gridImage.position = CGPoint(x: gridImage.position.x +  widthDiff, y: gridImage.position.y)
     gridImage.zPosition = SpriteZPosition.simulation.rawValue
     
-    self.scene.addChild(gridImage)
+    scene.addChild(gridImage)
   
-    self.scene.entityManager.loadTutorialLevel()
-    self.scene.entityManager.spawnHeros(mapSize: AppConstants.Layout.tutorialBoundrySize)
-    self.scene.entityManager.spawnDeposit()
+    scene.entityManager.loadTutorialLevel()
+    scene.entityManager.addUIElements()
     
-    self.repositionHero()
-  
-//    let backButton = SKLabelNode(text: "Back")
-//    backButton.name = AppConstants.ButtonNames.backButtonName
-//    backButton.fontColor = .black
-//    backButton.fontSize = 30.0
-//    backButton.alignTopLeft()
-//    backButton.zPosition = SpriteZPosition.menu.rawValue
-//    backButton.isUserInteractionEnabled = false
+    scene.entityManager.spawnHeros(mapSize: AppConstants.Layout.tutorialBoundrySize)
+    scene.entityManager.spawnDeposit()
     
-//    let pinchSticker = SKSpriteNode(imageNamed: "pinch-out")
-//    pinchSticker.name = AppConstants.ComponentNames.tutorialPinchStickerName
-//    pinchSticker.position = CGPoint(x: 50.0, y: -100.0)
-//    pinchSticker.anchorPoint = CGPoint(x: 0.2, y: 0.9)
-//    pinchSticker.zPosition = SpriteZPosition.inGameUI.rawValue
+    scene.entityManager.setupTutorial()
     
-//    let tapThrow = SKSpriteNode(imageNamed: "throw")
-//    tapThrow.name = AppConstants.ButtonNames.throwButtonName
-//    tapThrow.alignMidRight()
-//    tapThrow.zPosition = SpriteZPosition.inGameUI.rawValue
-//    tapThrow.alpha = 0.5
-    
-//    let throwHintSticker = SKSpriteNode(imageNamed: "tap")
-//    throwHintSticker.name = AppConstants.ComponentNames.tutorialThrowStickerName
-//    throwHintSticker.position = tapThrow.position
-//    throwHintSticker.anchorPoint = CGPoint(x: 0.2, y: 0.9)
-//    throwHintSticker.zPosition = SpriteZPosition.inGameUI2.rawValue
-//    throwHintSticker.alpha = 0.0
-
-//    let stepIndecatorBG = SKShapeNode(rectOf: UIScreen.main.bounds.size)
-//    stepIndecatorBG.fillColor = UIColor.black.withAlphaComponent(20.0)
-//    stepIndecatorBG.strokeColor = UIColor.black
-//    stepIndecatorBG.zPosition = SpriteZPosition.menu.rawValue
-    
-    self.scene.entityManager.addUIElements()
-//    self.scene.entityManager.addInGameUIView(element: backButton)
-//    self.scene.entityManager.addInGameUIView(element: pinchSticker)
-//    self.scene.entityManager.addInGameUIView(element: tapThrow)
-//    self.scene.entityManager.addInGameUIView(element: throwHintSticker)
-//    self.scene.entityManager.addInGameUIView(element: stepIndecatorBG)
-    
-    self.scene.entityManager.setupTutorial()
-    
-    self.scene.audioPlayer.play(music: Audio.MusicFiles.level)
+    scene.audioPlayer.play(music: Audio.MusicFiles.level)
   }
   
   override func willExit(to nextState: GKState) {
-    self.scene.audioPlayer.pause(music: Audio.MusicFiles.level)
+    scene.audioPlayer.pause(music: Audio.MusicFiles.level)
     NotificationCenter.default.post(name: .resizeView, object: -1000.0)
   }
   
@@ -186,32 +147,36 @@ class Tutorial: GKState {
   }
   
   override func update(deltaTime seconds: TimeInterval) {
-    self.repositionCamera()
+    repositionCamera()
   }
+  
 }
 
 extension Tutorial {
+  
   private func setupPhysics() {
-    self.scene.physicsBody = self.scene.borderBody
-    self.scene.physicsWorld.gravity = CGVector(dx: 0.0, dy: 0.0)
-    self.scene.physicsWorld.contactDelegate = self.scene
+    scene.physicsBody = scene.borderBody
+    scene.physicsWorld.gravity = CGVector(dx: 0.0, dy: 0.0)
+    scene.physicsWorld.contactDelegate = scene
   }
   
   private func setupCamera() {
-    self.scene.cam = SKCameraNode()
-    self.scene.camera = self.scene.cam
-    self.scene.addChild(self.scene.cam!)
+    scene.cam = SKCameraNode()
+    scene.camera = scene.cam
+    scene.addChild(scene.cam!)
   }
+  
 }
 
 extension Tutorial {
+  
   private func repositionCamera() {
-    guard let camera = self.scene.cam else { return }
-    guard let hero = self.scene.entityManager.hero as? General else { return }
+    guard let camera = scene.cam else { return }
+    guard let hero = scene.entityManager.hero as? General else { return }
     guard let spriteComponent = hero.component(ofType: SpriteComponent.self) else { return }
     
     let sideEdge = AppConstants.Layout.mapSize.width / 2
-    let frameSideEdge = self.scene.frame.size.width / 2
+    let frameSideEdge = scene.frame.size.width / 2
     if sideEdge - abs(spriteComponent.node.position.x) > frameSideEdge {
       camera.position.x = spriteComponent.node.position.x
     } else {
@@ -220,7 +185,7 @@ extension Tutorial {
     }
     
     let topEdge = AppConstants.Layout.mapSize.height / 2
-    let frameTopEdge = self.scene.frame.size.height / 2
+    let frameTopEdge = scene.frame.size.height / 2
     if topEdge - abs(spriteComponent.node.position.y) > frameTopEdge {
       camera.position.y = spriteComponent.node.position.y
     } else {
@@ -228,11 +193,5 @@ extension Tutorial {
       camera.position.y = spriteComponent.node.position.y < 0 ? -cameraPosY : cameraPosY
     }
   }
-  
-  private func repositionHero(){
-    guard let hero = self.scene.entityManager.playerEntites[0] as? General,
-      let spriteComponent = hero.component(ofType: SpriteComponent.self) else { return }
-    
-    spriteComponent.node.position = Tutorial.Step.tapLaunch.startPosition
-  }
+
 }

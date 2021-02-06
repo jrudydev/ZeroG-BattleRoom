@@ -23,11 +23,11 @@ class TutorialAction: GKEntity {
   private var stepFinished = false {
     didSet {
       guard stepFinished,
-        let tapSpriteComponent = self.component(ofType: SpriteComponent.self) else { return }
+        let tapSpriteComponent = component(ofType: SpriteComponent.self) else { return }
       
       tapSpriteComponent.node.removeAllActions()
       
-      self.stepFinished = false
+      stepFinished = false
     }
   }
   
@@ -44,7 +44,7 @@ class TutorialAction: GKEntity {
     tapComponent.node.position = Tutorial.Step.tapLaunch.tapPosition
     tapComponent.node.anchorPoint = CGPoint(x: 0.35, y: 0.9)
     tapComponent.node.zPosition = SpriteZPosition.menu.rawValue
-    self.addComponent(tapComponent)
+    addComponent(tapComponent)
   }
   
   required init?(coder: NSCoder) {
@@ -53,18 +53,18 @@ class TutorialAction: GKEntity {
   
   @discardableResult
   public func setupNextStep() -> Tutorial.Step? {
-    self.isShowingStep = true
+    isShowingStep = true
     
-    if self.currentStep == nil {
-      self.currentStep = .tapLaunch
+    if currentStep == nil {
+      currentStep = .rotateThrow
     } else {
-      self.currentStep = self.currentStep?.nextStep
+      currentStep = currentStep?.nextStep
     }
     
-    if let currentStep = self.currentStep {
-      self.delegate?.setupHintAnimations(step: currentStep)
+    if let currentStep = currentStep {
+      delegate?.setupHintAnimations(step: currentStep)
     }
-    
-    return self.currentStep
+  
+    return currentStep
   }
 }
