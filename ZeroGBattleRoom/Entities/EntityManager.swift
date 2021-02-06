@@ -540,9 +540,9 @@ extension EntityManager {
   
   func addUIElements() {
     self.setupBackButton()
-    self.setupRestartButton()
-    
+  
     if self.scene.gameState.currentState is Tutorial {
+      self.setupRestartButton()
       self.addTutorialStickers()
     }
   }
@@ -550,7 +550,7 @@ extension EntityManager {
   private func addTutorialStickers() {
     let tapSticker = SKSpriteNode(imageNamed: "throw")
     tapSticker.name = AppConstants.ButtonNames.throwButtonName
-    tapSticker.alignMidRight()
+    tapSticker.alignMidBottom()
     tapSticker.zPosition = SpriteZPosition.inGameUI.rawValue
     tapSticker.alpha = 0.5
     
@@ -601,7 +601,7 @@ extension EntityManager {
     restartButton.zPosition = SpriteZPosition.menu.rawValue
     restartButton.fillColor = AppConstants.UIColors.buttonBackground
     restartButton.strokeColor = AppConstants.UIColors.buttonForeground
-    restartButton.alignMidBottom()
+    restartButton.alignTopRight()
     
     let imageNode = SKSpriteNode(imageNamed: "refresh-white")
     imageNode.name = AppConstants.ButtonNames.refreshButtonName
