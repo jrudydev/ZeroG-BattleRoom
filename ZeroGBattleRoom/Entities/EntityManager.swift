@@ -686,55 +686,6 @@ extension EntityManager {
     }
   }
   
-//  private func spawnTutorialPanels() {
-//    let factory = self.scene.entityManager.panelFactory
-//
-//    let wallSize = AppConstants.Layout.wallSize
-//    let size = CGSize(width: 100.0 + wallSize.height, height: 400.0)
-//
-//    let widthSegments = factory.numberOfSegments(length: size.width, wallSize: wallSize.width)
-//    let heightSegments = factory.numberOfSegments(length: size.height, wallSize: wallSize.width)
-//
-//    let leftWall = factory.panelSegment(beamConfig: .none,
-//                                        number: heightSegments,
-//                                        position: CGPoint(x: -size.width/2, y: 0.0),
-//                                        orientation: .vertical)
-//    let rightWall = factory.panelSegment(beamConfig: .none,
-//                                         number: heightSegments,
-//                                         position: CGPoint(x: size.width/2, y: 0.0),
-//                                         orientation: .vertical)
-//    let bottomRightCorner = factory.panelSegment(beamConfig: .none,
-//    number: 1,
-//    position: CGPoint(x: size.width/2 - wallSize.width/2,
-//                      y: size.height/2))
-//    let topLeftCorner = factory.panelSegment(beamConfig: .none,
-//                                             number: 1,
-//                                             position: CGPoint(x: -size.width/2 + wallSize.width/2,
-//                                                               y: -size.height/2))
-//    let topRightCorner = factory.panelSegment(beamConfig: .none,
-//                                              number: 1,
-//                                              position: CGPoint(x: size.width/2 - wallSize.width/2,
-//                                                                y: -size.height/2))
-//    let bottomLeftCorner = factory.panelSegment(beamConfig: .none,
-//                                                number: 1,
-//                                                position: CGPoint(x: -size.width/2 + wallSize.width/2,
-//                                                                  y: size.height/2))
-//    let player1Base1 = factory.panelSegment(beamConfig: .top,
-//                                            number: 1,
-//                                            position: CGPoint(x: 0.0, y: -size.height/2),
-//                                            team: .team1)
-//    let player2Base1 = factory.panelSegment(beamConfig: .bottom,
-//                                            number: 1,
-//                                            position: CGPoint(x: 0.0, y: size.height/2),
-//                                            team: .team2)
-//
-//    let corners = topLeftCorner + topRightCorner + bottomLeftCorner + bottomRightCorner
-//    for entity in leftWall + rightWall/* + corners*/ + player1Base1 + player2Base1 {
-//      self.add(entity)
-//      self.wallEntities.append(entity)
-//    }
-//  }
-  
   private func getPanelSegment(wallNode: SKNode) -> GKEntity? {
     let panelFactory = scene.entityManager.panelFactory
     
