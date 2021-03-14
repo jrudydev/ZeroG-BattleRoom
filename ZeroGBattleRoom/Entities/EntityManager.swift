@@ -78,9 +78,13 @@ class EntityManager {
   init(scene: GameScene) {
     self.scene = scene
     
-    self.createResourceNode()
+    self.spawnResourceNode()
   }
   
+}
+
+extension EntityManager {
+
   func add(_ entity: GKEntity) {
     self.entities.insert(entity)
     
@@ -131,6 +135,12 @@ class EntityManager {
       componentSystem.addComponent(foundIn: entity)
     }
   }
+  
+}
+
+// MARK: - Update Methods
+
+extension EntityManager {
   
   func update(_ deltaTime: CFTimeInterval) {
     for entity in uiEntities {
@@ -208,35 +218,12 @@ class EntityManager {
     }
   }
   
-  private func isHeld(resource: Package) -> Bool {
-    var isHeld = false
-    playerEntites.forEach { player in
-      guard isHeld == false else { return }
-      guard let hero = player as? General,
-            let heroHands = hero.component(ofType: HandsComponent.self),
-            let shape = resource.component(ofType: ShapeComponent.self) else { return }
-      
-      // NOTE: Why does isHolding(resource:) not match?
-      if heroHands.leftHandSlot != nil || heroHands.rightHandSlot != nil { isHeld = true}
-    }
-    
-    return isHeld
-  }
-  
-  func isScored(resource: Package) -> Bool {
-    var isScored = false
-    playerEntites.forEach { player in
-      guard isScored == false else { return }
-      guard let deliveredComponent = player.component(ofType: DeliveredComponent.self) else { return }
-      
-      if deliveredComponent.resources.contains(resource) { isScored = true }
-    }
-    
-    return isScored
-  }
 }
 
+// MARK: - Spawn Methods
+
 extension EntityManager {
+  
   func spawnHeros(mapSize: CGSize) {
     let heroBlue = self.playerEntites[0]
     if let spriteComponent = heroBlue.component(ofType: SpriteComponent.self),
@@ -424,10 +411,8 @@ extension EntityManager {
                                                       position: rightBlinderPosition)
     return leftBlinder + rightBlinder
   }
-}
-
-extension EntityManager {
-  private func createResourceNode() {
+  
+  private func spawnResourceNode() {
     let width: CGFloat = 10.0
     let size = CGSize(width: width, height: width)
     
@@ -437,7 +422,10 @@ extension EntityManager {
     resourceNode.name = AppConstants.ComponentNames.resourceName
     resourceNode.lineWidth = 2.5
   }
+  
 }
+
+// MARK: - Utility Methods
 
 extension EntityManager {
   func heroWith(node: SKSpriteNode) -> GKEntity? {
@@ -532,11 +520,39 @@ extension EntityManager {
     
     return index
   }
+  
+  private func isHeld(resource: Package) -> Bool {
+    var isHeld = false
+    playerEntites.forEach { player in
+      guard isHeld == false else { return }
+      guard let hero = player as? General,
+            let heroHands = hero.component(ofType: HandsComponent.self),
+            let shape = resource.component(ofType: ShapeComponent.self) else { return }
+      
+      // NOTE: Why does isHolding(resource:) not match?
+      if heroHands.leftHandSlot != nil || heroHands.rightHandSlot != nil { isHeld = true}
+    }
+    
+    return isHeld
+  }
+  
+  func isScored(resource: Package) -> Bool {
+    var isScored = false
+    playerEntites.forEach { player in
+      guard isScored == false else { return }
+      guard let deliveredComponent = player.component(ofType: DeliveredComponent.self) else { return }
+      
+      if deliveredComponent.resources.contains(resource) { isScored = true }
+    }
+    
+    return isScored
+  }
+  
 }
 
+// MARK: - UI Setup Methods
+
 extension EntityManager {
-  
-  // MARK: - UI Setup Methods
   
   func addUIElements() {
     self.setupBackButton()
@@ -640,60 +656,22 @@ extension EntityManager {
   }
 }
 
+// MARK: - Tutorial Spawn Methods
+
 extension EntityManager {
   
-  // MARK: - Tutorial Spawn Methods
+  func spawnTutorial() {
+    addUIElements()
+    
+    loadTutorialLevel()
   
-  func spawnTutorialPanels() {
-    let factory = self.scene.entityManager.panelFactory
+    spawnHeros(mapSize: AppConstants.Layout.tutorialBoundrySize)
+    spawnDeposit()
     
-    let wallSize = AppConstants.Layout.wallSize
-    let size = CGSize(width: 100.0 + wallSize.height, height: 400.0)
-    
-    let widthSegments = factory.numberOfSegments(length: size.width, wallSize: wallSize.width)
-    let heightSegments = factory.numberOfSegments(length: size.height, wallSize: wallSize.width)
-
-    let leftWall = factory.panelSegment(beamConfig: .none,
-                                        number: heightSegments,
-                                        position: CGPoint(x: -size.width/2, y: 0.0),
-                                        orientation: .vertical)
-    let rightWall = factory.panelSegment(beamConfig: .none,
-                                         number: heightSegments,
-                                         position: CGPoint(x: size.width/2, y: 0.0),
-                                         orientation: .vertical)
-    let bottomRightCorner = factory.panelSegment(beamConfig: .none,
-    number: 1,
-    position: CGPoint(x: size.width/2 - wallSize.width/2,
-                      y: size.height/2))
-    let topLeftCorner = factory.panelSegment(beamConfig: .none,
-                                             number: 1,
-                                             position: CGPoint(x: -size.width/2 + wallSize.width/2,
-                                                               y: -size.height/2))
-    let topRightCorner = factory.panelSegment(beamConfig: .none,
-                                              number: 1,
-                                              position: CGPoint(x: size.width/2 - wallSize.width/2,
-                                                                y: -size.height/2))
-    let bottomLeftCorner = factory.panelSegment(beamConfig: .none,
-                                                number: 1,
-                                                position: CGPoint(x: -size.width/2 + wallSize.width/2,
-                                                                  y: size.height/2))
-    let player1Base1 = factory.panelSegment(beamConfig: .top,
-                                            number: 1,
-                                            position: CGPoint(x: 0.0, y: -size.height/2),
-                                            team: .team1)
-    let player2Base1 = factory.panelSegment(beamConfig: .bottom,
-                                            number: 1,
-                                            position: CGPoint(x: 0.0, y: size.height/2),
-                                            team: .team2)
-    
-    let corners = topLeftCorner + topRightCorner + bottomLeftCorner + bottomRightCorner
-    for entity in leftWall + rightWall/* + corners*/ + player1Base1 + player2Base1 {
-      self.add(entity)
-      self.wallEntities.append(entity)
-    }
+    initializeTutorial()
   }
   
-  func loadTutorialLevel() {
+  private func loadTutorialLevel() {
     guard let scene = SKScene(fileNamed: "TutorialScene") else { return }
     
     scene.enumerateChildNodes(withName: AppConstants.ComponentNames.wallPanelName) { wallNode, _  in
@@ -707,6 +685,55 @@ extension EntityManager {
       self.wallEntities.append(panelSegment)
     }
   }
+  
+//  private func spawnTutorialPanels() {
+//    let factory = self.scene.entityManager.panelFactory
+//
+//    let wallSize = AppConstants.Layout.wallSize
+//    let size = CGSize(width: 100.0 + wallSize.height, height: 400.0)
+//
+//    let widthSegments = factory.numberOfSegments(length: size.width, wallSize: wallSize.width)
+//    let heightSegments = factory.numberOfSegments(length: size.height, wallSize: wallSize.width)
+//
+//    let leftWall = factory.panelSegment(beamConfig: .none,
+//                                        number: heightSegments,
+//                                        position: CGPoint(x: -size.width/2, y: 0.0),
+//                                        orientation: .vertical)
+//    let rightWall = factory.panelSegment(beamConfig: .none,
+//                                         number: heightSegments,
+//                                         position: CGPoint(x: size.width/2, y: 0.0),
+//                                         orientation: .vertical)
+//    let bottomRightCorner = factory.panelSegment(beamConfig: .none,
+//    number: 1,
+//    position: CGPoint(x: size.width/2 - wallSize.width/2,
+//                      y: size.height/2))
+//    let topLeftCorner = factory.panelSegment(beamConfig: .none,
+//                                             number: 1,
+//                                             position: CGPoint(x: -size.width/2 + wallSize.width/2,
+//                                                               y: -size.height/2))
+//    let topRightCorner = factory.panelSegment(beamConfig: .none,
+//                                              number: 1,
+//                                              position: CGPoint(x: size.width/2 - wallSize.width/2,
+//                                                                y: -size.height/2))
+//    let bottomLeftCorner = factory.panelSegment(beamConfig: .none,
+//                                                number: 1,
+//                                                position: CGPoint(x: -size.width/2 + wallSize.width/2,
+//                                                                  y: size.height/2))
+//    let player1Base1 = factory.panelSegment(beamConfig: .top,
+//                                            number: 1,
+//                                            position: CGPoint(x: 0.0, y: -size.height/2),
+//                                            team: .team1)
+//    let player2Base1 = factory.panelSegment(beamConfig: .bottom,
+//                                            number: 1,
+//                                            position: CGPoint(x: 0.0, y: size.height/2),
+//                                            team: .team2)
+//
+//    let corners = topLeftCorner + topRightCorner + bottomLeftCorner + bottomRightCorner
+//    for entity in leftWall + rightWall/* + corners*/ + player1Base1 + player2Base1 {
+//      self.add(entity)
+//      self.wallEntities.append(entity)
+//    }
+//  }
   
   private func getPanelSegment(wallNode: SKNode) -> GKEntity? {
     let panelFactory = scene.entityManager.panelFactory
@@ -731,7 +758,7 @@ extension EntityManager {
     return panelSegment
   }
   
-  func setupTutorial() {
+  private func initializeTutorial() {
     guard let hero = self.playerEntites[0] as? General,
       let heroAliasComponent = hero.component(ofType: AliasComponent.self),
       let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
@@ -760,4 +787,5 @@ extension EntityManager {
     
     self.tutorialEntities.append(tutorialActionEntity)
   }
+  
 }

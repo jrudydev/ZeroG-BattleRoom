@@ -108,31 +108,9 @@ class Tutorial: GKState {
   override func didEnter(from previousState: GKState?) {
     setupCamera()
     setupPhysics()
-    
-    let mapSize = AppConstants.Layout.mapSize
-    let origin = CGPoint(x: -mapSize.width / 2, y: -mapSize.height / 2)
-    let whiteBackground = SKShapeNode(rect: CGRect(origin: origin, size: mapSize))
-    whiteBackground.fillColor = .white
-    whiteBackground.zPosition = SpriteZPosition.background.rawValue
-    scene.addChild(whiteBackground)
-    
-    let gridImage = SKSpriteNode(imageNamed: "tron_grid")
-    gridImage.name = AppConstants.ComponentNames.gridImageName
-    gridImage.aspectFillToSize(fillSize: mapSize)
-    
-    let widthDiff = (gridImage.size.width - mapSize.width) / 2
-    gridImage.position = CGPoint(x: gridImage.position.x +  widthDiff, y: gridImage.position.y)
-    gridImage.zPosition = SpriteZPosition.simulation.rawValue
-    
-    scene.addChild(gridImage)
+    setupBackground()
   
-    scene.entityManager.loadTutorialLevel()
-    scene.entityManager.addUIElements()
-    
-    scene.entityManager.spawnHeros(mapSize: AppConstants.Layout.tutorialBoundrySize)
-    scene.entityManager.spawnDeposit()
-    
-    scene.entityManager.setupTutorial()
+    scene.entityManager.spawnTutorial()
     
     scene.audioPlayer.play(music: Audio.MusicFiles.level)
   }
@@ -148,6 +126,28 @@ class Tutorial: GKState {
   
   override func update(deltaTime seconds: TimeInterval) {
     repositionCamera()
+  }
+  
+}
+
+extension Tutorial {
+  
+  private func setupBackground() {
+    let mapSize = AppConstants.Layout.mapSize
+    let origin = CGPoint(x: -mapSize.width / 2, y: -mapSize.height / 2)
+    let whiteBackground = SKShapeNode(rect: CGRect(origin: origin, size: mapSize))
+    whiteBackground.fillColor = .white
+    whiteBackground.zPosition = SpriteZPosition.background.rawValue
+    scene.addChild(whiteBackground)
+    
+    let gridImage = SKSpriteNode(imageNamed: "tron_grid")
+    gridImage.name = AppConstants.ComponentNames.gridImageName
+    gridImage.aspectFillToSize(fillSize: mapSize)
+    
+    let widthDiff = (gridImage.size.width - mapSize.width) / 2
+    gridImage.position = CGPoint(x: gridImage.position.x +  widthDiff, y: gridImage.position.y)
+    gridImage.zPosition = SpriteZPosition.simulation.rawValue
+    scene.addChild(gridImage)
   }
   
 }
