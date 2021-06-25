@@ -12,8 +12,8 @@ import GameKit
 
 extension GameScene: SKPhysicsContactDelegate {
   func didBegin(_ contact: SKPhysicsContact) {
-    guard self.gameState.currentState is Playing ||
-      self.gameState.currentState is Tutorial else { return }
+    guard gameState.currentState is Playing ||
+      gameState.currentState is Tutorial else { return }
     
     var firstBody: SKPhysicsBody
     var secondBody: SKPhysicsBody
@@ -29,87 +29,87 @@ extension GameScene: SKPhysicsContactDelegate {
     if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
       secondBody.categoryBitMask == PhysicsCategoryMask.hero {
       
-      self.handleHeroHeroCollision(firstBody: firstBody, secondBody: secondBody)
+      handleHeroHeroCollision(firstBody: firstBody, secondBody: secondBody)
     }
     
     if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
       secondBody.categoryBitMask == PhysicsCategoryMask.package {
 
-      self.handleHeroPackageCollision(firstBody: firstBody, secondBody: secondBody)
+      handleHeroPackageCollision(firstBody: firstBody, secondBody: secondBody)
     }
     
     if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
       secondBody.categoryBitMask == PhysicsCategoryMask.deposit {
       
-      self.handleHeroDepositCollision(firstBody: firstBody, secondBody: secondBody)
+      handleHeroDepositCollision(firstBody: firstBody, secondBody: secondBody)
     }
     
     if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
       secondBody.categoryBitMask == PhysicsCategoryMask.wall {
       
-      self.handleHeroWallCollision(firstBody: firstBody, secondBody: secondBody)
+      handleHeroWallCollision(firstBody: firstBody, secondBody: secondBody)
     }
     
     if firstBody.categoryBitMask == PhysicsCategoryMask.wall &&
       secondBody.categoryBitMask == PhysicsCategoryMask.package {
         
       guard let resourceNode = secondBody.node as? SKShapeNode,
-        let impactedResource = self.entityManager.resourceWith(node: resourceNode) as? Package else { return }
+        let impactedResource = entityManager.resourceWith(node: resourceNode) as? Package else { return }
       
       impactedResource.wasThrownBy = nil
     }
   }
   
   public func handleDeposit(package: Package) {
-    if self.gameState.currentState is Tutorial,
-      let tutorial = self.entityManager.tutorialEntities[0] as? TutorialAction,
+    if gameState.currentState is Tutorial,
+      let tutorial = entityManager.tutorialEntities[0] as? TutorialAction,
       let wasThrownBy = package.wasThrownBy,
-      wasThrownBy === self.entityManager.playerEntites[0] {
+      wasThrownBy === entityManager.playerEntites[0] {
 
       let nextStep = tutorial.setupNextStep()
       if nextStep == nil {
-        self.gameOverStatus = .tutorialDone
-        self.gameState.enter(GameOver.self)
+        gameOverStatus = .tutorialDone
+        gameState.enter(GameOver.self)
         return
       }
     }
   }
   
   private func handleHeroHeroCollision(firstBody: SKPhysicsBody, secondBody: SKPhysicsBody) {
-    guard !(self.gameState.currentState is Tutorial) else { return }
+    guard !(gameState.currentState is Tutorial) else { return }
     
     guard let firstHeroNode = firstBody.node as? SKSpriteNode,
       let secondHeroNode = secondBody.node as? SKSpriteNode else { return }
     
-    guard let firstHero = self.entityManager.heroWith(node: firstHeroNode) as? General,
+    guard let firstHero = entityManager.heroWith(node: firstHeroNode) as? General,
       let firstHeroSpriteComponent = firstHero.component(ofType: SpriteComponent.self),
       let firstHeroHandsComponent = firstHero.component(ofType: HandsComponent.self),
-      let secondHero = self.entityManager.heroWith(node: secondHeroNode) as? General,
+      let secondHero = entityManager.heroWith(node: secondHeroNode) as? General,
       let secondHeroHandsComponent = secondHero.component(ofType: HandsComponent.self),
       !firstHeroHandsComponent.isImpacted && !secondHeroHandsComponent.isImpacted else { return }
     
     firstHero.impactedAt(point: firstHeroSpriteComponent.node.position)
     secondHero.impactedAt(point: firstHeroSpriteComponent.node.position)
     
-    self.audioPlayer.play(effect: Audio.EffectFiles.playerCollision)
+    audioPlayer.play(effect: Audio.EffectFiles.playerCollision)
     
-//    self.multiplayerNetworking.sendImpacted(senderIndex: 0)
-//    self.multiplayerNetworking.sendImpacted(senderIndex: 1)
+//    multiplayerNetworking.sendImpacted(senderIndex: 0)
+//    multiplayerNetworking.sendImpacted(senderIndex: 1)
   }
   
   private func handleHeroPackageCollision(firstBody: SKPhysicsBody, secondBody: SKPhysicsBody) {
     guard let heroNode = firstBody.node as? SKSpriteNode,
       let resourceNode = secondBody.node as? SKShapeNode else { return }
     
-    guard let hero = self.entityManager.heroWith(node: heroNode) as? General,
-      let impactedResource = self.entityManager.resourceWith(node: resourceNode) as? Package else { return }
+    guard let hero = entityManager.heroWith(node: heroNode) as? General,
+      let impactedResource = entityManager.resourceWith(node: resourceNode) as? Package else { return }
     
     guard let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
       let heroHandsComponent = hero.component(ofType: HandsComponent.self),
       let resourceShapeComponent = impactedResource.component(ofType: ShapeComponent.self),
       !heroHandsComponent.isImpacted else { return }
     
-    guard let throwButton = self.cam?.childNode(withName: AppConstants.ButtonNames.throwButtonName) else { return }
+    guard let throwButton = cam?.childNode(withName: AppConstants.ButtonNames.throwButtonName) else { return }
     
     if heroHandsComponent.hasFreeHand {
       heroHandsComponent.grab(resource: impactedResource)
@@ -117,26 +117,26 @@ extension GameScene: SKPhysicsContactDelegate {
       // enable the throw button
       throwButton.alpha = 1.0
       
-      if let resourceIndex = self.entityManager.indexForResource(shape: resourceShapeComponent.node),
-        let heroIndex = self.entityManager.playerEntites.firstIndex(of: hero) {
+      if let resourceIndex = entityManager.indexForResource(shape: resourceShapeComponent.node),
+        let heroIndex = entityManager.playerEntites.firstIndex(of: hero) {
       
-//        self.multiplayerNetworking
+//        multiplayerNetworking
 //          .sendGrabbedResource(index: resourceIndex,
 //                               playerIndex: heroIndex,
-//                               senderIndex: self.entityManager.currentPlayerIndex)
+//                               senderIndex: entityManager.currentPlayerIndex)
       }
       hero.updateResourcePositions()
       
       let effect = heroHandsComponent.rightHandSlot == nil ?
         Audio.EffectFiles.collectResource1 : Audio.EffectFiles.collectResource1
-      self.audioPlayer.play(effect: effect)
+      audioPlayer.play(effect: effect)
     } else {
       hero.impactedAt(point: heroSpriteComponent.node.position)
       
       // disable the throw button
       throwButton.alpha = 0.5
       
-      self.audioPlayer.play(effect: Audio.EffectFiles.collisionLoseResource)
+      audioPlayer.play(effect: Audio.EffectFiles.collisionLoseResource)
     }
   }
   
@@ -144,8 +144,8 @@ extension GameScene: SKPhysicsContactDelegate {
     guard let heroNode = firstBody.node as? SKSpriteNode,
       let depositNode = secondBody.node as? SKShapeNode else { return }
     
-    guard let hero = self.entityManager.heroWith(node: heroNode) as? General,
-      let deposit = self.entityManager.enitityWith(node: depositNode) as? Deposit else { return }
+    guard let hero = entityManager.heroWith(node: heroNode) as? General,
+      let deposit = entityManager.enitityWith(node: depositNode) as? Deposit else { return }
     
     guard let handsComponent = hero.component(ofType: HandsComponent.self),
       let teamComponent = hero.component(ofType: TeamComponent.self),
@@ -173,10 +173,10 @@ extension GameScene: SKPhysicsContactDelegate {
     }
     
     var heroAlias: String
-    if hero == self.entityManager.playerEntites[0] {
-      heroAlias = self.getPlayerAliasAt(index: 0)
+    if hero == entityManager.playerEntites[0] {
+      heroAlias = getPlayerAliasAt(index: 0)
     } else {
-      heroAlias = self.getPlayerAliasAt(index: 1)
+      heroAlias = getPlayerAliasAt(index: 1)
     }
     aliasComponent.node.text = "\(heroAlias) (\(hero.numberOfDeposits)/\(resourcesNeededToWin))"
     
@@ -186,39 +186,39 @@ extension GameScene: SKPhysicsContactDelegate {
     default: break
     }
     
-    if let label = self.gameMessage {
+    if let label = gameMessage {
       label.text = "Deposit"
       label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
     }
     
     ShapeFactory.shared.spawnDepositParticleEffect(pos: depositNode.position)
-    self.audioPlayer.play(effect: Audio.EffectFiles.youScored)
+    audioPlayer.play(effect: Audio.EffectFiles.youScored)
   }
   
   private func handleHeroWallCollision(firstBody: SKPhysicsBody, secondBody: SKPhysicsBody) {
     guard let heroNode = firstBody.node as? SKSpriteNode,
       let beam = secondBody.node as? SKShapeNode else { return }
     
-    guard let hero = self.entityManager.heroWith(node: heroNode) as? General,
+    guard let hero = entityManager.heroWith(node: heroNode) as? General,
       let spriteComponent = hero.component(ofType: SpriteComponent.self),
       let physicsComponent = hero.component(ofType: PhysicsComponent.self),
       let impulseComponent = hero.component(ofType: ImpulseComponent.self),
       let launchComponent = hero.component(ofType: LaunchComponent.self),
-      let panel = self.entityManager.panelWith(node: beam) as? Panel,
+      let panel = entityManager.panelWith(node: beam) as? Panel,
       let panelShapeComponent = panel.component(ofType: ShapeComponent.self),
       let tractorBeamComponent = panel.component(ofType: BeamComponent.self),
-      self.gameState.currentState is Tutorial || !tractorBeamComponent.isOccupied,
+      gameState.currentState is Tutorial || !tractorBeamComponent.isOccupied,
       hero.isBeamable else { return }
     
     if let panelTeamComponent = panel.component(ofType: TeamComponent.self),
       let heroTeamComponent = hero.component(ofType: TeamComponent.self),
       panelTeamComponent.team != heroTeamComponent.team,
-      self.gameState.currentState is Tutorial,
-      hero !== self.entityManager.playerEntites[1],
-      let tutorial = self.entityManager.tutorialEntities[0] as? TutorialAction {
+      gameState.currentState is Tutorial,
+      hero !== entityManager.playerEntites[1],
+      let tutorial = entityManager.tutorialEntities[0] as? TutorialAction {
       
       if let step = tutorial.setupNextStep(), step == .rotateThrow {
-        self.entityManager.spawnResource(position: step.midPosition, velocity: .zero)
+        entityManager.spawnResource(position: step.midPosition, velocity: .zero)
       }
       
       return
@@ -227,7 +227,7 @@ extension GameScene: SKPhysicsContactDelegate {
     physicsComponent.isEffectedByPhysics = false
     
     let isTopBeam = beam.position.y == abs(beam.position.y)
-    let convertedPosition = self.convert(beam.position, from: panelShapeComponent.node)
+    let convertedPosition = convert(beam.position, from: panelShapeComponent.node)
     let rotation = isTopBeam ? panelShapeComponent.node.zRotation : panelShapeComponent.node.zRotation + CGFloat.pi
     
     DispatchQueue.main.async {
@@ -236,7 +236,7 @@ extension GameScene: SKPhysicsContactDelegate {
     }
     
     hero.switchToState(.beamed)
-    if hero == self.entityManager.playerEntites[self.entityManager.currentPlayerIndex] {
+    if hero == entityManager.playerEntites[entityManager.currentPlayerIndex] {
       let launchLineNode = launchComponent.node.childNode(withName: AppConstants.ComponentNames.launchLineName) as? SKShapeNode
       launchLineNode?.alpha = LaunchComponent.targetLineAlpha
     }
@@ -244,13 +244,13 @@ extension GameScene: SKPhysicsContactDelegate {
     hero.occupiedPanel = panel
     tractorBeamComponent.isOccupied = true
     
-    //      if let index = self.entityManager.indexForWall(panel: panel) {
-    //        self.multiplayerNetworking.sendWall(index: index, isOccupied: true)
+    //      if let index = entityManager.indexForWall(panel: panel) {
+    //        multiplayerNetworking.sendWall(index: index, isOccupied: true)
     //      }
     impulseComponent.isOnCooldown = false
     
-    if hero != self.entityManager.playerEntites[1] {
-      self.audioPlayer.play(effect: Audio.EffectFiles.blipSound)
+    if hero != entityManager.playerEntites[1] {
+      audioPlayer.play(effect: Audio.EffectFiles.blipSound)
     }
   }
 }
