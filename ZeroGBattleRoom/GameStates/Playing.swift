@@ -17,7 +17,7 @@ class Playing: GKState {
     case level_3
     
     var filename: String {
-      return "Level_\(self.rawValue)"
+      return "Level_\(rawValue)"
     }
   }
   
@@ -29,21 +29,9 @@ class Playing: GKState {
   }
   
   override func didEnter(from previousState: GKState?) {
-    self.setupCamera()
-    self.setupPhysics()
-  
-    self.scene.entityManager.spawnPanels()
-    
-//    self.loadLevel()
-    
-    self.scene.entityManager.spawnResources()
-    self.scene.entityManager.spawnHeros(mapSize: AppConstants.Layout.boundarySize)
-    self.scene.entityManager.spawnDeposit()
-    
-    self.scene.entityManager.addUIElements()
-    
-    self.scene.audioPlayer.play(effect: Audio.EffectFiles.startGame)
-    self.scene.audioPlayer.play(music: Audio.MusicFiles.level)
+    setupCamera()
+    setupPhysics()
+    setupLevel()
   }
   
   override func willExit(to nextState: GKState) {
@@ -61,41 +49,48 @@ class Playing: GKState {
     self.repositionCamera()
   }
   
-  private func loadLevel(_ level: Level = .level_1) {
-    guard let scene = SKScene(fileNamed: level.filename) else { return }
-    
-    scene.enumerateChildNodes(withName: AppConstants.ComponentNames.wallPanelName) { wallNode, _  in
-//      if let wall = self.scene.entitityManager.wallNodeCopy {
-//        wall.position = wallNode.position
-//        wall.zRotation = wallNode.zRotation
-//        self.scene.addChild(wall)
-//      }
-    }
-  }
 }
 
 extension Playing {
-  private func setupPhysics() {
-    self.scene.physicsBody = self.scene.borderBody
-    self.scene.physicsWorld.gravity = CGVector(dx: 0.0, dy: 0.0)
-    self.scene.physicsWorld.contactDelegate = self.scene
-  }
   
   private func setupCamera() {
-    self.scene.cam = SKCameraNode()
-    self.scene.camera = self.scene.cam
-    self.scene.addChild(self.scene.cam!)
+    scene.cam = SKCameraNode()
+    scene.camera = scene.cam
+    scene.addChild(scene.cam!)
   }
+  
+  private func setupPhysics() {
+    scene.physicsBody = scene.borderBody
+    scene.physicsWorld.gravity = CGVector(dx: 0.0, dy: 0.0)
+    scene.physicsWorld.contactDelegate = scene
+  }
+  
+  private func setupLevel() {
+    scene.entityManager.spawnPanels()
+  
+    scene.entityManager.spawnResources()
+    scene.entityManager.spawnHeros(mapSize: AppConstants.Layout.boundarySize)
+    scene.entityManager.spawnDeposit()
+    scene.entityManager.spawnField()
+    
+  
+    scene.entityManager.addUIElements()
+    
+    scene.audioPlayer.play(effect: Audio.EffectFiles.startGame)
+    scene.audioPlayer.play(music: Audio.MusicFiles.level)
+  }
+
 }
 
 extension Playing {
+  
   private func repositionCamera() {
-    guard let camera = self.scene.cam else { return }
-    guard let hero = self.scene.entityManager.hero as? General else { return }
+    guard let camera = scene.cam else { return }
+    guard let hero = scene.entityManager.hero as? General else { return }
     guard let spriteComponent = hero.component(ofType: SpriteComponent.self) else { return }
     
     let sideEdge = AppConstants.Layout.mapSize.width / 2
-    let frameSideEdge = self.scene.frame.size.width / 2
+    let frameSideEdge = scene.frame.size.width / 2
     if sideEdge - abs(spriteComponent.node.position.x) > frameSideEdge {
       camera.position.x = spriteComponent.node.position.x
     } else {
@@ -104,7 +99,7 @@ extension Playing {
     }
     
     let topEdge = AppConstants.Layout.mapSize.height / 2
-    let frameTopEdge = self.scene.frame.size.height / 2
+    let frameTopEdge = scene.frame.size.height / 2
     if topEdge - abs(spriteComponent.node.position.y) > frameTopEdge {
       camera.position.y = spriteComponent.node.position.y
     } else {
@@ -112,4 +107,5 @@ extension Playing {
       camera.position.y = spriteComponent.node.position.y < 0 ? -cameraPosY : cameraPosY
     }
   }
+  
 }
