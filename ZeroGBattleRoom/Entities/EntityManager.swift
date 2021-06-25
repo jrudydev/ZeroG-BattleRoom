@@ -39,14 +39,14 @@ class EntityManager {
   var isHost: Bool { currentPlayerIndex == 0 }
   
   var hero: GKEntity? {
-    guard self.playerEntites.count > 0 else { return nil }
-    guard self.currentPlayerIndex < self.playerEntites.count else { return nil }
+    guard playerEntites.count > 0 else { return nil }
+    guard currentPlayerIndex < playerEntites.count else { return nil }
     
-    return self.playerEntites[self.currentPlayerIndex]
+    return playerEntites[currentPlayerIndex]
   }
   
   var deposit: GKEntity? {
-    let deposit = self.entities.first { entity -> Bool in
+    let deposit = entities.first { entity -> Bool in
       guard let _ = entity as? Deposit else { return false }
       
       return true
@@ -55,8 +55,8 @@ class EntityManager {
   }
   
   var winningTeam: Team? {
-    guard let deposit = self.deposit as? Deposit,
-      let depositComponent = deposit.component(ofType: DepositComponent.self) else { return nil }
+    guard let deposit = deposit as? Deposit,
+          let depositComponent = deposit.component(ofType: DepositComponent.self) else { return nil }
     
     if depositComponent.team1Deposits >= resourcesNeededToWin {
       return Team.team1
@@ -78,29 +78,29 @@ class EntityManager {
   init(scene: GameScene) {
     self.scene = scene
     
-    self.spawnResourceNode()
+    spawnResourceNode()
   }
   
 }
 
 extension EntityManager {
-
+  
   func add(_ entity: GKEntity) {
-    self.entities.insert(entity)
+    entities.insert(entity)
     
     if let spriteNode = entity.component(ofType: SpriteComponent.self)?.node {
-      self.scene.addChild(spriteNode)
+      scene.addChild(spriteNode)
     }
     
     if let shapeNode = entity.component(ofType: ShapeComponent.self)?.node {
-      self.scene.addChild(shapeNode)
+      scene.addChild(shapeNode)
     }
     
     if let trailNode = entity.component(ofType: TrailComponent.self)?.node {
-      self.scene.addChild(trailNode)
+      scene.addChild(trailNode)
     }
     
-    self.addToComponentSysetem(entity: entity)
+    addToComponentSysetem(entity: entity)
   }
   
   func remove(_ entity: GKEntity) {
@@ -116,22 +116,22 @@ extension EntityManager {
       trailNode.removeFromParent()
     }
     
-    self.entities.remove(entity)
-    self.toRemove.insert(entity)
+    entities.remove(entity)
+    toRemove.insert(entity)
   }
   
   func removeAllResourceEntities() {
     print("removing all resources")
-    for entity in self.resourcesEntities {
+    for entity in resourcesEntities {
       if let shapeComponent = entity.component(ofType: ShapeComponent.self) {
         shapeComponent.node.removeFromParent()
       }
     }
-    self.resourcesEntities.removeAll()
+    resourcesEntities.removeAll()
   }
   
   private func addToComponentSysetem(entity: GKEntity) {
-    for componentSystem in self.componentSystems {
+    for componentSystem in componentSystems {
       componentSystem.addComponent(foundIn: entity)
     }
   }
@@ -145,53 +145,53 @@ extension EntityManager {
   func update(_ deltaTime: CFTimeInterval) {
     for entity in uiEntities {
       if let scaledComponent = entity as? ScaledContainer {
-        scaledComponent.updateViewPort(size: self.scene.viewportSize)
+        scaledComponent.updateViewPort(size: scene.viewportSize)
       }
     }
     
-    for componentSystem in self.componentSystems {
+    for componentSystem in componentSystems {
       componentSystem.update(deltaTime: deltaTime)
     }
     
     for currentRemove in toRemove {
-      for componentSystem in self.componentSystems {
+      for componentSystem in componentSystems {
         componentSystem.removeComponent(foundIn: currentRemove)
       }
     }
-    self.toRemove.removeAll()
+    toRemove.removeAll()
     
-    self.updateUIElements()
-    self.updateResourceVelocity()
+    updateUIElements()
+    updateResourceVelocity()
   }
   
   private func updateUIElements() {
-    guard let restartButton = self.scene.cam?.childNode(withName: AppConstants.ButtonNames.refreshButtonName) else { return }
+    guard let restartButton = scene.cam?.childNode(withName: AppConstants.ButtonNames.refreshButtonName) else { return }
     
-    guard let hero = self.playerEntites[0] as? General,
-      let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
-      let physicsBody = heroSpriteComponent.node.physicsBody,
-      !hero.isBeamed else { return }
+    guard let hero = playerEntites[0] as? General,
+          let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
+          let physicsBody = heroSpriteComponent.node.physicsBody,
+          !hero.isBeamed else { return }
     
     let absDx = abs(physicsBody.velocity.dx)
     let absDy = abs(physicsBody.velocity.dy)
     let notMoving = absDx < minDriftVelocity && absDy < minDriftVelocity
-//    restartButton.alpha = notMoving ? 1.0 : 0.0
+    //    restartButton.alpha = notMoving ? 1.0 : 0.0
   }
   
   private func updateResourceVelocity() {
-    guard let deposit = self.scene.childNode(withName: AppConstants.ComponentNames.depositNodeName) else { return }
-  
-    for resource in self.resourcesEntities {
-      guard let package = resource as? Package,
-        let physicsComponent = package.component(ofType: PhysicsComponent.self),
-        let shapeComponent = package.component(ofType: ShapeComponent.self) else { return }
+    guard let deposit = scene.childNode(withName: AppConstants.ComponentNames.depositNodeName) else { return }
     
+    for resource in resourcesEntities {
+      guard let package = resource as? Package,
+            let physicsComponent = package.component(ofType: PhysicsComponent.self),
+            let shapeComponent = package.component(ofType: ShapeComponent.self) else { return }
+      
       let dx = deposit.position.x - shapeComponent.node.position.x
       let dy = deposit.position.y - shapeComponent.node.position.y
       let distanceToDeposit = sqrt(pow(dx, 2.0) + pow(dy, 2.0))
-
+      
       if distanceToDeposit < Deposit.eventHorizon {
-        self.scene.handleDeposit(package: package)
+        scene.handleDeposit(package: package)
       } else if distanceToDeposit < Deposit.pullDistance && !isHeld(resource: package) {
         let pullStength = (Deposit.pullDistance - distanceToDeposit) * resourcePullDamper
         let moveX = deposit.position.x - shapeComponent.node.position.x
@@ -199,7 +199,7 @@ extension EntityManager {
         let moveVector = CGVector(dx:  moveX, dy: moveY)
         let adjustedVector = moveVector.normalized() * pullStength
         physicsComponent.physicsBody.applyImpulse(adjustedVector)
-      } else if package.wasThrownBy == nil && !(self.scene.gameState.currentState is Tutorial) {
+      } else if package.wasThrownBy == nil && !(scene.gameState.currentState is Tutorial) {
         let xSpeed = sqrt(physicsComponent.physicsBody.velocity.dy * physicsComponent.physicsBody.velocity.dx)
         let ySpeed = sqrt(physicsComponent.physicsBody.velocity.dy * physicsComponent.physicsBody.velocity.dy)
         
@@ -225,13 +225,14 @@ extension EntityManager {
 extension EntityManager {
   
   func spawnHeros(mapSize: CGSize) {
-    let heroBlue = self.playerEntites[0]
+    let heroBlue = playerEntites[0]
     if let spriteComponent = heroBlue.component(ofType: SpriteComponent.self),
-      let trailComponent = heroBlue.component(ofType: TrailComponent.self),
-      let aliasComponent = heroBlue.component(ofType: AliasComponent.self),
-      let handsComponent = heroBlue.component(ofType: HandsComponent.self) {
+       let trailComponent = heroBlue.component(ofType: TrailComponent.self),
+       let aliasComponent = heroBlue.component(ofType: AliasComponent.self),
+       let handsComponent = heroBlue.component(ofType: HandsComponent.self) {
       
-      handsComponent.didRemoveResource = { resource in
+      handsComponent.didRemoveResource = { [weak self] resource in
+        guard let self = self else { return }
         guard let shapeComponent = resource.component(ofType: ShapeComponent.self) else { return }
         
         self.scene.addChild(shapeComponent.node)
@@ -239,23 +240,24 @@ extension EntityManager {
       
       spriteComponent.node.position = CGPoint(x: 0.0, y: -mapSize.height/2 + 20)
       spriteComponent.node.zPosition = SpriteZPosition.hero.rawValue
-      self.scene.addChild(spriteComponent.node)
+      scene.addChild(spriteComponent.node)
       
-      self.scene.addChild(trailComponent.node)
+      scene.addChild(trailComponent.node)
       
-      aliasComponent.node.text = self.scene.getPlayerAliasAt(index: 0)
-      self.scene.addChild(aliasComponent.node)
+      aliasComponent.node.text = scene.getPlayerAliasAt(index: 0)
+      scene.addChild(aliasComponent.node)
     }
-
-    self.addToComponentSysetem(entity: heroBlue)
     
-    let heroRed = self.playerEntites[1]
+    addToComponentSysetem(entity: heroBlue)
+    
+    let heroRed = playerEntites[1]
     if let spriteComponent = heroRed.component(ofType: SpriteComponent.self),
-      let trailComponent = heroRed.component(ofType: TrailComponent.self),
-      let aliasComponent = heroRed.component(ofType: AliasComponent.self),
-      let handsComponent = heroRed.component(ofType: HandsComponent.self) {
+       let trailComponent = heroRed.component(ofType: TrailComponent.self),
+       let aliasComponent = heroRed.component(ofType: AliasComponent.self),
+       let handsComponent = heroRed.component(ofType: HandsComponent.self) {
       
-      handsComponent.didRemoveResource = { resource in
+      handsComponent.didRemoveResource = { [weak self] resource in
+        guard let self = self else { return }
         guard let shapeComponent = resource.component(ofType: ShapeComponent.self) else { return }
         
         self.scene.addChild(shapeComponent.node)
@@ -264,34 +266,34 @@ extension EntityManager {
       spriteComponent.node.position = CGPoint(x: 0.0, y: mapSize.height/2 - 20)
       spriteComponent.node.zPosition = SpriteZPosition.hero.rawValue
       spriteComponent.node.zRotation = CGFloat.pi
-      self.scene.addChild(spriteComponent.node)
+      scene.addChild(spriteComponent.node)
       
-      self.scene.addChild(trailComponent.node)
+      scene.addChild(trailComponent.node)
       
-      aliasComponent.node.text = self.scene.getPlayerAliasAt(index: 1)
-      self.scene.addChild(aliasComponent.node)
+      aliasComponent.node.text = scene.getPlayerAliasAt(index: 1)
+      scene.addChild(aliasComponent.node)
     }
-
-    self.addToComponentSysetem(entity: heroRed)
+    
+    addToComponentSysetem(entity: heroRed)
   }
   
   func spawnResources() {
     guard isHost else { return }
     
     for _ in 0..<numberOfSpawnedResources {
-      self.spawnResource()
+      spawnResource()
     }
   }
   
   func spawnResource(position: CGPoint = AppConstants.Layout.boundarySize.randomPosition,
                      velocity: CGVector? = nil) {
-    guard let resourceNode = self.resourceNode?.copy() as? SKShapeNode else { return }
+    guard let resourceNode = resourceNode?.copy() as? SKShapeNode else { return }
     
     let resource = Package(shapeNode: resourceNode,
-                           physicsBody: self.resourcePhysicsBody(frame: resourceNode.frame))
+                           physicsBody: resourcePhysicsBody(frame: resourceNode.frame))
     if let physicsComponent = resource.component(ofType: PhysicsComponent.self) {
       
-      self.scene.addChild(resourceNode)
+      scene.addChild(resourceNode)
       resourceNode.position = position
       DispatchQueue.main.async {
         if let vector = velocity {
@@ -303,7 +305,7 @@ extension EntityManager {
     }
     
     resourceNode.strokeColor = SKColor.green
-    self.resourcesEntities.append(resource)
+    resourcesEntities.append(resource)
   }
   
   private func resourcePhysicsBody(frame: CGRect) -> SKPhysicsBody {
@@ -315,7 +317,7 @@ extension EntityManager {
     physicsBody.linearDamping = 0.0
     physicsBody.angularDamping = 0.0
     physicsBody.categoryBitMask = PhysicsCategoryMask.package
-  
+    
     // Make sure resources are only colliding on the designated host device
     if isHost {
       physicsBody.contactTestBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.wall
@@ -327,18 +329,32 @@ extension EntityManager {
     
     return physicsBody
   }
-    
+  
   func spawnDeposit(position: CGPoint = .zero) {
     let deposit = Deposit()
     
     guard let shapeComponent = deposit.component(ofType: ShapeComponent.self) else { return }
     
     shapeComponent.node.position = position
-    self.add(deposit)
+    add(deposit)
+  }
+  
+  func spawnField(position: CGPoint = .zero) {
+    let shapeNode = SKShapeNode(circleOfRadius: 20.0)
+    shapeNode.fillColor = .blue
+    shapeNode.alpha = 0.5
+    shapeNode.strokeColor = .white
+    let physicsBody = SKPhysicsBody(circleOfRadius: 20.0)
+    let field = Field(shapeNode: shapeNode, physicsBody: physicsBody)
+    
+    guard let shapeComponent = field.component(ofType: ShapeComponent.self) else { return }
+    
+    shapeComponent.node.position = position
+    add(field)
   }
   
   func spawnPanels() {
-    let factory = self.scene.entityManager.panelFactory
+    let factory = scene.entityManager.panelFactory
     let wallPanels = factory.perimeterWallFrom(size: AppConstants.Layout.boundarySize)
     let centerPanels = self.centerPanels()
     let blinderPanels = self.blinderPanels()
@@ -346,35 +362,35 @@ extension EntityManager {
     
     for entity in wallPanels + centerPanels + blinderPanels + extraPanels {
       if let shapeNode = entity.component(ofType: ShapeComponent.self)?.node {
-        self.scene.addChild(shapeNode)
+        scene.addChild(shapeNode)
       }
-      self.wallEntities.append(entity)
+      wallEntities.append(entity)
     }
   }
   
   private func centerPanels() -> [GKEntity] {
     let position = CGPoint(x: 75.0, y: 130.0)
     let topLeftPosition = CGPoint(x: -position.x, y: position.y)
-    let topLeftWall = self.panelFactory.panelSegment(beamConfig: .both,
-                                                     number: 2,
-                                                     position: topLeftPosition,
-                                                     orientation: .risingDiag)
+    let topLeftWall = panelFactory.panelSegment(beamConfig: .both,
+                                                number: 2,
+                                                position: topLeftPosition,
+                                                orientation: .risingDiag)
     let topRightPosition = CGPoint(x: position.x, y: position.y)
-    let topRightWall = self.panelFactory.panelSegment(beamConfig: .both,
-                                                      number: 2,
-                                                      position: topRightPosition,
-                                                      orientation: .fallingDiag)
+    let topRightWall = panelFactory.panelSegment(beamConfig: .both,
+                                                 number: 2,
+                                                 position: topRightPosition,
+                                                 orientation: .fallingDiag)
     let bottomLeftPosition = CGPoint(x: -position.x, y: -position.y)
-    let bottomLeftWall = self.panelFactory.panelSegment(beamConfig: .both,
-                                                        number: 2,
-                                                        position: bottomLeftPosition,
-                                                        orientation: .fallingDiag)
+    let bottomLeftWall = panelFactory.panelSegment(beamConfig: .both,
+                                                   number: 2,
+                                                   position: bottomLeftPosition,
+                                                   orientation: .fallingDiag)
     let bottomRightPosition = CGPoint(x: position.x, y: -position.y)
-    let bottomRightWall = self.panelFactory.panelSegment(beamConfig: .both,
-                                                         number: 2,
-                                                         position: bottomRightPosition,
-                                                         orientation: .risingDiag)
-
+    let bottomRightWall = panelFactory.panelSegment(beamConfig: .both,
+                                                    number: 2,
+                                                    position: bottomRightPosition,
+                                                    orientation: .risingDiag)
+    
     return topLeftWall + topRightWall + bottomLeftWall + bottomRightWall
   }
   
@@ -383,15 +399,15 @@ extension EntityManager {
     let numberOfSegments = 5
     let topBlinderPosition = CGPoint(x: 0.0,
                                      y: AppConstants.Layout.boundarySize.height * yPosRatio)
-    let topBlinder = self.panelFactory.panelSegment(beamConfig: .both,
-                                                    number: numberOfSegments,
-                                                    position: topBlinderPosition)
+    let topBlinder = panelFactory.panelSegment(beamConfig: .both,
+                                               number: numberOfSegments,
+                                               position: topBlinderPosition)
     
     let bottomBlinderPosition = CGPoint(x: 0.0,
                                         y: -AppConstants.Layout.boundarySize.height * yPosRatio)
-    let bottomBlinder = self.panelFactory.panelSegment(beamConfig: .both,
-                                                       number: numberOfSegments,
-                                                       position: bottomBlinderPosition)
+    let bottomBlinder = panelFactory.panelSegment(beamConfig: .both,
+                                                  number: numberOfSegments,
+                                                  position: bottomBlinderPosition)
     return topBlinder + bottomBlinder
   }
   
@@ -399,16 +415,16 @@ extension EntityManager {
     let width = AppConstants.Layout.boundarySize.width
     let wallLength = AppConstants.Layout.wallSize.width
     let numberOfSegments = 2
-  
+    
     let leftBlinderPosition = CGPoint(x: -width / 2 + wallLength + 10, y: 0.0)
-    let leftBlinder = self.panelFactory.panelSegment(beamConfig: .both,
-                                                     number: numberOfSegments,
-                                                     position: leftBlinderPosition)
- 
+    let leftBlinder = panelFactory.panelSegment(beamConfig: .both,
+                                                number: numberOfSegments,
+                                                position: leftBlinderPosition)
+    
     let rightBlinderPosition = CGPoint(x: width / 2 - wallLength - 10, y: 0.0)
-    let rightBlinder = self.panelFactory.panelSegment(beamConfig: .both,
-                                                      number: numberOfSegments,
-                                                      position: rightBlinderPosition)
+    let rightBlinder = panelFactory.panelSegment(beamConfig: .both,
+                                                 number: numberOfSegments,
+                                                 position: rightBlinderPosition)
     return leftBlinder + rightBlinder
   }
   
@@ -416,8 +432,8 @@ extension EntityManager {
     let width: CGFloat = 10.0
     let size = CGSize(width: width, height: width)
     
-    self.resourceNode = SKShapeNode(rectOf: size, cornerRadius: width * 0.3)
-    guard let resourceNode = self.resourceNode else { return }
+    resourceNode = SKShapeNode(rectOf: size, cornerRadius: width * 0.3)
+    guard let resourceNode = resourceNode else { return }
     
     resourceNode.name = AppConstants.ComponentNames.resourceName
     resourceNode.lineWidth = 2.5
@@ -429,7 +445,7 @@ extension EntityManager {
 
 extension EntityManager {
   func heroWith(node: SKSpriteNode) -> GKEntity? {
-    let player = self.playerEntites.first { entity -> Bool in
+    let player = playerEntites.first { entity -> Bool in
       guard let hero = entity as? General else { return false }
       guard let spriteComponent = hero.component(ofType: SpriteComponent.self) else { return false }
       
@@ -440,7 +456,7 @@ extension EntityManager {
   }
   
   func resourceWith(node: SKShapeNode) -> GKEntity? {
-    let resource = self.resourcesEntities.first { entity -> Bool in
+    let resource = resourcesEntities.first { entity -> Bool in
       guard let package = entity as? Package else { return false }
       guard let shapeComponent = package.component(ofType: ShapeComponent.self) else { return false }
       
@@ -451,14 +467,14 @@ extension EntityManager {
   }
   
   func panelWith(node: SKShapeNode) -> GKEntity? {
-    let panel = self.wallEntities.first { entity -> Bool in
+    let panel = wallEntities.first { entity -> Bool in
       guard let panelEntity = entity as? Panel,
-        let beamComponent = panelEntity.component(ofType: BeamComponent.self) else { return false }
+            let beamComponent = panelEntity.component(ofType: BeamComponent.self) else { return false }
       
       let beam = beamComponent.beams.first { beam -> Bool in
         return beam === node
       }
-  
+      
       return beam == nil ? false : true
     }
     
@@ -466,7 +482,7 @@ extension EntityManager {
   }
   
   func enitityWith(node: SKNode) -> GKEntity? {
-    let entity = self.entities.first { entity -> Bool in
+    let entity = entities.first { entity -> Bool in
       switch node {
       case is SKSpriteNode:
         guard let hero = entity as? General else { return false }
@@ -477,7 +493,7 @@ extension EntityManager {
         switch entity {
         case is Deposit:
           guard let deposit = entity as? Deposit,
-            let shapeComponent = deposit.component(ofType: ShapeComponent.self) else { return false }
+                let shapeComponent = deposit.component(ofType: ShapeComponent.self) else { return false }
           
           return shapeComponent.node === node
           
@@ -492,9 +508,9 @@ extension EntityManager {
   }
   
   func uiEntityWith(nodeName: String) -> GKEntity? {
-    let element = self.uiEntities.first { entity -> Bool in
+    let element = uiEntities.first { entity -> Bool in
       guard let uiEntity = entity as? ScaledContainer else { return false }
-
+      
       return uiEntity.node.name == nodeName
     }
     
@@ -502,7 +518,7 @@ extension EntityManager {
   }
   
   func indexForResource(shape: SKShapeNode) -> Int? {
-    let index = self.resourcesEntities.firstIndex { entity -> Bool in
+    let index = resourcesEntities.firstIndex { entity -> Bool in
       guard let package = entity as? Package else { return false }
       guard let shapeComponent = package.component(ofType: ShapeComponent.self) else { return  false }
       
@@ -513,7 +529,7 @@ extension EntityManager {
   }
   
   func indexForWall(panel: Panel) -> Int? {
-    let index = self.wallEntities.firstIndex { entity -> Bool in
+    let index = wallEntities.firstIndex { entity -> Bool in
       guard let wall = entity as? Panel else { return false }
       return wall == panel
     }
@@ -555,27 +571,32 @@ extension EntityManager {
 extension EntityManager {
   
   func addUIElements() {
-    self.setupBackButton()
-  
-    if self.scene.gameState.currentState is Tutorial {
-      self.setupRestartButton()
-      self.addTutorialStickers()
+    setupBackButton()
+    setupThrowButton()
+    setupRestartButton()
+    
+    if scene.gameState.currentState is Tutorial {
+      addTutorialStickers()
     }
   }
   
-  private func addTutorialStickers() {
-    let tapSticker = SKSpriteNode(imageNamed: "throw")
-    tapSticker.name = AppConstants.ButtonNames.throwButtonName
-    tapSticker.alignMidBottom()
-    tapSticker.zPosition = SpriteZPosition.inGameUI.rawValue
-    tapSticker.alpha = 0.5
+  private func setupThrowButton() {
+    let throwButton = SKSpriteNode(imageNamed: "throw")
+    throwButton.name = AppConstants.ButtonNames.throwButtonName
+    throwButton.alignMidBottom()
+    throwButton.zPosition = SpriteZPosition.inGameUI.rawValue
+    throwButton.alpha = 0.5
     
-    let throwTapSticker = SKSpriteNode(imageNamed: "tap")
-    throwTapSticker.name = AppConstants.ComponentNames.tutorialThrowStickerName
-    throwTapSticker.zPosition = SpriteZPosition.inGameUI2.rawValue
-    throwTapSticker.anchorPoint = CGPoint(x: 0.2, y: 0.9)
-    throwTapSticker.alignMidRight()
-    throwTapSticker.alpha = 0.0
+    addInGameUIView(element: throwButton)
+  }
+  
+  private func addTutorialStickers() {
+    let tapSticker = SKSpriteNode(imageNamed: "tap")
+    tapSticker.name = AppConstants.ComponentNames.tutorialThrowStickerName
+    tapSticker.zPosition = SpriteZPosition.inGameUI2.rawValue
+    tapSticker.anchorPoint = CGPoint(x: 0.2, y: 0.9)
+    tapSticker.alignMidRight()
+    tapSticker.alpha = 0.0
     
     let pinchSticker = SKSpriteNode(imageNamed: "pinch-out")
     pinchSticker.name = AppConstants.ComponentNames.tutorialPinchStickerName
@@ -583,11 +604,11 @@ extension EntityManager {
     pinchSticker.anchorPoint = CGPoint(x: 0.2, y: 0.9)
     pinchSticker.zPosition = SpriteZPosition.inGameUI.rawValue
     
-    self.addInGameUIViews(elements: [tapSticker, throwTapSticker, pinchSticker])
+    addInGameUIViews(elements: [tapSticker, pinchSticker])
   }
   
   func removeUIElements() {
-    self.removeInGameUIViewElements()
+    removeInGameUIViewElements()
   }
   
   private func setupBackButton() {
@@ -606,8 +627,8 @@ extension EntityManager {
     imageNode.color = AppConstants.UIColors.buttonForeground
     imageNode.colorBlendFactor = 1
     backButton.addChild(imageNode)
-  
-    self.addInGameUIView(element: backButton)
+    
+    addInGameUIView(element: backButton)
   }
   
   private func setupRestartButton() {
@@ -626,33 +647,33 @@ extension EntityManager {
     imageNode.color = AppConstants.UIColors.buttonForeground
     imageNode.colorBlendFactor = 1
     restartButton.addChild(imageNode)
-  
-    self.addInGameUIView(element: restartButton)
+    
+    addInGameUIView(element: restartButton)
   }
   
   private func addInGameUIViews(elements: [SKNode]) {
     for element in elements {
-      self.addInGameUIView(element: element)
+      addInGameUIView(element: element)
     }
   }
   
   private func addInGameUIView(element: SKNode) {
     let scaledComponent = ScaledContainer(element: element)
     
-    self.scene.cam!.addChild(scaledComponent.node)
+    scene.cam!.addChild(scaledComponent.node)
     
-    self.uiEntities.insert(scaledComponent)
-    self.addToComponentSysetem(entity: scaledComponent)
+    uiEntities.insert(scaledComponent)
+    addToComponentSysetem(entity: scaledComponent)
   }
   
   private func removeInGameUIViewElements() {
-    for entity in self.uiEntities {
+    for entity in uiEntities {
       if let scalableElement = entity as? ScaledContainer {
-        self.toRemove.insert(scalableElement)
+        toRemove.insert(scalableElement)
       }
     }
-  
-    self.uiEntities.removeAll()
+    
+    uiEntities.removeAll()
   }
 }
 
@@ -664,7 +685,7 @@ extension EntityManager {
     addUIElements()
     
     loadTutorialLevel()
-  
+    
     spawnHeros(mapSize: AppConstants.Layout.tutorialBoundrySize)
     spawnDeposit()
     
@@ -672,9 +693,9 @@ extension EntityManager {
   }
   
   private func loadTutorialLevel() {
-    guard let scene = SKScene(fileNamed: "TutorialScene") else { return }
+    guard let tutorialScene = SKScene(fileNamed: "TutorialScene") else { return }
     
-    scene.enumerateChildNodes(withName: AppConstants.ComponentNames.wallPanelName) { wallNode, _  in
+    tutorialScene.enumerateChildNodes(withName: AppConstants.ComponentNames.wallPanelName) { wallNode, _  in
       guard let panelSegment = self.getPanelSegment(wallNode: wallNode),
             let panelShapeComponent = panelSegment.component(ofType: ShapeComponent.self) else { return }
       
@@ -697,11 +718,11 @@ extension EntityManager {
     
     var config: Panel.BeamArrangment = .none
     if let userData = wallNode.userData,
-      let beamsRawValue = userData[Tutorial.beamsUserDataKey] as? Int {
+       let beamsRawValue = userData[Tutorial.beamsUserDataKey] as? Int {
       
       config = Panel.BeamArrangment(rawValue: beamsRawValue)!
     }
-  
+    
     guard let panelSegment = panelFactory.panelSegment(beamConfig: config,
                                                        number: 1,
                                                        team: team).first else { return nil}
@@ -710,14 +731,14 @@ extension EntityManager {
   }
   
   private func initializeTutorial() {
-    guard let hero = self.playerEntites[0] as? General,
-      let heroAliasComponent = hero.component(ofType: AliasComponent.self),
-      let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
-      let heroPhysicsComponent = hero.component(ofType: PhysicsComponent.self),
-      let ghost = self.playerEntites[1] as? General,
-      let ghostAliasComponent = ghost.component(ofType: AliasComponent.self),
-      let ghostSpriteComponent = ghost.component(ofType: SpriteComponent.self),
-      let ghostPhysicsComponent = ghost.component(ofType: PhysicsComponent.self) else { return }
+    guard let hero = playerEntites[0] as? General,
+          let heroAliasComponent = hero.component(ofType: AliasComponent.self),
+          let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
+          let heroPhysicsComponent = hero.component(ofType: PhysicsComponent.self),
+          let ghost = playerEntites[1] as? General,
+          let ghostAliasComponent = ghost.component(ofType: AliasComponent.self),
+          let ghostSpriteComponent = ghost.component(ofType: SpriteComponent.self),
+          let ghostPhysicsComponent = ghost.component(ofType: PhysicsComponent.self) else { return }
     
     heroAliasComponent.node.text = ""
     ghostAliasComponent.node.text = ""
@@ -727,16 +748,16 @@ extension EntityManager {
     ghostPhysicsComponent.physicsBody.collisionBitMask = PhysicsCategoryMask.package
     heroPhysicsComponent.physicsBody.collisionBitMask = PhysicsCategoryMask.package
     
-    let tutorialActionEntity = TutorialAction(delegate: self.scene)
+    let tutorialActionEntity = TutorialAction(delegate: scene)
     if let tapSpriteComponent = tutorialActionEntity.component(ofType: SpriteComponent.self) {
-      self.scene.addChild(tapSpriteComponent.node)
+      scene.addChild(tapSpriteComponent.node)
     }
     
     if let step = tutorialActionEntity.setupNextStep(), step == .rotateThrow {
       spawnResource(position: step.midPosition, velocity: .zero)
     }
     
-    self.tutorialEntities.append(tutorialActionEntity)
+    tutorialEntities.append(tutorialActionEntity)
   }
   
 }
