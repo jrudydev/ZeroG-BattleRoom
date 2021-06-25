@@ -32,6 +32,7 @@ extension GameScene: TutorialActionDelegate {
   }
   
   func setupHintAnimations(step: Tutorial.Step) {
+    
     guard let ghost = self.entityManager.playerEntites[1] as? General,
       let ghostSpriteComponent = ghost.component(ofType: SpriteComponent.self),
       let ghostHandsComponent = ghost.component(ofType: HandsComponent.self),
@@ -39,10 +40,7 @@ extension GameScene: TutorialActionDelegate {
       let launchComponent = ghost.component(ofType: LaunchComponent.self),
       let tapSticker = self.childNode(withName: AppConstants.ComponentNames.tutorialTapStickerName),
       let pinchSticker = self.cam?.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName),
-      let throwHintSticker = self.cam?.childNode(withName: AppConstants.ComponentNames.tutorialThrowStickerName),
-      let restartButton = self.cam?.childNode(withName: AppConstants.ButtonNames.refreshButtonName) else { return }
-    
-//    restartButton.alpha = 0.0
+      let throwHintSticker = self.cam?.childNode(withName: AppConstants.ComponentNames.tutorialThrowStickerName) else { return }
   
     self.stopAllTutorialAnimations()
     self.resetSprites(pos: step.startPosition, rotation: step.startRotation, tapPos: step.tapPosition)

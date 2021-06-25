@@ -208,10 +208,7 @@ extension GameScene: SKPhysicsContactDelegate {
       let panelShapeComponent = panel.component(ofType: ShapeComponent.self),
       let tractorBeamComponent = panel.component(ofType: BeamComponent.self),
       self.gameState.currentState is Tutorial || !tractorBeamComponent.isOccupied,
-      hero.isBeamable,
-      let restartButton = self.cam?.childNode(withName: AppConstants.ButtonNames.refreshButtonName) else { return }
-    
-//    restartButton.alpha = 0.0
+      hero.isBeamable else { return }
     
     if let panelTeamComponent = panel.component(ofType: TeamComponent.self),
       let heroTeamComponent = hero.component(ofType: TeamComponent.self),

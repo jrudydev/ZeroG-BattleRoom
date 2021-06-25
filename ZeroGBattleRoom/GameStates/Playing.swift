@@ -72,7 +72,6 @@ extension Playing {
     scene.entityManager.spawnHeros(mapSize: AppConstants.Layout.boundarySize)
     scene.entityManager.spawnDeposit()
     scene.entityManager.spawnField()
-    
   
     scene.entityManager.addUIElements()
     

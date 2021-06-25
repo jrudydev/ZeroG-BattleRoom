@@ -31,7 +31,7 @@ class GameScene: SKScene {
   
   var entityManager: EntityManager!
   var graphs = [String : GKGraph]()
-  
+
   lazy var gameState: GKStateMachine = GKStateMachine(states: [
     WaitingForTap(scene: self),
     Tutorial(scene: self),
