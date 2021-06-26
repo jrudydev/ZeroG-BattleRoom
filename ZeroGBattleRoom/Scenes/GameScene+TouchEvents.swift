@@ -18,7 +18,7 @@ extension GameScene {
     numberOfTouches += 1
 
     guard !isInGameButton(node: atPoint(pos)) else { return }
-    guard isPinchZoom(step: currentTutorialStep) else { return }
+    guard !(gameState.currentState is Tutorial) || isPinchZoom(step: currentTutorialStep) else { return }
     guard let hero = entityManager.hero as? General,
           let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
           let launchComponent = hero.component(ofType: LaunchComponent.self) else { return }
@@ -132,7 +132,7 @@ extension GameScene {
   private func handleRestartTap(node: SKNode) {
     guard let name = node.name, name == AppConstants.ButtonNames.refreshButtonName,
           let tutorialStep = tutorialAction?.currentStep else { return }
-
+    
     setupHintAnimations(step: tutorialStep)
     
 //    audioPlayer.play(effect: Audio.EffectFiles.uiMenuSelect)

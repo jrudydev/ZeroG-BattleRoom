@@ -43,7 +43,9 @@ extension GameScene: TutorialActionDelegate {
       let throwHintSticker = cam?.childNode(withName: AppConstants.ComponentNames.tutorialThrowStickerName) else { return }
   
     stopAllTutorialAnimations()
-    resetSprites(pos: step.startPosition, rotation: step.startRotation, tapPos: step.tapPosition)
+    resetSprites(pos: step.startPosition,
+                 rotation: step.startRotation,
+                 tapPos: step.tapPosition)
     showTutorialHints()
     
     let initialWait = 1.0
