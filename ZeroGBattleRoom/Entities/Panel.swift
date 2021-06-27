@@ -39,7 +39,6 @@ class Panel: GKEntity {
     beamPhysicsBody.isDynamic = false
     beamPhysicsBody.categoryBitMask = PhysicsCategoryMask.wall
     beamPhysicsBody.contactTestBitMask = PhysicsCategoryMask.hero
-    beamPhysicsBody.collisionBitMask = PhysicsCategoryMask.hero
     
     if let team = team {
       shapeNode.strokeColor = team.color

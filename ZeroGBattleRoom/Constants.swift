@@ -17,7 +17,7 @@ struct AppConstants {
   
   struct Layout {
     static let mapSize = CGSize(width: 2000, height: 3000)
-    static let boundarySize = CGSize(width:  1000, height: 1600)
+    static let boundarySize = CGSize(width:  1100, height: 1600)
     static let tutorialBoundrySize = CGSize(width: 100.0, height: 400.0)
     static let wallSize = CGSize(width: 100, height: 20)
     static var wallCornerRadius: CGFloat {

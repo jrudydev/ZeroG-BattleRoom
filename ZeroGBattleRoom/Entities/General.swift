@@ -123,9 +123,7 @@ class General: GKEntity, BeamableProtocol {
   var isBeamable: Bool = true
   
   func resetBeamTimer() {
-    DispatchQueue.main.asyncAfter(deadline: .now() + General.beamResetTime) {
-      [weak self] in
-      
+    DispatchQueue.main.asyncAfter(deadline: .now() + General.beamResetTime) { [weak self] in
       guard let self = self else { return }
       
       self.isBeamable = true

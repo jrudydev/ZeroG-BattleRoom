@@ -11,6 +11,7 @@ import SpriteKit
 import GameKit
 
 extension GameScene: SKPhysicsContactDelegate {
+  
   func didBegin(_ contact: SKPhysicsContact) {
     guard gameState.currentState is Playing ||
       gameState.currentState is Tutorial else { return }
@@ -228,7 +229,9 @@ extension GameScene: SKPhysicsContactDelegate {
     
     let isTopBeam = beam.position.y == abs(beam.position.y)
     let convertedPosition = convert(beam.position, from: panelShapeComponent.node)
-    let rotation = isTopBeam ? panelShapeComponent.node.zRotation : panelShapeComponent.node.zRotation + CGFloat.pi
+    let rotation = isTopBeam ?
+      panelShapeComponent.node.zRotation :
+      panelShapeComponent.node.zRotation + CGFloat.pi
     
     DispatchQueue.main.async {
       spriteComponent.node.position = convertedPosition
@@ -253,4 +256,5 @@ extension GameScene: SKPhysicsContactDelegate {
       audioPlayer.play(effect: Audio.EffectFiles.blipSound)
     }
   }
+  
 }
