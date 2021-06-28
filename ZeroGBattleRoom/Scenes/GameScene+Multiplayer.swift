@@ -44,7 +44,6 @@ extension GameScene: MultiplayerNetworkingProtocol {
         let beamComponent = player.occupiedPanel?.component(ofType: BeamComponent.self) {
         
         beamComponent.isOccupied = false
-        player.resetBeamTimer()
       } else {
         guard !impulseComponent.isOnCooldown else { return }
   

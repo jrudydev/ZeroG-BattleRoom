@@ -14,5 +14,4 @@ protocol BeamableProtocol {
   var occupiedPanel: Panel? { get set }
   var isBeamed: Bool { get }
   var isBeamable: Bool { get }
-  func resetBeamTimer()
 }

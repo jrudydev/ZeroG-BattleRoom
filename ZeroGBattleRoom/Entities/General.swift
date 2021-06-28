@@ -122,14 +122,6 @@ class General: GKEntity, BeamableProtocol {
   }
   var isBeamable: Bool = true
   
-  func resetBeamTimer() {
-    DispatchQueue.main.asyncAfter(deadline: .now() + General.beamResetTime) { [weak self] in
-      guard let self = self else { return }
-      
-      self.isBeamable = true
-    }
-  }
-  
 }
 
 extension General {
@@ -296,7 +288,6 @@ extension General: LaunchableProtocol {
     
     launchComponent.hide()
     
-    self.resetBeamTimer()
     completion?(spriteComponent.node,
                 physicsComponent.physicsBody.velocity,
                 physicsComponent.physicsBody.angularVelocity,

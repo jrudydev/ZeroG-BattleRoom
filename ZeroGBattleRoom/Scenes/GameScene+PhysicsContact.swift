@@ -12,20 +12,28 @@ import GameKit
 
 extension GameScene: SKPhysicsContactDelegate {
   
+  func didEnd(_ contact: SKPhysicsContact) {
+    guard gameState.currentState is Playing ||
+      gameState.currentState is Tutorial else { return }
+    
+    let (firstBody, secondBody) = contact.physicsBodies
+  
+    if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
+      secondBody.categoryBitMask == PhysicsCategoryMask.wall {
+      
+      guard let heroNode = firstBody.node as? SKSpriteNode else { return }
+      
+      guard let hero = entityManager.heroWith(node: heroNode) as? General else { return }
+      
+      hero.isBeamable = true
+    }
+  }
+  
   func didBegin(_ contact: SKPhysicsContact) {
     guard gameState.currentState is Playing ||
       gameState.currentState is Tutorial else { return }
     
-    var firstBody: SKPhysicsBody
-    var secondBody: SKPhysicsBody
-    
-    if contact.bodyA.categoryBitMask < contact.bodyB.categoryBitMask {
-      firstBody = contact.bodyA
-      secondBody = contact.bodyB
-    } else {
-      firstBody = contact.bodyB
-      secondBody = contact.bodyA
-    }
+    let (firstBody, secondBody) = contact.physicsBodies
     
     if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
       secondBody.categoryBitMask == PhysicsCategoryMask.hero {
@@ -255,6 +263,25 @@ extension GameScene: SKPhysicsContactDelegate {
     if hero != entityManager.playerEntites[1] {
       audioPlayer.play(effect: Audio.EffectFiles.blipSound)
     }
+  }
+  
+}
+
+private extension SKPhysicsContact {
+  
+  var physicsBodies: (first: SKPhysicsBody, second: SKPhysicsBody) {
+    var firstBody: SKPhysicsBody
+    var secondBody: SKPhysicsBody
+    
+    if self.bodyA.categoryBitMask < self.bodyB.categoryBitMask {
+      firstBody = self.bodyA
+      secondBody = self.bodyB
+    } else {
+      firstBody = self.bodyB
+      secondBody = self.bodyA
+    }
+    
+    return (firstBody, secondBody)
   }
   
 }
