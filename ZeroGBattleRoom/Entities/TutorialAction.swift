@@ -55,15 +55,9 @@ class TutorialAction: GKEntity {
   public func setupNextStep() -> Tutorial.Step? {
     isShowingStep = true
     
-    if currentStep == nil {
-      currentStep = .tapLaunch
-    } else {
-      currentStep = currentStep?.nextStep
-    }
-    
-    if let currentStep = currentStep {
-      delegate?.setupHintAnimations(step: currentStep)
-    }
+    let step = currentStep?.nextStep ?? .tapLaunch
+    delegate?.setupHintAnimations(step: step)
+    currentStep = step
   
     return currentStep
   }
