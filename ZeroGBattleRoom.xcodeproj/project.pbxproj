@@ -44,6 +44,8 @@
 		9348D9B124E54F9A004F1D05 /* ScalableButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9348D9B024E54F9A004F1D05 /* ScalableButton.swift */; };
 		934A5F302433221700A3D232 /* MultiplayerNetworking+Messages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A5F2F2433221700A3D232 /* MultiplayerNetworking+Messages.swift */; };
 		934A97A225C7BA260034C840 /* GameScene+Multiplayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934A97A125C7BA260034C840 /* GameScene+Multiplayer.swift */; };
+		934B1995269A9934001345E3 /* ParallaxController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934B1994269A9934001345E3 /* ParallaxController.swift */; };
+		934B1998269A9A63001345E3 /* GKEntity+Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934B1997269A9A63001345E3 /* GKEntity+Components.swift */; };
 		934D2C2D2459A3B000AA7803 /* TutorialAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934D2C2C2459A3AF00AA7803 /* TutorialAction.swift */; };
 		934D6E4024A18B0F0082404B /* StepIndicatorComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 934D6E3F24A18B0F0082404B /* StepIndicatorComponent.swift */; };
 		93513E0F25FEAB14004B8241 /* Field.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93513E0E25FEAB14004B8241 /* Field.swift */; };
@@ -139,6 +141,8 @@
 		9348D9B024E54F9A004F1D05 /* ScalableButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScalableButton.swift; sourceTree = "<group>"; };
 		934A5F2F2433221700A3D232 /* MultiplayerNetworking+Messages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MultiplayerNetworking+Messages.swift"; sourceTree = "<group>"; };
 		934A97A125C7BA260034C840 /* GameScene+Multiplayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameScene+Multiplayer.swift"; sourceTree = "<group>"; };
+		934B1994269A9934001345E3 /* ParallaxController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParallaxController.swift; sourceTree = "<group>"; };
+		934B1997269A9A63001345E3 /* GKEntity+Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GKEntity+Components.swift"; sourceTree = "<group>"; };
 		934D2C2C2459A3AF00AA7803 /* TutorialAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TutorialAction.swift; sourceTree = "<group>"; };
 		934D6E3F24A18B0F0082404B /* StepIndicatorComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepIndicatorComponent.swift; sourceTree = "<group>"; };
 		93513E0E25FEAB14004B8241 /* Field.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Field.swift; sourceTree = "<group>"; };
@@ -391,6 +395,7 @@
 			children = (
 				934892AA24DB93E000C8EFC8 /* AudioService */,
 				93A55EF624307D4F0027E83E /* Extensions */,
+				934B1994269A9934001345E3 /* ParallaxController.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -405,6 +410,7 @@
 				93A55EF824307D4F0027E83E /* SKNode+Impulse.swift */,
 				93C9FE512468A48C005E71C1 /* SKSpriteNode+Texture.swift */,
 				93482E9A24CA06A500947C21 /* SKNode+Align.swift */,
+				934B1997269A9A63001345E3 /* GKEntity+Components.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -605,11 +611,13 @@
 				93C9FE522468A48C005E71C1 /* SKSpriteNode+Texture.swift in Sources */,
 				93FEBDB1242EE0CF006CCBFB /* GameScene.swift in Sources */,
 				93FEBDB3242EE0CF006CCBFB /* GameViewController.swift in Sources */,
+				934B1998269A9A63001345E3 /* GKEntity+Components.swift in Sources */,
 				93A55EFB24307D4F0027E83E /* CGVector+Normalize.swift in Sources */,
 				93A077A3243C9E8700D52205 /* BeamComponent.swift in Sources */,
 				93A55EF024307D280027E83E /* MultiplayerNetworking.swift in Sources */,
 				93F3DCB5244309960058B288 /* ImpulsableProtocol.swift in Sources */,
 				93A077A9243DC45800D52205 /* LaunchComponent.swift in Sources */,
+				934B1995269A9934001345E3 /* ParallaxController.swift in Sources */,
 				93E61FEC246A262F0038F168 /* DeliveredComponent.swift in Sources */,
 				93873A1624394C5D00A6E59A /* ImpulseComponent.swift in Sources */,
 				93FEBDAB242EE0CF006CCBFB /* AppDelegate.swift in Sources */,

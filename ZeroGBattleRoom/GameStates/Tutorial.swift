@@ -9,6 +9,7 @@
 import Foundation
 import GameplayKit
 
+
 class Tutorial: GKState {
   
   static let teamUserDataKey = "team"
@@ -100,6 +101,19 @@ class Tutorial: GKState {
     }.map { $0.position }
   }()
   
+  private let parallaxController = ParallaxController()
+  private let gridImage: SKSpriteNode = {
+    let mapSize = AppConstants.Layout.mapSize
+    let sprite = SKSpriteNode(imageNamed: "tron_grid")
+    sprite.name = AppConstants.ComponentNames.gridImageName
+    sprite.aspectFillToSize(fillSize: mapSize)
+//    let widthDiff = (sprite.size.width - mapSize.width) / 2
+//    sprite.position = CGPoint(x: sprite.position.x + widthDiff, y: sprite.position.y)
+    sprite.zPosition = SpriteZPosition.simulation.rawValue
+    
+    return sprite
+  }()
+  
   init(scene: SKScene) {
     self.scene = scene as! GameScene
     super.init()
@@ -109,8 +123,12 @@ class Tutorial: GKState {
     setupCamera()
     setupPhysics()
     setupBackground()
-  
+
     scene.entityManager.spawnTutorial()
+    
+    parallaxController.focus = scene.entityManager.hero?.sprite
+    let demension = ParallaxController.Dimension(layer: gridImage, distance: -5)
+    parallaxController.add(demension)
     
     scene.audioPlayer.play(music: Audio.MusicFiles.level)
   }
@@ -126,6 +144,7 @@ class Tutorial: GKState {
   
   override func update(deltaTime seconds: TimeInterval) {
     repositionCamera()
+    parallaxController.update()
   }
   
 }
@@ -140,13 +159,6 @@ extension Tutorial {
     whiteBackground.zPosition = SpriteZPosition.background.rawValue
     scene.addChild(whiteBackground)
     
-    let gridImage = SKSpriteNode(imageNamed: "tron_grid")
-    gridImage.name = AppConstants.ComponentNames.gridImageName
-    gridImage.aspectFillToSize(fillSize: mapSize)
-    
-    let widthDiff = (gridImage.size.width - mapSize.width) / 2
-    gridImage.position = CGPoint(x: gridImage.position.x +  widthDiff, y: gridImage.position.y)
-    gridImage.zPosition = SpriteZPosition.simulation.rawValue
     scene.addChild(gridImage)
   }
   
