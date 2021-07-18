@@ -748,16 +748,17 @@ extension EntityManager {
     ghostPhysicsComponent.physicsBody.collisionBitMask = PhysicsCategoryMask.package
     heroPhysicsComponent.physicsBody.collisionBitMask = PhysicsCategoryMask.package
     
-    let tutorialActionEntity = TutorialAction(delegate: scene)
-    if let tapSpriteComponent = tutorialActionEntity.component(ofType: SpriteComponent.self) {
+    let tutorialAction = TutorialAction(delegate: scene)
+    if let tapSpriteComponent = tutorialAction.component(ofType: SpriteComponent.self) {
       scene.addChild(tapSpriteComponent.node)
     }
     
-    if let step = tutorialActionEntity.setupNextStep(), step == .rotateThrow {
-      spawnResource(position: step.midPosition, velocity: .zero)
+    // Spawn resource when starting on throw tutorial
+    if let nextStep = tutorialAction.setupNextStep(), nextStep == .rotateThrow {
+      spawnResource(position: nextStep.midPosition, velocity: .zero)
     }
     
-    tutorialEntities.append(tutorialActionEntity)
+    tutorialEntities.append(tutorialAction)
   }
   
 }

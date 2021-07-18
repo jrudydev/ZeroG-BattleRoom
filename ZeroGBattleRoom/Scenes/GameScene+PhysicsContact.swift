@@ -70,18 +70,21 @@ extension GameScene: SKPhysicsContactDelegate {
   }
   
   public func handleDeposit(package: Package) {
-    if gameState.currentState is Tutorial,
-      let tutorial = entityManager.tutorialEntities[0] as? TutorialAction,
-      let wasThrownBy = package.wasThrownBy,
-      wasThrownBy === entityManager.playerEntites[0] {
-
-      let nextStep = tutorial.setupNextStep()
-      if nextStep == nil {
-        gameOverStatus = .tutorialDone
-        gameState.enter(GameOver.self)
-        return
-      }
+    guard package.wasThrownBy != nil else { return }
+    guard gameState.currentState is Tutorial else {
+      // TODO: - Handle in-game thrown deposit
+      return
     }
+    guard let currentStep = tutorialAction?.currentStep else { return }
+    guard package.wasThrownBy === entityManager.hero else {
+      setupHintAnimations(step: currentStep)
+      return
+    }
+    guard tutorialAction?.setupNextStep() == nil else { return }
+  
+    gameOverStatus = .tutorialDone
+    gameState.enter(GameOver.self)
+    return
   }
   
   private func handleHeroHeroCollision(firstBody: SKPhysicsBody, secondBody: SKPhysicsBody) {

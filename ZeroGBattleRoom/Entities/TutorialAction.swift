@@ -12,11 +12,14 @@ import GameplayKit
 
 
 protocol TutorialActionDelegate: AnyObject {
+    
   func setupHintAnimations(step: Tutorial.Step)
+
 }
  
 
 class TutorialAction: GKEntity {
+  
   var isShowingStep = false
   
   var currentStep: Tutorial.Step? = nil
@@ -53,12 +56,21 @@ class TutorialAction: GKEntity {
   
   @discardableResult
   public func setupNextStep() -> Tutorial.Step? {
-    isShowingStep = true
+    defer { isShowingStep = true }
     
-    let step = currentStep?.nextStep ?? .tapLaunch
-    delegate?.setupHintAnimations(step: step)
-    currentStep = step
+    guard currentStep != nil else {
+      delegate?.setupHintAnimations(step: .tapLaunch)
+      currentStep = .tapLaunch
+      return currentStep
+    }
+    guard let nextStep = currentStep?.nextStep else {
+      return nil
+    }
   
+    delegate?.setupHintAnimations(step: nextStep)
+    currentStep = nextStep
+    
     return currentStep
   }
+  
 }
