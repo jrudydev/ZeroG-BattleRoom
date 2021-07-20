@@ -126,8 +126,10 @@ extension GameScene: SKPhysicsContactDelegate {
     if heroHandsComponent.hasFreeHand {
       heroHandsComponent.grab(resource: impactedResource)
       
-      // enable the throw button
-      throwButton.alpha = 1.0
+      // enable the throw button if this is the main hero
+      if hero == entityManager.hero {
+        throwButton.alpha = 1.0
+      }
       
       if let resourceIndex = entityManager.indexForResource(shape: resourceShapeComponent.node),
         let heroIndex = entityManager.playerEntites.firstIndex(of: hero) {
