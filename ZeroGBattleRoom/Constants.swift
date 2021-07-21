@@ -41,6 +41,7 @@ struct AppConstants {
     static let shopLabelName = "shop-label"
     
     static let gameOverLabel = "game-over-label"
+    static let matchFoundLabel = "match-found-label"
     static let matchFoundVSLabel = "match-found-vs-label"
     static let matchFoundPlayer1Label = "match-found-player1-label"
     static let matchFoundPlayer2Label = "match-found-player2-label"
