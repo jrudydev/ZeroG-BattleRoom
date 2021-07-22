@@ -70,17 +70,19 @@ extension GameScene {
   // MARK: Touch Up
     
   func touchUp(atPoint pos : CGPoint) {
+    let hero = entityManager.hero as? General
+    let node = atPoint(pos)
+    
     switch gameState.currentState {
     case is WaitingForTap:
       handleWaitingForTap(pos: pos)
     case is Tutorial, is Playing:
-      let node = atPoint(pos)
-      if isInGameButton(node: node) && node.alpha == 1.0 {
+      if let _ = hero?.component(ofType: LaunchComponent.self) {
+        handlePlayerLaunch(pos: pos)
+      } else if isInGameButton(node: node) && node.alpha == 1.0 {
         handleThrowTap(node: node)
         handleBackTap(node: node)
         handleRestartTap(node: node)
-      } else {
-        handlePlayerLaunch(pos: pos)
       }
     case is GameOver:
       NotificationCenter.default.post(name: .restartGame, object: nil)
