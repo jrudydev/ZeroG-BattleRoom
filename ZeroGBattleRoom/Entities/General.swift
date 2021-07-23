@@ -307,30 +307,29 @@ extension General: ThrowableProtocol {
       handsComponent.release(resource: rightResource, point: point)
       
       if let physicsComponent = self.component(ofType: PhysicsComponent.self),
-        let resourcePhysicsComponent = rightResource.component(ofType: PhysicsComponent.self) {
-        
+         let resourcePhysicsComponent = rightResource.component(ofType: PhysicsComponent.self) {
         
         resourcePhysicsComponent.physicsBody.velocity = .zero
         
         resourcePhysicsComponent.physicsBody.velocity = physicsComponent.physicsBody.velocity
         resourcePhysicsComponent.physicsBody.applyImpulse(throwVector * defaultThrowMagnitude)
-        
-        rightResource.wasThrownBy = self
       }
-    } else if let leftResource = handsComponent.leftHandSlot {
-        handsComponent.isImpacted = true
-        handsComponent.release(resource: leftResource, point: point)
-        
-        if let physicsComponent = self.component(ofType: PhysicsComponent.self),
-          let resourcePhysicsComponent = leftResource.component(ofType: PhysicsComponent.self) {
-          
-          resourcePhysicsComponent.physicsBody.velocity = .zero
-          
-          resourcePhysicsComponent.physicsBody.velocity = physicsComponent.physicsBody.velocity
-          resourcePhysicsComponent.physicsBody.applyImpulse(throwVector)
-        }
       
-        leftResource.wasThrownBy = self
+      rightResource.wasThrownBy = self
+    } else if let leftResource = handsComponent.leftHandSlot {
+      handsComponent.isImpacted = true
+      handsComponent.release(resource: leftResource, point: point)
+      
+      if let physicsComponent = self.component(ofType: PhysicsComponent.self),
+         let resourcePhysicsComponent = leftResource.component(ofType: PhysicsComponent.self) {
+        
+        resourcePhysicsComponent.physicsBody.velocity = .zero
+        
+        resourcePhysicsComponent.physicsBody.velocity = physicsComponent.physicsBody.velocity
+        resourcePhysicsComponent.physicsBody.applyImpulse(throwVector * defaultThrowMagnitude )
       }
+      
+      leftResource.wasThrownBy = self
     }
+  }
 }

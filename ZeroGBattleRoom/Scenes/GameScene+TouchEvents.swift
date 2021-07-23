@@ -77,7 +77,8 @@ extension GameScene {
     case is WaitingForTap:
       handleWaitingForTap(pos: pos)
     case is Tutorial, is Playing:
-      if let _ = hero?.component(ofType: LaunchComponent.self) {
+      if let launchComponent = hero?.component(ofType: LaunchComponent.self),
+         launchComponent.launchInfo.lastTouchBegan != nil {
         handlePlayerLaunch(pos: pos)
       } else if isInGameButton(node: node) && node.alpha == 1.0 {
         handleThrowTap(node: node)
