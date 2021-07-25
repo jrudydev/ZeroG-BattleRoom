@@ -10,6 +10,7 @@ import Foundation
 import SpriteKit
 
 extension CGSize {
+  
   public func asepctFill(_ target: CGSize) -> CGSize {
     let baseAspect = self.width / self.height
     let targetAspect = target.width / target.height
@@ -19,4 +20,14 @@ extension CGSize {
       return CGSize(width: target.width, height: (target.width * height) / width)
     }
   }
+  
+  var randomResourcePosition: CGPoint {
+    let halfWidth = (width - 50) / 2
+    let halfHeight = (height - 50) / 2
+    let randomPoint = CGPoint(x: CGFloat.random(in: -halfWidth...halfWidth),
+                              y: CGFloat.random(in: -halfHeight...halfHeight))
+
+    return randomPoint.removeInnerPoints(distance: CGFloat(AppConstants.Layout.innerDistance))
+  }
+  
 }

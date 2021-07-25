@@ -192,7 +192,7 @@ extension GameScene: SKPhysicsContactDelegate {
     } else {
       heroAlias = getPlayerAliasAt(index: 1)
     }
-    aliasComponent.node.text = "\(heroAlias) (\(hero.numberOfDeposits)/\(resourcesNeededToWin))"
+    aliasComponent.node.text = "\(heroAlias) (\(hero.numberOfDeposits)/\(EntityManager.Constants.resourcesNeededToWin))"
     
     switch teamComponent.team {
     case .team1: depositComponent.team1Deposits = hero.numberOfDeposits

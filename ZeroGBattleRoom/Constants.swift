@@ -9,7 +9,9 @@
 import Foundation
 import SpriteKit
 
+
 struct AppConstants {
+  
   struct UIColors {
     static let buttonBackground = UIColor(named: "BtnBackground") ?? .gray
     static let buttonForeground = /*UIColor(named: "BtnForegroundGreen") ??*/ UIColor.white
@@ -23,6 +25,7 @@ struct AppConstants {
     static var wallCornerRadius: CGFloat {
       return wallSize.width * 0.1
     }
+    static let innerDistance: CGFloat = 200.0
     static let buttonWidth: CGFloat = 50.0
     static let buttonCornerRadius: CGFloat = 10.0
     static let buttonOrigin = CGPoint(x: -buttonWidth/2, y:  -buttonWidth/2)
@@ -89,14 +92,5 @@ struct AppConstants {
     static let maxSwipeDistance: CGFloat = 100.0
     static let maxRotation: CGFloat = 100.0
   }
-}
-
-extension CGSize {
-  var randomPosition: CGPoint {
-    let halfWidth = (self.width - 50) / 2
-    let halfHeight = (self.height - 50) / 2
-
-    return CGPoint(x: CGFloat.random(in: -halfWidth...halfWidth),
-                   y: CGFloat.random(in: -halfHeight...halfHeight))
-  }
+  
 }

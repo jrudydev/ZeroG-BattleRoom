@@ -52,3 +52,24 @@ extension CGPoint {
   }
   
 }
+
+extension CGPoint {
+  
+  func removeInnerPoints(distance: CGFloat) -> CGPoint {
+    var point = self
+    switch point.x {
+    case -distance...0: point.x = -distance
+    case 0...distance: point.x = distance
+    default: break
+    }
+    
+    switch point.y {
+    case -distance...0: point.y = -distance
+    case 0...distance: point.y = distance
+    default: break
+    }
+    
+    return point
+  }
+  
+}

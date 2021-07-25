@@ -20,7 +20,7 @@ extension GameScene: MultiplayerNetworkingProtocol {
     for (idx, alias) in playerAliases.enumerated() {
       let entity = entityManager.playerEntites[idx]
       if let aliasComponent = entity.component(ofType: AliasComponent.self) {
-        aliasComponent.node.text = "\(alias) (0/\(resourcesNeededToWin))"
+        aliasComponent.node.text = "\(alias) (0/\(EntityManager.Constants.resourcesNeededToWin))"
       }
     }
   }

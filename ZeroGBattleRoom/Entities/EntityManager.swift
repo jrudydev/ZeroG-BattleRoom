@@ -10,13 +10,18 @@ import Foundation
 import SpriteKit
 import GameplayKit
 
-
-let numberOfSpawnedResources = 10
-let resourcesNeededToWin = 3
-let minDriftVelocity: CGFloat = 5.0
-let resourcePullDamper: CGFloat = 0.015
-
 class EntityManager {
+  
+  struct Constants {
+    static let heroImageName = "spaceman-idle"
+    static let numberOfSpawnedResources = 10
+    static let resourcesNeededToWin = 3
+    static let minDriftVelocity: CGFloat = 5.0
+    static let resourcePullDamper: CGFloat = 0.015
+    static let distanceFromCenter: CGFloat = 140.0
+    static let fieldRadius: CGFloat = 50.0
+    static let fieldAlpha: CGFloat = 0.3
+  }
   
   lazy var componentSystems: [GKComponentSystem] = {
     let aliasComponent = GKComponentSystem(componentClass: AliasComponent.self)
@@ -25,8 +30,8 @@ class EntityManager {
   }()
   
   var playerEntites: [GKEntity] = [
-    General(imageName: "spaceman-idle-0", team: .team1),
-    General(imageName: "spaceman-idle-0", team: .team2)
+    General(imageName: "\(Constants.heroImageName)-0", team: .team1),
+    General(imageName: "\(Constants.heroImageName)-0", team: .team2)
   ]
   var resourcesEntities = [GKEntity]()
   var wallEntities = [GKEntity]()
@@ -58,11 +63,11 @@ class EntityManager {
     guard let deposit = deposit as? Deposit,
           let depositComponent = deposit.component(ofType: DepositComponent.self) else { return nil }
     
-    if depositComponent.team1Deposits >= resourcesNeededToWin {
+    if depositComponent.team1Deposits >= Constants.resourcesNeededToWin {
       return Team.team1
     }
     
-    if depositComponent.team2Deposits >= resourcesNeededToWin {
+    if depositComponent.team2Deposits >= Constants.resourcesNeededToWin {
       return Team.team2
     }
     
@@ -174,7 +179,7 @@ extension EntityManager {
     
     let absDx = abs(physicsBody.velocity.dx)
     let absDy = abs(physicsBody.velocity.dy)
-    let notMoving = absDx < minDriftVelocity && absDy < minDriftVelocity
+    let notMoving = absDx < Constants.minDriftVelocity && absDy < Constants.minDriftVelocity
     //    restartButton.alpha = notMoving ? 1.0 : 0.0
   }
   
@@ -193,7 +198,7 @@ extension EntityManager {
       if distanceToDeposit < Deposit.eventHorizon {
         scene.handleDeposit(package: package)
       } else if distanceToDeposit < Deposit.pullDistance && !isHeld(resource: package) {
-        let pullStength = (Deposit.pullDistance - distanceToDeposit) * resourcePullDamper
+        let pullStength = (Deposit.pullDistance - distanceToDeposit) * Constants.resourcePullDamper
         let moveX = deposit.position.x - shapeComponent.node.position.x
         let moveY = deposit.position.y - shapeComponent.node.position.y
         let moveVector = CGVector(dx:  moveX, dy: moveY)
@@ -280,12 +285,12 @@ extension EntityManager {
   func spawnResources() {
     guard isHost else { return }
     
-    for _ in 0..<numberOfSpawnedResources {
+    for _ in 0..<Constants.numberOfSpawnedResources {
       spawnResource()
     }
   }
   
-  func spawnResource(position: CGPoint = AppConstants.Layout.boundarySize.randomPosition,
+  func spawnResource(position: CGPoint = AppConstants.Layout.boundarySize.randomResourcePosition,
                      velocity: CGVector? = nil) {
     guard let resourceNode = resourceNode?.copy() as? SKShapeNode else { return }
     
@@ -339,28 +344,33 @@ extension EntityManager {
     add(deposit)
   }
   
-  func spawnField(position: CGPoint = .zero) {
-    let shapeNode = SKShapeNode(circleOfRadius: 20.0)
-    shapeNode.fillColor = .blue
-    shapeNode.alpha = 0.5
-    shapeNode.strokeColor = .white
-    let physicsBody = SKPhysicsBody(circleOfRadius: 20.0)
-    let field = Field(shapeNode: shapeNode, physicsBody: physicsBody)
-    
-    guard let shapeComponent = field.component(ofType: ShapeComponent.self) else { return }
-    
-    shapeComponent.node.position = position
-    add(field)
+  func spawnFields() {
+    spawnField(position: CGPoint(x: Constants.distanceFromCenter, y: 0.0))
+    spawnField(position: CGPoint(x: -Constants.distanceFromCenter, y: 0.0))
+  }
+  
+  private func spawnField(position: CGPoint = .zero) {
+    let fieldShapeNode: SKShapeNode = {
+      let node = SKShapeNode(circleOfRadius: Constants.fieldRadius)
+      node.fillColor = .blue
+      node.alpha = Constants.fieldAlpha
+      node.strokeColor = .white
+      node.position = position
+      
+      return node
+    }()
+    let physicsBody = SKPhysicsBody(circleOfRadius: Constants.fieldRadius)
+    physicsBody.isDynamic = false
+    let fieldEntityModel = FieldEntityModel(shapeNode: fieldShapeNode, physicsBody: physicsBody)
+
+    add(Field(entityModel: fieldEntityModel))
   }
   
   func spawnPanels() {
     let factory = scene.entityManager.panelFactory
     let wallPanels = factory.perimeterWallFrom(size: AppConstants.Layout.boundarySize)
-    let centerPanels = self.centerPanels()
-    let blinderPanels = self.blinderPanels()
-    let extraPanels = self.extraPanels()
     
-    for entity in wallPanels + centerPanels + blinderPanels + extraPanels {
+    for entity in wallPanels + centerPanels() + blinderPanels() + extraPanels() {
       if let shapeNode = entity.component(ofType: ShapeComponent.self)?.node {
         scene.addChild(shapeNode)
       }

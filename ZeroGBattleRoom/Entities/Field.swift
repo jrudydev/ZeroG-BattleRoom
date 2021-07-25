@@ -10,6 +10,7 @@ import Foundation
 import SpriteKit
 import GameplayKit
 
+
 protocol Entity {
   func setupComponents()
   func setupPhysics()
@@ -17,13 +18,10 @@ protocol Entity {
 
 class Field: GKEntity {
   
-  private let shapeNode: SKShapeNode
-  private let physicsBody: SKPhysicsBody
+  internal var entityModel: FieldEntityModel
 
-  init(shapeNode: SKShapeNode,
-       physicsBody: SKPhysicsBody) {
-    self.shapeNode = shapeNode
-    self.physicsBody = physicsBody
+  init(entityModel: FieldEntityModel) {
+    self.entityModel = entityModel
     
     super.init()
     
@@ -40,12 +38,19 @@ class Field: GKEntity {
 extension Field: Entity {
   
   func setupComponents() {
-    addComponent(ShapeComponent(node: shapeNode))
-    addComponent(PhysicsComponent(physicsBody: physicsBody))
+    addComponent(ShapeComponent(node: entityModel.shapeNode))
+    addComponent(PhysicsComponent(physicsBody: entityModel.physicsBody))
   }
   
   func setupPhysics() {
-    shapeNode.physicsBody = physicsBody
+    entityModel.shapeNode.physicsBody = entityModel.physicsBody
   }
 
+}
+
+struct FieldEntityModel {
+  
+  let shapeNode: SKShapeNode
+  let physicsBody: SKPhysicsBody
+  
 }
