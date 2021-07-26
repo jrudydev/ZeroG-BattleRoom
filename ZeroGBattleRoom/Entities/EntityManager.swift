@@ -325,8 +325,8 @@ extension EntityManager {
     
     // Make sure resources are only colliding on the designated host device
     if isHost {
-      physicsBody.contactTestBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.wall
-      physicsBody.collisionBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.package
+      physicsBody.contactTestBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.tractor
+      physicsBody.collisionBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.package | PhysicsCategoryMask.wall
     } else {
       physicsBody.contactTestBitMask = 0
       physicsBody.collisionBitMask = 0

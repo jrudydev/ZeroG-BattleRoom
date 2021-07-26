@@ -37,7 +37,7 @@ class Panel: GKEntity {
     let tractorSize = CGSize(width: size.width * 0.4, height: size.width * 0.05)
     let beamPhysicsBody = SKPhysicsBody(rectangleOf: tractorSize)
     beamPhysicsBody.isDynamic = false
-    beamPhysicsBody.categoryBitMask = PhysicsCategoryMask.wall
+    beamPhysicsBody.categoryBitMask = PhysicsCategoryMask.tractor
     beamPhysicsBody.contactTestBitMask = PhysicsCategoryMask.hero
     
     if let team = team {

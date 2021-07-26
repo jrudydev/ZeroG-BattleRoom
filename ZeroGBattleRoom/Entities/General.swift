@@ -105,7 +105,7 @@ class General: GKEntity, BeamableProtocol {
     // TODO: Send and handle a state parameter here
     let physicsBody = SKPhysicsBody(circleOfRadius: 10)
     physicsBody.categoryBitMask = PhysicsCategoryMask.hero
-    physicsBody.collisionBitMask = PhysicsCategoryMask.package | PhysicsCategoryMask.hero
+    physicsBody.collisionBitMask = PhysicsCategoryMask.package | PhysicsCategoryMask.hero | PhysicsCategoryMask.wall
     physicsBody.contactTestBitMask = PhysicsCategoryMask.hero
     
     return physicsBody

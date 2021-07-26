@@ -19,7 +19,7 @@ extension GameScene: SKPhysicsContactDelegate {
     let (firstBody, secondBody) = contact.physicsBodies
   
     if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
-      secondBody.categoryBitMask == PhysicsCategoryMask.wall {
+      secondBody.categoryBitMask == PhysicsCategoryMask.tractor {
       
       guard let heroNode = firstBody.node as? SKSpriteNode else { return }
       
@@ -54,7 +54,7 @@ extension GameScene: SKPhysicsContactDelegate {
     }
     
     if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
-      secondBody.categoryBitMask == PhysicsCategoryMask.wall {
+      secondBody.categoryBitMask == PhysicsCategoryMask.tractor {
       
       handleHeroWallCollision(firstBody: firstBody, secondBody: secondBody)
     }

@@ -15,11 +15,12 @@ struct PhysicsCategoryMask {
   static var hero     : UInt32 = 0x1 << 0
   static var base     : UInt32 = 0x1 << 1
   static var wall     : UInt32 = 0x1 << 2
-  static var strap    : UInt32 = 0x1 << 3
-  static var payload  : UInt32 = 0x1 << 4
-  static var package  : UInt32 = 0x1 << 5
-  static var deposit  : UInt32 = 0x1 << 6
-  static var pod      : UInt32 = 0x1 << 7
+  static var tractor  : UInt32 = 0x1 << 3
+  static var field    : UInt32 = 0x1 << 4
+  static var payload  : UInt32 = 0x1 << 5
+  static var package  : UInt32 = 0x1 << 6
+  static var deposit  : UInt32 = 0x1 << 7
+  static var pod      : UInt32 = 0x1 << 8
 }
 
 

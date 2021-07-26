@@ -33,6 +33,7 @@ struct PanelFactory {
     
     let physicsBody = SKPhysicsBody(rectangleOf: shape.frame.size)
     physicsBody.isDynamic = false
+    physicsBody.categoryBitMask = PhysicsCategoryMask.wall
 
     return Panel(shapeNode: shape, physicsBody: physicsBody, team: team, config: beamConfig)
   }
