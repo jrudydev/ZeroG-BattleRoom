@@ -134,11 +134,17 @@ extension GameScene {
   
   private func handleRestartTap(node: SKNode) {
     guard let name = node.name, name == AppConstants.ButtonNames.refreshButtonName,
-          let tutorialStep = tutorialAction?.currentStep else { return }
+          let hero = entityManager.hero as? General,
+          let heroSprite = hero.sprite else { return }
     
-    setupHintAnimations(step: tutorialStep)
+    if let tutorialStep = tutorialAction?.currentStep {
+      setupHintAnimations(step: tutorialStep)
+    } else {
+      hero.impactedAt(point: heroSprite.position)
+      heroSprite.position = CGPoint(x: 0.0, y: -AppConstants.Layout.boundarySize.height/2 + 20)
+    }
     
-//    audioPlayer.play(effect: Audio.EffectFiles.uiMenuSelect)
+    audioPlayer.play(effect: Audio.EffectFiles.uiMenuSelect)
   }
   
   private func isInGameButton(node: SKNode) -> Bool {

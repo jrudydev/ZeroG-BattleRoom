@@ -582,9 +582,9 @@ extension EntityManager {
   func addUIElements() {
     setupBackButton()
     setupThrowButton()
+    setupRestartButton()
     
     if scene.gameState.currentState is Tutorial {
-      setupRestartButton()
       addTutorialStickers()
     }
   }
