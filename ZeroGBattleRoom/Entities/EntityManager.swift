@@ -184,23 +184,21 @@ extension EntityManager {
   }
   
   private func updateResourceVelocity() {
-    guard let deposit = scene.childNode(withName: AppConstants.ComponentNames.depositNodeName) else { return }
+    guard let depositNode = scene.childNode(withName: AppConstants.ComponentNames.depositNodeName) else { return }
     
     for resource in resourcesEntities {
       guard let package = resource as? Package,
             let physicsComponent = package.component(ofType: PhysicsComponent.self),
             let shapeComponent = package.component(ofType: ShapeComponent.self) else { return }
       
-      let dx = deposit.position.x - shapeComponent.node.position.x
-      let dy = deposit.position.y - shapeComponent.node.position.y
+      let dx = depositNode.position.x - shapeComponent.node.position.x
+      let dy = depositNode.position.y - shapeComponent.node.position.y
       let distanceToDeposit = sqrt(pow(dx, 2.0) + pow(dy, 2.0))
-      
-      if distanceToDeposit < Deposit.eventHorizon {
-        scene.handleDeposit(package: package)
-      } else if distanceToDeposit < Deposit.pullDistance && !isHeld(resource: package) {
+  
+      if distanceToDeposit < Deposit.pullDistance && !isHeld(resource: package) {
         let pullStength = (Deposit.pullDistance - distanceToDeposit) * Constants.resourcePullDamper
-        let moveX = deposit.position.x - shapeComponent.node.position.x
-        let moveY = deposit.position.y - shapeComponent.node.position.y
+        let moveX = depositNode.position.x - shapeComponent.node.position.x
+        let moveY = depositNode.position.y - shapeComponent.node.position.y
         let moveVector = CGVector(dx:  moveX, dy: moveY)
         let adjustedVector = moveVector.normalized() * pullStength
         physicsComponent.physicsBody.applyImpulse(adjustedVector)
@@ -361,6 +359,7 @@ extension EntityManager {
     }()
     let physicsBody = SKPhysicsBody(circleOfRadius: Constants.fieldRadius)
     physicsBody.isDynamic = false
+    physicsBody.categoryBitMask = PhysicsCategoryMask.field
     let fieldEntityModel = FieldEntityModel(shapeNode: fieldShapeNode, physicsBody: physicsBody)
 
     add(Field(entityModel: fieldEntityModel))
@@ -491,7 +490,7 @@ extension EntityManager {
     return panel
   }
   
-  func enitityWith(node: SKNode) -> GKEntity? {
+  func entityWith(node: SKNode) -> GKEntity? {
     let entity = entities.first { entity -> Bool in
       switch node {
       case is SKSpriteNode:

@@ -24,8 +24,8 @@ class Package: GKEntity {
     
     super.init()
     
-    self.addComponent(ShapeComponent(node: shapeNode))
-    self.addComponent(PhysicsComponent(physicsBody: self.physicsBody))
+    addComponent(ShapeComponent(node: shapeNode))
+    addComponent(PhysicsComponent(physicsBody: self.physicsBody))
     
     shapeNode.physicsBody = self.physicsBody
   }
@@ -37,25 +37,28 @@ class Package: GKEntity {
 }
 
 extension Package {
+  
   func disableCollisionDetection() {
-    guard let shapeComponent = self.component(ofType: ShapeComponent.self) else { return }
+    guard let shapeComponent = component(ofType: ShapeComponent.self) else { return }
 
     shapeComponent.node.physicsBody = nil
   }
   
   func enableCollisionDetections() {
-    guard let shapeComponent = self.component(ofType: ShapeComponent.self),
-      let physicsComponent = self.component(ofType: PhysicsComponent.self) else { return }
+    guard let shapeComponent = component(ofType: ShapeComponent.self),
+      let physicsComponent = component(ofType: PhysicsComponent.self) else { return }
     
-    physicsComponent.physicsBody = self.physicsBody
-    shapeComponent.node.physicsBody = self.physicsBody
+    physicsComponent.physicsBody = physicsBody
+    shapeComponent.node.physicsBody = physicsBody
   }
+  
 }
 
 extension Package {
+  
   func placeFor(tutorialStep: Tutorial.Step) {
-    if let shapeComponent = self.component(ofType: ShapeComponent.self),
-      let physicsComponent = self.component(ofType: PhysicsComponent.self) {
+    if let shapeComponent = component(ofType: ShapeComponent.self),
+      let physicsComponent = component(ofType: PhysicsComponent.self) {
       
       DispatchQueue.main.async {
         shapeComponent.node.position = tutorialStep.midPosition
@@ -63,4 +66,16 @@ extension Package {
       }
     }
   }
+  
+}
+
+extension Package {
+  
+  func deposit(_ delivered: DeliveredComponent) {
+    guard let resourceShape = component(ofType: ShapeComponent.self) else { return }
+    
+    resourceShape.node.removeFromParent()
+    delivered.resources.insert(self)
+  }
+  
 }

@@ -35,8 +35,13 @@ class General: GKEntity, BeamableProtocol {
       physicsComponent.isEffectedByPhysics = true
     }
   }
+  
+  lazy var hands: HandsComponent? = { component(ofType: HandsComponent.self) }()
+  lazy var alias: AliasComponent? = { component(ofType: AliasComponent.self) }()
+  lazy var delivered: DeliveredComponent? = { component(ofType: DeliveredComponent.self) }()
+  lazy var team: TeamComponent? = { component(ofType: TeamComponent.self) }()
   var numberOfDeposits: Int {
-    guard let deliveredComponent = self.component(ofType: DeliveredComponent.self) else { return 0 }
+    guard let deliveredComponent = delivered else { return 0 }
     
     return deliveredComponent.resources.count
   }
@@ -105,7 +110,7 @@ class General: GKEntity, BeamableProtocol {
     // TODO: Send and handle a state parameter here
     let physicsBody = SKPhysicsBody(circleOfRadius: 10)
     physicsBody.categoryBitMask = PhysicsCategoryMask.hero
-    physicsBody.collisionBitMask = PhysicsCategoryMask.package | PhysicsCategoryMask.hero | PhysicsCategoryMask.wall
+    physicsBody.collisionBitMask = PhysicsCategoryMask.package | PhysicsCategoryMask.hero | PhysicsCategoryMask.wall | PhysicsCategoryMask.field
     physicsBody.contactTestBitMask = PhysicsCategoryMask.hero
     
     return physicsBody

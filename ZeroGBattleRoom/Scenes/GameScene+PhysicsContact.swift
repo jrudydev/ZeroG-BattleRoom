@@ -48,12 +48,6 @@ extension GameScene: SKPhysicsContactDelegate {
     }
     
     if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
-      secondBody.categoryBitMask == PhysicsCategoryMask.deposit {
-      
-      handleHeroDepositCollision(firstBody: firstBody, secondBody: secondBody)
-    }
-    
-    if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
       secondBody.categoryBitMask == PhysicsCategoryMask.tractor {
       
       handleHeroWallCollision(firstBody: firstBody, secondBody: secondBody)
@@ -67,24 +61,18 @@ extension GameScene: SKPhysicsContactDelegate {
       
       impactedResource.wasThrownBy = nil
     }
-  }
-  
-  public func handleDeposit(package: Package) {
-    guard package.wasThrownBy != nil else { return }
-    guard gameState.currentState is Tutorial else {
-      // TODO: - Handle in-game thrown deposit
-      return
+    
+    if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
+      secondBody.categoryBitMask == PhysicsCategoryMask.deposit {
+      
+      handleHeroDepositCollision(firstBody: firstBody, secondBody: secondBody)
     }
-    guard let currentStep = tutorialAction?.currentStep else { return }
-    guard package.wasThrownBy === entityManager.hero else {
-      setupHintAnimations(step: currentStep)
-      return
+    
+    if firstBody.categoryBitMask == PhysicsCategoryMask.package &&
+      secondBody.categoryBitMask == PhysicsCategoryMask.deposit {
+      
+      handlePackageDepositCollision(firstBody: firstBody, secondBody: secondBody)
     }
-    guard tutorialAction?.setupNextStep() == nil else { return }
-  
-    gameOverStatus = .tutorialDone
-    gameState.enter(GameOver.self)
-    return
   }
   
   private func handleHeroHeroCollision(firstBody: SKPhysicsBody, secondBody: SKPhysicsBody) {
@@ -154,61 +142,6 @@ extension GameScene: SKPhysicsContactDelegate {
     }
   }
   
-  private func handleHeroDepositCollision(firstBody: SKPhysicsBody, secondBody: SKPhysicsBody) {
-    guard let heroNode = firstBody.node as? SKSpriteNode,
-      let depositNode = secondBody.node as? SKShapeNode else { return }
-    
-    guard let hero = entityManager.heroWith(node: heroNode) as? General,
-      let deposit = entityManager.enitityWith(node: depositNode) as? Deposit else { return }
-    
-    guard let handsComponent = hero.component(ofType: HandsComponent.self),
-      let teamComponent = hero.component(ofType: TeamComponent.self),
-      let aliasComponent = hero.component(ofType: AliasComponent.self),
-      let deliveredComponent = hero.component(ofType: DeliveredComponent.self),
-      let depositComponent = deposit.component(ofType: DepositComponent.self),
-      (handsComponent.leftHandSlot != nil || handsComponent.rightHandSlot != nil) else { return }
-    
-    if let lefthanditem = handsComponent.leftHandSlot,
-      let shapeComponent = lefthanditem.component(ofType: ShapeComponent.self) {
-      
-      handsComponent.release(resource: lefthanditem)
-      shapeComponent.node.removeFromParent()
-    
-      deliveredComponent.resources.insert(lefthanditem)
-    }
-    
-    if let rightHandItem = handsComponent.rightHandSlot,
-      let shapeComponent = rightHandItem.component(ofType: ShapeComponent.self) {
-      
-      handsComponent.release(resource: rightHandItem)
-      shapeComponent.node.removeFromParent()
-      
-      deliveredComponent.resources.insert(rightHandItem)
-    }
-    
-    var heroAlias: String
-    if hero == entityManager.playerEntites[0] {
-      heroAlias = getPlayerAliasAt(index: 0)
-    } else {
-      heroAlias = getPlayerAliasAt(index: 1)
-    }
-    aliasComponent.node.text = "\(heroAlias) (\(hero.numberOfDeposits)/\(EntityManager.Constants.resourcesNeededToWin))"
-    
-    switch teamComponent.team {
-    case .team1: depositComponent.team1Deposits = hero.numberOfDeposits
-    case .team2: depositComponent.team2Deposits = hero.numberOfDeposits
-    default: break
-    }
-    
-    if let label = gameMessage {
-      label.text = "Deposit"
-      label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
-    }
-    
-    ShapeFactory.shared.spawnDepositParticleEffect(pos: depositNode.position)
-    audioPlayer.play(effect: Audio.EffectFiles.youScored)
-  }
-  
   private func handleHeroWallCollision(firstBody: SKPhysicsBody, secondBody: SKPhysicsBody) {
     guard let heroNode = firstBody.node as? SKSpriteNode,
       let beam = secondBody.node as? SKShapeNode else { return }
@@ -269,6 +202,86 @@ extension GameScene: SKPhysicsContactDelegate {
       audioPlayer.play(effect: Audio.EffectFiles.blipSound)
     }
   }
+  
+  private func handlePackageDepositCollision(firstBody: SKPhysicsBody, secondBody: SKPhysicsBody) {
+    guard let packageNode = firstBody.node as? SKShapeNode,
+      let depositNode = secondBody.node as? SKShapeNode else { return }
+    
+    guard let deposite = entityManager.entityWith(node: depositNode) as? Deposit,
+          let package = entityManager.resourceWith(node: packageNode) as? Package else { return }
+    
+    guard !(gameState.currentState is Tutorial) else {
+      handleTutorialDeposit(package: package)
+      return
+    }
+    
+    handleResourceDeposit(package: package, deposit: deposite)
+  }
+  
+  // MARK: Handle Deposits
+  
+  private func handleResourceDeposit(package: Package, deposit: Deposit) {
+    guard let hero = package.wasThrownBy else { return }
+    
+    handleHeroDeposit(hero, deposit: deposit, resource: package)
+  }
+  
+  private func handleHeroDepositCollision(firstBody: SKPhysicsBody, secondBody: SKPhysicsBody) {
+    guard let heroNode = firstBody.node as? SKSpriteNode,
+      let depositNode = secondBody.node as? SKShapeNode else { return }
+    
+    guard let hero = entityManager.heroWith(node: heroNode) as? General,
+          let deposit = entityManager.entityWith(node: depositNode) as? Deposit else { return }
+    
+    handleHeroDeposit(hero, deposit: deposit)
+  }
+  
+  private func handleHeroDeposit(_ hero: General, deposit: Deposit, resource: Package? = nil) {
+    guard let depositEntity = entityManager.deposit,
+          let deposit = depositEntity.component(ofType: DepositComponent.self),
+          let depositShape = depositEntity.component(ofType: ShapeComponent.self),
+          let delivered = hero.delivered,
+          let alias = hero.alias,
+          let team = hero.team else { return}
+      
+    resource?.deposit(delivered)
+    hero.hands?.leftHandSlot?.deposit(delivered)
+    hero.hands?.rightHandSlot?.deposit(delivered)
+    
+    let heroIndex = (hero == entityManager.playerEntites[0]) ? 0 : 1
+    let playerAlias = getPlayerAliasAt(index: heroIndex)
+    alias.node.text = "\(playerAlias) (\(hero.numberOfDeposits)/\(EntityManager.Constants.resourcesNeededToWin))"
+    
+    // Update team component
+    switch team.team {
+    case .team1: deposit.team1Deposits = hero.numberOfDeposits
+    case .team2: deposit.team2Deposits = hero.numberOfDeposits
+    default: break
+    }
+    
+    if let label = gameMessage {
+      label.text = "Deposit"
+      label.run(SKAction.init(named: "Pulse")!, withKey: "fadeInOut")
+    }
+    
+    ShapeFactory.shared.spawnDepositParticleEffect(pos: depositShape.node.position)
+    audioPlayer.play(effect: Audio.EffectFiles.youScored)
+  }
+  
+  public func handleTutorialDeposit(package: Package) {
+    guard let hero = package.wasThrownBy else { return }
+    guard let currentStep = tutorialAction?.currentStep else { return }
+    guard hero === entityManager.hero else {
+      setupHintAnimations(step: currentStep)
+      return
+    }
+    guard tutorialAction?.setupNextStep() == nil else { return }
+  
+    gameOverStatus = .tutorialDone
+    gameState.enter(GameOver.self)
+    return
+  }
+  
   
 }
 

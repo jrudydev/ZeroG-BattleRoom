@@ -39,7 +39,7 @@ class Deposit: GKEntity {
     let physicsBody = SKPhysicsBody(circleOfRadius: Deposit.eventHorizon)
    
     physicsBody.categoryBitMask = PhysicsCategoryMask.deposit
-    physicsBody.contactTestBitMask = PhysicsCategoryMask.hero
+    physicsBody.contactTestBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.package
     physicsBody.collisionBitMask = 0
     
     return physicsBody
