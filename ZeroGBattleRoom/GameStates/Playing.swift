@@ -23,6 +23,8 @@ class Playing: GKState {
   
   unowned let scene: GameScene
   
+  private let parallaxController = ParallaxController()
+  
   init(scene: SKScene) {
     self.scene = scene as! GameScene
     super.init()
@@ -35,10 +37,10 @@ class Playing: GKState {
   }
   
   override func willExit(to nextState: GKState) {
-    self.scene.entityManager.removeUIElements()
+    scene.entityManager.removeUIElements()
     NotificationCenter.default.post(name: .resizeView, object: -1000.0)
     
-    self.scene.audioPlayer.pause(music: Audio.MusicFiles.level)
+    scene.audioPlayer.pause(music: Audio.MusicFiles.level)
   }
   
   override func isValidNextState(_ stateClass: AnyClass) -> Bool {
@@ -46,7 +48,8 @@ class Playing: GKState {
   }
 
   override func update(deltaTime seconds: TimeInterval) {
-    self.repositionCamera()
+    repositionCamera()
+    parallaxController.update()
   }
   
 }
@@ -74,6 +77,13 @@ extension Playing {
     scene.entityManager.spawnFields()
   
     scene.entityManager.addUIElements()
+    
+    parallaxController.focus = scene.entityManager.hero?.sprite
+    if let backgroundNode = scene.childNode(withName: AppConstants.ComponentNames.gameBackgroungName),
+       let backgroundSprite = backgroundNode as? SKSpriteNode {
+      let demension = ParallaxController.Dimension(layer: backgroundSprite, distance: -5)
+      parallaxController.add(demension)
+    }
     
     scene.audioPlayer.play(effect: Audio.EffectFiles.startGame)
     scene.audioPlayer.play(music: Audio.MusicFiles.level)

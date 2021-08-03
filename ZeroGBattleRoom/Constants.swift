@@ -37,9 +37,10 @@ struct AppConstants {
     static let heroPlayerName = "hero-player"
     static let menuImageName = "munu-image"
     static let menuBackgroundName = "menu-background"
+    static let gameBackgroungName = "universe"
     static let gridImageName = "grid-image"
-    static let localLabelName = "tutorial-label"
-    static let tutorialLabelName = "local-label"
+    static let localLabelName = "local-label"
+    static let tutorialLabelName = "tutorial-label"
     static let onlineLabelName = "online-label"
     static let shopLabelName = "shop-label"
     
