@@ -50,7 +50,7 @@ extension GameScene: SKPhysicsContactDelegate {
     if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
       secondBody.categoryBitMask == PhysicsCategoryMask.tractor {
       
-      handleHeroWallCollision(firstBody: firstBody, secondBody: secondBody)
+      handleHeroTractorCollision(firstBody: firstBody, secondBody: secondBody)
     }
     
     if firstBody.categoryBitMask == PhysicsCategoryMask.wall &&
@@ -140,7 +140,7 @@ extension GameScene: SKPhysicsContactDelegate {
     }
   }
   
-  private func handleHeroWallCollision(firstBody: SKPhysicsBody, secondBody: SKPhysicsBody) {
+  private func handleHeroTractorCollision(firstBody: SKPhysicsBody, secondBody: SKPhysicsBody) {
     guard let heroNode = firstBody.node as? SKSpriteNode,
       let beam = secondBody.node as? SKShapeNode else { return }
     

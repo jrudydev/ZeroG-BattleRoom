@@ -717,8 +717,6 @@ extension EntityManager {
   }
   
   private func getPanelSegment(wallNode: SKNode) -> GKEntity? {
-    let panelFactory = scene.entityManager.panelFactory
-    
     var team: Team? = nil
     if let userData = wallNode.userData,
        let teamRawValue = userData[Tutorial.teamUserDataKey] as? Int {
@@ -732,11 +730,7 @@ extension EntityManager {
       config = Panel.BeamArrangment(rawValue: beamsRawValue)!
     }
     
-    guard let panelSegment = panelFactory.panelSegment(beamConfig: config,
-                                                       number: 1,
-                                                       team: team).first else { return nil}
-    
-    return panelSegment
+    return  scene.entityManager.panelFactory.panelSegment(beamConfig: config, number: 1, team: team).first
   }
   
   private func initializeTutorial() {
@@ -755,7 +749,7 @@ extension EntityManager {
     ghost.switchToState(.moving)
     ghostSpriteComponent.node.alpha = 0.5
     ghostPhysicsComponent.physicsBody.collisionBitMask = PhysicsCategoryMask.package
-    heroPhysicsComponent.physicsBody.collisionBitMask = PhysicsCategoryMask.package
+    heroPhysicsComponent.physicsBody.collisionBitMask = PhysicsCategoryMask.package | PhysicsCategoryMask.wall
     
     let tutorialAction = TutorialAction(delegate: scene)
     if let tapSpriteComponent = tutorialAction.component(ofType: SpriteComponent.self) {
