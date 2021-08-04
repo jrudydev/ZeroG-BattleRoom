@@ -116,9 +116,7 @@ extension GameScene {
     let throwPoint = convert(CGPoint(x: 0.0, y: 1.0), from: spriteComponent.node)
     hero.throwResourceAt(point: throwPoint)
     
-    if !handsComponent.hasResourceInHand {
-      throwButton.alpha = 0.5
-    }
+    throwButton.alpha = handsComponent.hasResourceInHand ? 1.0 : throwButton.alpha
     
     audioPlayer.play(effect: Audio.EffectFiles.throwResource)
   }

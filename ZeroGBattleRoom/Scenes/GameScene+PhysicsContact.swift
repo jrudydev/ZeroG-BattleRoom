@@ -115,9 +115,7 @@ extension GameScene: SKPhysicsContactDelegate {
       heroHandsComponent.grab(resource: impactedResource)
       
       // enable the throw button if this is the main hero
-      if hero == entityManager.hero {
-        throwButton.alpha = 1.0
-      }
+      throwButton.alpha = hero == entityManager.hero ? 1.0 : throwButton.alpha
       
       if let resourceIndex = entityManager.indexForResource(shape: resourceShapeComponent.node),
         let heroIndex = entityManager.playerEntites.firstIndex(of: hero) {
@@ -135,8 +133,8 @@ extension GameScene: SKPhysicsContactDelegate {
     } else {
       hero.impactedAt(point: heroSpriteComponent.node.position)
       
-      // disable the throw button
-      throwButton.alpha = 0.5
+      // disable the throw button if this is the main hero
+      throwButton.alpha = hero == entityManager.hero ? 1.0 : throwButton.alpha
       
       audioPlayer.play(effect: Audio.EffectFiles.collisionLoseResource)
     }
