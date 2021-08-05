@@ -17,8 +17,8 @@ class AudioPlayer {
   public init(music: Music? = nil) {
     if let music = music {
       // Preload music
-      self.play(music: music)
-      self.pause(music: music)
+      play(music: music)
+      pause(music: music)
     }
   }
   
@@ -34,12 +34,13 @@ class AudioPlayer {
 extension AudioPlayer: AudioPlayerProtocol {
   func play(music: Music) {
     currentMusicPlayer?.stop()
-    guard let newPlayer = try? AVAudioPlayer(sound: music) else { return }
+    guard let player = try? AVAudioPlayer(sound: music) else { return }
     
-    newPlayer.volume = musicVolume
-    newPlayer.play()
+    player.volume = musicVolume
+    player.numberOfLoops = -1
+    player.play()
     
-    currentMusicPlayer = newPlayer
+    currentMusicPlayer = player
   }
   
   func pause(music: Music) {
