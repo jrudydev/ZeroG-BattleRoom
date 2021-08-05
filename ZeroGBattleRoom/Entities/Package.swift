@@ -27,6 +27,12 @@ class Package: GKEntity {
     addComponent(ShapeComponent(node: shapeNode))
     addComponent(PhysicsComponent(physicsBody: self.physicsBody))
     
+    let trailComponent = TrailComponent()
+    addComponent(trailComponent)
+    if let emitter = trailComponent.emitter {
+      shapeNode.addChild(emitter)
+    }
+    
     shapeNode.physicsBody = self.physicsBody
   }
   

@@ -57,9 +57,13 @@ extension GameScene: SKPhysicsContactDelegate {
       secondBody.categoryBitMask == PhysicsCategoryMask.package {
         
       guard let resourceNode = secondBody.node as? SKShapeNode,
-        let impactedResource = entityManager.resourceWith(node: resourceNode) as? Package else { return }
+            let impactedResource = entityManager.resourceWith(node: resourceNode) as? Package else { return }
+        
+      guard impactedResource.wasThrownBy != nil,
+        let resourceTrail = impactedResource.component(ofType: TrailComponent.self) else { return }
       
       impactedResource.wasThrownBy = nil
+      resourceTrail.type = .resource
     }
     
     if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
@@ -109,13 +113,18 @@ extension GameScene: SKPhysicsContactDelegate {
       let resourceShapeComponent = impactedResource.component(ofType: ShapeComponent.self),
       !heroHandsComponent.isImpacted else { return }
     
-    guard let throwButton = cam?.childNode(withName: AppConstants.ButtonNames.throwButtonName) else { return }
+    guard let throwButton = cam?.childNode(withName: AppConstants.ButtonNames.throwButtonName),
+          let resourceTrail = impactedResource.component(ofType: TrailComponent.self) else { return }
     
     if heroHandsComponent.hasFreeHand {
       heroHandsComponent.grab(resource: impactedResource)
       
       // enable the throw button if this is the main hero
       throwButton.alpha = hero == entityManager.hero ? 1.0 : throwButton.alpha
+      
+      if let team = hero.component(ofType: TeamComponent.self) {
+        resourceTrail.type = team.team == .team1 ? .team1 : .team2
+      }
       
       if let resourceIndex = entityManager.indexForResource(shape: resourceShapeComponent.node),
         let heroIndex = entityManager.playerEntites.firstIndex(of: hero) {
@@ -279,7 +288,6 @@ extension GameScene: SKPhysicsContactDelegate {
     gameState.enter(GameOver.self)
     return
   }
-  
   
 }
 

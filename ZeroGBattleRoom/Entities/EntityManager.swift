@@ -294,16 +294,19 @@ extension EntityManager {
     
     let resource = Package(shapeNode: resourceNode,
                            physicsBody: resourcePhysicsBody(frame: resourceNode.frame))
-    if let physicsComponent = resource.component(ofType: PhysicsComponent.self) {
-      
-      scene.addChild(resourceNode)
-      resourceNode.position = position
-      DispatchQueue.main.async {
-        if let vector = velocity {
-          physicsComponent.physicsBody.velocity = vector
-        } else {
-          physicsComponent.randomImpulse()
-        }
+    
+    guard let physics = resource.component(ofType: PhysicsComponent.self),
+          let trail = resource.component(ofType: TrailComponent.self) else { return }
+    
+    scene.addChild(trail.node)
+    
+    scene.addChild(resourceNode)
+    resourceNode.position = position
+    DispatchQueue.main.async {
+      if let vector = velocity {
+        physics.physicsBody.velocity = vector
+      } else {
+        physics.randomImpulse()
       }
     }
     
@@ -323,7 +326,7 @@ extension EntityManager {
     
     // Make sure resources are only colliding on the designated host device
     if isHost {
-      physicsBody.contactTestBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.tractor
+      physicsBody.contactTestBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.tractor | PhysicsCategoryMask.wall
       physicsBody.collisionBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.package | PhysicsCategoryMask.wall
     } else {
       physicsBody.contactTestBitMask = 0

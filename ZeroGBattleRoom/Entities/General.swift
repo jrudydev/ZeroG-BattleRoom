@@ -29,8 +29,8 @@ class General: GKEntity, BeamableProtocol {
   
   private(set) var state: State = .idle {
     didSet {
-      guard self.state == .moving else { return }
-      guard let physicsComponent = self.component(ofType: PhysicsComponent.self) else { return }
+      guard state == .moving else { return }
+      guard let physicsComponent = component(ofType: PhysicsComponent.self) else { return }
     
       physicsComponent.isEffectedByPhysics = true
     }
@@ -51,31 +51,31 @@ class General: GKEntity, BeamableProtocol {
     
     let spriteComponent = SpriteComponent(texture: SKTexture(imageNamed: imageName))
     spriteComponent.node.zPosition = SpriteZPosition.hero.rawValue
-    self.addComponent(spriteComponent)
-    self.addComponent(TeamComponent(team: team))
+    addComponent(spriteComponent)
+    addComponent(TeamComponent(team: team))
     
-    let physicsBody = self.getPhysicsBody()
-    self.addComponent(PhysicsComponent(physicsBody: physicsBody))    
+    let physicsBody = getPhysicsBody()
+    addComponent(PhysicsComponent(physicsBody: physicsBody))
     spriteComponent.node.physicsBody = physicsBody
 
-    self.addComponent(ImpulseComponent())
-    self.addComponent(HandsComponent())
+    addComponent(ImpulseComponent())
+    addComponent(HandsComponent())
     
     let trailComponent = TrailComponent()
-    self.addComponent(trailComponent)
-    if let emitter = trailComponent.emitter {
+    addComponent(trailComponent)
+//    if let emitter = trailComponent.emitter {
 //      spriteComponent.node.addChild(emitter)
-    }
+//    }
     
-    self.addComponent(AliasComponent())
+    addComponent(AliasComponent())
     
     let launchComponent = LaunchComponent()
     spriteComponent.node.addChild(launchComponent.node)
-    self.addComponent(launchComponent)
+    addComponent(launchComponent)
     
-    self.addComponent(DeliveredComponent())
+    addComponent(DeliveredComponent())
     
-    self.setupActions()
+    setupActions()
   }
   
   required init?(coder: NSCoder) {
@@ -85,25 +85,25 @@ class General: GKEntity, BeamableProtocol {
   func switchToState(_ state: State) {
       switch (state) {
       case .idle:
-        self.stopAllAnimation()
-        self.startAnimation(type: .idle)
+        stopAllAnimation()
+        startAnimation(type: .idle)
         
         self.state = .idle
       case .moving:
-        self.stopAllAnimation()
-        self.startAnimation(type: .moving)
+        stopAllAnimation()
+        startAnimation(type: .moving)
         
         self.state = .moving
       case .beamed:
-        self.isBeamable = false
+        isBeamable = false
         
-        self.stopAllAnimation()
-        self.startAnimation(type: .idle)
+        stopAllAnimation()
+        startAnimation(type: .idle)
         
         self.state = .beamed
       }
     
-      self.updateResourcePositions()
+      updateResourcePositions()
     }
   
   func getPhysicsBody() -> SKPhysicsBody {
@@ -123,13 +123,14 @@ class General: GKEntity, BeamableProtocol {
   unowned var occupiedPanel: Panel? = nil
   
   var isBeamed: Bool {
-    return self.state == .beamed
+    return state == .beamed
   }
   var isBeamable: Bool = true
   
 }
 
 extension General {
+  
   enum AnimationType: String, CaseIterable {
     case idle
     case moving
@@ -137,15 +138,15 @@ extension General {
   }
   
   func startAnimation(type: AnimationType) {
-    guard let spriteComponent = self.component(ofType: SpriteComponent.self) else { return }
+    guard let spriteComponent = component(ofType: SpriteComponent.self) else { return }
     
     if spriteComponent.node.action(forKey: type.rawValue) == nil {
       let action: SKAction
       switch type {
       case .idle:
-        action = self.idleAction
-      case .moving: action = self.moveAction
-      default: action = self.moveAction
+        action = idleAction
+      case .moving: action = moveAction
+      default: action = moveAction
       }
       
       spriteComponent.node.run( SKAction.repeatForever(action), withKey: type.rawValue)
@@ -153,14 +154,14 @@ extension General {
   }
   
   func stopAnimation(type: AnimationType) {
-    guard let spriteComponent = self.component(ofType: SpriteComponent.self) else { return }
+    guard let spriteComponent = component(ofType: SpriteComponent.self) else { return }
     
     spriteComponent.node.removeAction(forKey: type.rawValue)
   }
   
   func stopAllAnimation() {
     for type in General.AnimationType.allCases {
-      self.stopAnimation(type: type)
+      stopAnimation(type: type)
     }
   }
   
@@ -172,7 +173,7 @@ extension General {
     for i in (0..<4).reversed() {
       idleTextures.append(SKTexture(imageNamed: "spaceman-idle-\(i)"))
     }
-    self.idleAction = SKAction.animate(with: idleTextures, timePerFrame: 0.2)
+    idleAction = SKAction.animate(with: idleTextures, timePerFrame: 0.2)
     
     var moveTextures:[SKTexture] = []
     for i in 0..<5 {
@@ -181,15 +182,15 @@ extension General {
     for i in (0..<5).reversed() {
       moveTextures.append(SKTexture(imageNamed: "spaceman-move-\(i)"))
     }
-    self.moveAction = SKAction.animate(with: moveTextures, timePerFrame: 0.1)
+    moveAction = SKAction.animate(with: moveTextures, timePerFrame: 0.1)
   }
   
   func updateResourcePositions() {
-    guard let handsComponent = self.component(ofType: HandsComponent.self) else { return }
+    guard let handsComponent = component(ofType: HandsComponent.self) else { return }
     
     let leftPos: CGPoint
     let rightPos: CGPoint
-    switch self.state {
+    switch state {
     case .idle:
       leftPos = CGPoint(x: -9, y: 15)
       rightPos = CGPoint(x: 9, y: 15)
@@ -213,28 +214,36 @@ extension General {
       shapeComponent.node.position = rightPos
     }
   }
+  
 }
 
 extension General: ImpactableProtocol {
+  
   func impactedAt(point: CGPoint) {
-    guard let heroHandsComponent = self.component(ofType: HandsComponent.self) else { return }
+    guard let heroHandsComponent = component(ofType: HandsComponent.self) else { return }
     
     heroHandsComponent.isImpacted = true
     
-    if let resource = heroHandsComponent.leftHandSlot {
+    if let resource = heroHandsComponent.leftHandSlot,
+       let resourceTrail = resource.component(ofType: TrailComponent.self) {
       heroHandsComponent.release(resource: resource, point: point)
+      resourceTrail.type = .resource
     }
     
-    if let resource = heroHandsComponent.rightHandSlot {
+    if let resource = heroHandsComponent.rightHandSlot,
+       let resourceTrail = resource.component(ofType: TrailComponent.self) {
       heroHandsComponent.release(resource: resource, point: point)
+      resourceTrail.type = .resource
     }
   }
+  
 }
 
 extension General: ImpulsableProtocol {
+  
   func impulse(vector: CGVector, angularVelocity: CGFloat = 0.0) {
-    if let physicsComponent = self.component(ofType: PhysicsComponent.self),
-      let spriteComponent = self.component(ofType: SpriteComponent.self) {
+    if let physicsComponent = component(ofType: PhysicsComponent.self),
+      let spriteComponent = component(ofType: SpriteComponent.self) {
 
       physicsComponent.physicsBody.applyImpulse(vector)
       physicsComponent.physicsBody.angularVelocity = angularVelocity
@@ -243,52 +252,54 @@ extension General: ImpulsableProtocol {
   }
   
   func impulseTo(location: CGPoint, completion: (SKSpriteNode, CGVector, CGFloat) -> Void) {
-    guard let spriteComponent = self.component(ofType: SpriteComponent.self),
-      let impulseComponent = self.component(ofType: ImpulseComponent.self),
-      let physicsComponent = self.component(ofType: PhysicsComponent.self) else { return }
+    guard let spriteComponent = component(ofType: SpriteComponent.self),
+      let impulseComponent = component(ofType: ImpulseComponent.self),
+      let physicsComponent = component(ofType: PhysicsComponent.self) else { return }
     
     guard !impulseComponent.isOnCooldown else { return }
     
     impulseComponent.isOnCooldown = true
-    self.switchToState(.moving)
+    switchToState(.moving)
     
     let moveVector = CGVector(dx: location.x - spriteComponent.node.position.x,
                              dy: location.y - spriteComponent.node.position.y)
-    self.impulse(vector: moveVector.normalized() * self.defaultImpulseMagnitude)
+    impulse(vector: moveVector.normalized() * defaultImpulseMagnitude)
   
     completion(spriteComponent.node,
                physicsComponent.physicsBody.velocity,
                physicsComponent.physicsBody.angularVelocity)
   }
+  
 }
 
 extension General: LaunchableProtocol {
+  
   func updateLaunchComponents(touchPosition: CGPoint) {
-    guard let launchComponent = self.component(ofType: LaunchComponent.self),
-      let physicsComponent = self.component(ofType: PhysicsComponent.self),
-      (self.isBeamed && !physicsComponent.isEffectedByPhysics) else { return }
+    guard let launchComponent = component(ofType: LaunchComponent.self),
+      let physicsComponent = component(ofType: PhysicsComponent.self),
+      (isBeamed && !physicsComponent.isEffectedByPhysics) else { return }
   
     launchComponent.update(touchPosition: touchPosition)
   }
   
   func launch(completion: LaunchAftermath? = nil) {
-    guard let spriteComponent = self.component(ofType: SpriteComponent.self),
-      let physicsComponent = self.component(ofType: PhysicsComponent.self),
-      let launchComponent = self.component(ofType: LaunchComponent.self),
+    guard let spriteComponent = component(ofType: SpriteComponent.self),
+      let physicsComponent = component(ofType: PhysicsComponent.self),
+      let launchComponent = component(ofType: LaunchComponent.self),
       let moveVector = launchComponent.launchInfo.direction,
       let movePercent = launchComponent.launchInfo.directionPercent,
       let rotationPercent = launchComponent.launchInfo.rotationPercent,
       let isLeftRotation = launchComponent.launchInfo.isLeftRotation,
-      let beamComponent = self.occupiedPanel?.component(ofType: BeamComponent.self),
-      let occupiedPanel = self.occupiedPanel else { return }
+      let beamComponent = occupiedPanel?.component(ofType: BeamComponent.self),
+      let occupiedPanel = occupiedPanel else { return }
     
-    self.switchToState(.moving)
+    switchToState(.moving)
     beamComponent.isOccupied = false
       
-    let launchMagnitude = self.defaultImpulseMagnitude * 2
+    let launchMagnitude = defaultImpulseMagnitude * 2
     let impulseVector = moveVector.normalized() * launchMagnitude * movePercent
-    let angularVelocity = self.defaultLaunchRotation * rotationPercent
-    self.impulse(vector: impulseVector,
+    let angularVelocity = defaultLaunchRotation * rotationPercent
+    impulse(vector: impulseVector,
                  angularVelocity: isLeftRotation ? -1 * angularVelocity : angularVelocity)
     
     launchComponent.hide()
@@ -298,12 +309,14 @@ extension General: LaunchableProtocol {
                 physicsComponent.physicsBody.angularVelocity,
                 occupiedPanel)
   }
+  
 }
 
 extension General: ThrowableProtocol {
+  
   func throwResourceAt(point: CGPoint) {
-    guard let handsComponent = self.component(ofType: HandsComponent.self),
-      let spriteComponent = self.component(ofType: SpriteComponent.self) else { return }
+    guard let handsComponent = component(ofType: HandsComponent.self),
+      let spriteComponent = component(ofType: SpriteComponent.self) else { return }
     
     let throwVector = spriteComponent.node.position.vectorTo(point: point)
     
@@ -311,7 +324,7 @@ extension General: ThrowableProtocol {
       handsComponent.isImpacted = true
       handsComponent.release(resource: rightResource, point: point)
       
-      if let physicsComponent = self.component(ofType: PhysicsComponent.self),
+      if let physicsComponent = component(ofType: PhysicsComponent.self),
          let resourcePhysicsComponent = rightResource.component(ofType: PhysicsComponent.self) {
         
         resourcePhysicsComponent.physicsBody.velocity = .zero
@@ -325,7 +338,7 @@ extension General: ThrowableProtocol {
       handsComponent.isImpacted = true
       handsComponent.release(resource: leftResource, point: point)
       
-      if let physicsComponent = self.component(ofType: PhysicsComponent.self),
+      if let physicsComponent = component(ofType: PhysicsComponent.self),
          let resourcePhysicsComponent = leftResource.component(ofType: PhysicsComponent.self) {
         
         resourcePhysicsComponent.physicsBody.velocity = .zero
@@ -337,4 +350,5 @@ extension General: ThrowableProtocol {
       leftResource.wasThrownBy = self
     }
   }
+  
 }
