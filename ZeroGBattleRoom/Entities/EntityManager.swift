@@ -682,6 +682,7 @@ extension EntityManager {
     for entity in uiEntities {
       if let scalableElement = entity as? ScaledContainer {
         toRemove.insert(scalableElement)
+        scalableElement.node.removeFromParent()
       }
     }
     
