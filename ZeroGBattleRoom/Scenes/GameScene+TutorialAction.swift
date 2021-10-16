@@ -35,7 +35,6 @@ extension GameScene: TutorialActionDelegate {
   func setupHintAnimations(step: Tutorial.Step) {
     guard let ghost = entityManager.playerEntites[1] as? General,
       let ghostSpriteComponent = ghost.component(ofType: SpriteComponent.self),
-      let ghostHandsComponent = ghost.component(ofType: HandsComponent.self),
       let ghostPhysicsComponent = ghost.component(ofType: PhysicsComponent.self),
       let launchComponent = ghost.component(ofType: LaunchComponent.self),
       let tapSticker = childNode(withName: AppConstants.ComponentNames.tutorialTapStickerName),
@@ -43,9 +42,7 @@ extension GameScene: TutorialActionDelegate {
       let throwHintSticker = cam?.childNode(withName: AppConstants.ComponentNames.tutorialThrowStickerName) else { return }
   
     stopAllTutorialAnimations()
-    resetSprites(pos: step.startPosition,
-                 rotation: step.startRotation,
-                 tapPos: step.tapPosition)
+    setupTutorial(step: step)
     showTutorialHints()
     
     let initialWait = 1.0
@@ -210,9 +207,9 @@ extension GameScene: TutorialActionDelegate {
         SKAction.wait(forDuration: 3.5),
         launchGhost,
         spawnSpinnyNode,
-        SKAction.wait(forDuration: 3.4),
+        SKAction.wait(forDuration: 3.3),
         throwResource,
-        SKAction.wait(forDuration: 2.6),
+        SKAction.wait(forDuration: 0.2),
       ]))
 
       let swipeAction = SKAction.repeatForever(SKAction.sequence([
@@ -223,8 +220,7 @@ extension GameScene: TutorialActionDelegate {
                       duration: Double(swipeFrames) * swipeFrameDuration),
         SKAction.wait(forDuration: 1.5),
         SKAction.fadeOut(withDuration: 0.5),
-        SKAction.wait(forDuration: 3.5),
-        SKAction.wait(forDuration: 2.0)
+        SKAction.wait(forDuration: 3.0),
       ]))
 
       let touchUpdateAction = SKAction.sequence([
@@ -235,16 +231,14 @@ extension GameScene: TutorialActionDelegate {
       let touchAction = SKAction.repeatForever(SKAction.sequence([
         SKAction.wait(forDuration: initialWait + 0.5),
         SKAction.repeat(touchUpdateAction, count: swipeFrames),
-        SKAction.wait(forDuration: 7.5)
+        SKAction.wait(forDuration: 5.0)
       ]))
       
       let hintStickerAction = SKAction.repeatForever(SKAction.sequence([
         SKAction.fadeOut(withDuration: 0.0),
         SKAction.wait(forDuration: 7.4),
         SKAction.fadeIn(withDuration: 0.5),
-        SKAction.wait(forDuration: 0.5),
-        SKAction.fadeOut(withDuration: 0.5),
-        SKAction.wait(forDuration: 1.6)
+        SKAction.wait(forDuration: 0.1),
       ]))
 
       tapSticker.run(SKAction.group([launchSequence, swipeAction, touchAction]))
@@ -255,23 +249,23 @@ extension GameScene: TutorialActionDelegate {
   
   func stopAllTutorialAnimations() {
     guard let hero = entityManager.hero as? General,
-      let ghost = entityManager.playerEntites[1] as? General,
-      let ghostSpriteComponent = ghost.component(ofType: SpriteComponent.self),
-      let ghostHandsComponent = ghost.component(ofType: HandsComponent.self),
-//      let ghostPhysicsComponent = ghost.component(ofType: PhysicsComponent.self),
-      let tapSticker = childNode(withName: AppConstants.ComponentNames.tutorialTapStickerName),
-      let pinchSticker = cam?.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName),
-      let throwButton = cam?.childNode(withName: AppConstants.ButtonNames.throwButtonName),
-      let throwHintSticker = cam?.childNode(withName: AppConstants.ComponentNames.tutorialThrowStickerName),
-      let tutorialStep = tutorialAction?.currentStep else { return }
+          let heroHands = hero.component(ofType: HandsComponent.self),
+          let ghost = entityManager.playerEntites[1] as? General,
+          let ghostSpriteComponent = ghost.component(ofType: SpriteComponent.self),
+          let ghostHandsComponent = ghost.component(ofType: HandsComponent.self),
+          let tapSticker = childNode(withName: AppConstants.ComponentNames.tutorialTapStickerName),
+          let pinchSticker = cam?.childNode(withName: AppConstants.ComponentNames.tutorialPinchStickerName),
+          let throwButton = cam?.childNode(withName: AppConstants.ButtonNames.throwButtonName),
+          let throwHintSticker = cam?.childNode(withName: AppConstants.ComponentNames.tutorialThrowStickerName),
+          let tutorialStep = tutorialAction?.currentStep else { return }
     
     tapSticker.removeAllActions()
     ghostSpriteComponent.node.removeAllActions()
     pinchSticker.removeAllActions()
     throwHintSticker.removeAllActions()
 
-//    // Reposition the resource when needed
-//    if let package = ghostHandsComponent.leftHandSlot,
+    // Reposition the resource when needed
+//    if let package = heroHands.leftHandSlot,
 //      let shapeComponent = package.component(ofType: ShapeComponent.self) {
 //
 //      ghostHandsComponent.release(resource: package)
@@ -281,15 +275,27 @@ extension GameScene: TutorialActionDelegate {
 //
 //      package.placeFor(tutorialStep: tutorialStep)
 //      scene?.addChild(shapeComponent.node)
-//    } else if entityManager.resourcesEntities.count > 0,
-//      let package = entityManager.resourcesEntities[0] as? Package {
-//      package.placeFor(tutorialStep: tutorialStep)
-//    }
+//    } else
+    if let package = ghostHandsComponent.leftHandSlot,
+      let shapeComponent = package.component(ofType: ShapeComponent.self) {
+
+      ghostHandsComponent.release(resource: package)
+      shapeComponent.node.removeFromParent()
+
+      throwButton.alpha = 0.5
+
+      package.placeFor(tutorialStep: tutorialStep)
+      scene?.addChild(shapeComponent.node)
+    } else if entityManager.resourcesEntities.count > 0,
+      let package = entityManager.resourcesEntities[0] as? Package {
+      package.placeFor(tutorialStep: tutorialStep)
+    }
     
     hideTutorialHints()
   }
   
-  private func resetSprites(pos: CGPoint, rotation: CGFloat, tapPos: CGPoint) {
+  
+  private func setupTutorial(step: Tutorial.Step) {
     guard let hero = entityManager.hero as? General,
       let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
       let ghost = entityManager.playerEntites[1] as? General,
@@ -297,13 +303,13 @@ extension GameScene: TutorialActionDelegate {
       let tapSticker = childNode(withName: AppConstants.ComponentNames.tutorialTapStickerName) else { return }
 
     DispatchQueue.main.async {
-      tapSticker.position = tapPos
+      tapSticker.position = step.tapPosition
       
-      heroSpriteComponent.node.position = pos
-      heroSpriteComponent.node.zRotation = rotation
+      heroSpriteComponent.node.position = step.startPosition
+      heroSpriteComponent.node.zRotation = step.startRotation
       
-      ghostSpriteComponent.node.position = pos
-      ghostSpriteComponent.node.zRotation = rotation
+      ghostSpriteComponent.node.position = step.startPosition
+      ghostSpriteComponent.node.zRotation = step.startRotation
       ghostSpriteComponent.node.physicsBody?.velocity = .zero
       ghostSpriteComponent.node.physicsBody?.angularVelocity = .zero
     }

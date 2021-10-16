@@ -16,17 +16,23 @@ extension GameScene {
   
   func touchDown(atPoint pos : CGPoint) {
     numberOfTouches += 1
+    
+    print("👇 Touch Down - Pos: \(pos)")
 
     guard !isInGameButton(node: atPoint(pos)) else { return }
-    guard !(gameState.currentState is Tutorial) || isPinchZoom(step: currentTutorialStep) else { return }
+    
+    if gameState.currentState is Tutorial && !isPinchZoom(step: currentTutorialStep) { return }
+    
     guard let hero = entityManager.hero as? General,
-          let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
+          let heroSprite = hero.sprite,
           let launchComponent = hero.component(ofType: LaunchComponent.self) else { return }
-    guard numberOfTouches <= 1 else { launchComponent.hide(); return }
-    guard maxSwipeDistance(tapPos: pos, heroPos: heroSpriteComponent.node.position) else {
-      launchComponent.hide()
-      return
-    }
+    guard case .beamed = hero.state else { return }
+    guard numberOfTouches <= 1, maxSwipeDistance(tapPos: pos, heroPos: heroSprite.position) else {
+        launchComponent.hide()
+        return
+      }
+    
+    print("👇🚀🕛 Launch components updated")
   
     launchComponent.launchInfo.lastTouchBegan = pos
     hero.updateLaunchComponents(touchPosition: pos)
@@ -48,28 +54,31 @@ extension GameScene {
   // MARK: Touch Moved
   
   func touchMoved(toPoint pos : CGPoint) {
-    guard !isInGameButton(node: atPoint(pos)) else { handleMovedOverButton(); return }
+    guard let hero = entityManager.hero as? General,
+          let launchComponent = hero.component(ofType: LaunchComponent.self) else { return }
+    
+    print("👉 Touch Moved - Pos: \(pos)")
+    
+    guard !isInGameButton(node: atPoint(pos)) else { launchComponent.hide(); return }
     
     switch gameState.currentState {
     case is Playing, is Tutorial:
       if let hero = entityManager.hero as? General {
+        
+        print("👉🚀🕛 Launch components updated")
+        
         hero.updateLaunchComponents(touchPosition: pos)
       }
     default: break
     }
   }
   
-  func handleMovedOverButton() {
-    guard let hero = entityManager.hero as? General,
-          let launchComponent = hero.component(ofType: LaunchComponent.self) else { return }
-      
-    launchComponent.launchInfo.lastTouchBegan = nil
-    launchComponent.hide()
-  }
-  
   // MARK: Touch Up
     
   func touchUp(atPoint pos : CGPoint) {
+    
+    print("👆 Touch Up - Pos: \(pos)")
+    
     let hero = entityManager.hero as? General
     let node = atPoint(pos)
     
@@ -77,13 +86,19 @@ extension GameScene {
     case is WaitingForTap:
       handleWaitingForTap(pos: pos)
     case is Tutorial, is Playing:
-      if let launchComponent = hero?.component(ofType: LaunchComponent.self),
-         launchComponent.launchInfo.lastTouchBegan != nil {
-        handlePlayerLaunch(pos: pos)
-      } else if isInGameButton(node: node) && node.alpha == 1.0 {
+      if isInGameButton(node: node) && node.alpha == 1.0 {
+        
+        print("👆🆑 Button Tapped")
+        
         handleThrowTap(node: node)
         handleBackTap(node: node)
         handleRestartTap(node: node)
+      } else if let launchComponent = hero?.component(ofType: LaunchComponent.self),
+         launchComponent.launchInfo.lastTouchBegan != nil {
+        
+        print("👆🚀 Player Luanched")
+        
+        handlePlayerLaunch(pos: pos)
       }
     case is GameOver:
       NotificationCenter.default.post(name: .restartGame, object: nil)
@@ -140,6 +155,7 @@ extension GameScene {
     } else {
       hero.impactedAt(point: heroSprite.position)
       heroSprite.position = CGPoint(x: 0.0, y: -AppConstants.Layout.boundarySize.height/2 + 20)
+      heroSprite.zRotation = 0.0
     }
     
     audioPlayer.play(effect: Audio.EffectFiles.uiMenuSelect)

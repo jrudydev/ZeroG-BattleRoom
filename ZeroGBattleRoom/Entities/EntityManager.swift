@@ -165,23 +165,23 @@ extension EntityManager {
     }
     toRemove.removeAll()
     
-    updateUIElements()
+//    updateUIElements()
     updateResourceVelocity()
   }
   
-  private func updateUIElements() {
-    guard let restartButton = scene.cam?.childNode(withName: AppConstants.ButtonNames.refreshButtonName) else { return }
-    
-    guard let hero = playerEntites[0] as? General,
-          let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
-          let physicsBody = heroSpriteComponent.node.physicsBody,
-          !hero.isBeamed else { return }
-    
-    let absDx = abs(physicsBody.velocity.dx)
-    let absDy = abs(physicsBody.velocity.dy)
-    let notMoving = absDx < Constants.minDriftVelocity && absDy < Constants.minDriftVelocity
-    //    restartButton.alpha = notMoving ? 1.0 : 0.0
-  }
+//  private func updateUIElements() {
+//    guard let restartButton = scene.cam?.childNode(withName: AppConstants.ButtonNames.refreshButtonName) else { return }
+//
+//    guard let hero = playerEntites[0] as? General,
+//          let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
+//          let physicsBody = heroSpriteComponent.node.physicsBody,
+//          !hero.isBeamed else { return }
+//
+//    let absDx = abs(physicsBody.velocity.dx)
+//    let absDy = abs(physicsBody.velocity.dy)
+//    let notMoving = absDx < Constants.minDriftVelocity && absDy < Constants.minDriftVelocity
+//        restartButton.alpha = notMoving ? 1.0 : 0.0
+//  }
   
   private func updateResourceVelocity() {
     guard let depositNode = scene.childNode(withName: AppConstants.ComponentNames.depositNodeName) else { return }
@@ -288,15 +288,16 @@ extension EntityManager {
     }
   }
   
+  @discardableResult
   func spawnResource(position: CGPoint = AppConstants.Layout.boundarySize.randomResourcePosition,
-                     velocity: CGVector? = nil) {
-    guard let resourceNode = resourceNode?.copy() as? SKShapeNode else { return }
+                     velocity: CGVector? = nil) -> Package? {
+    guard let resourceNode = resourceNode?.copy() as? SKShapeNode else { return nil }
     
     let resource = Package(shapeNode: resourceNode,
                            physicsBody: resourcePhysicsBody(frame: resourceNode.frame))
     
     guard let physics = resource.component(ofType: PhysicsComponent.self),
-          let trail = resource.component(ofType: TrailComponent.self) else { return }
+          let trail = resource.component(ofType: TrailComponent.self) else { return nil }
     
     scene.addChild(trail.node)
     
@@ -312,6 +313,8 @@ extension EntityManager {
     
     resourceNode.strokeColor = SKColor.green
     resourcesEntities.append(resource)
+    
+    return resource
   }
   
   private func resourcePhysicsBody(frame: CGRect) -> SKPhysicsBody {
@@ -607,7 +610,7 @@ extension EntityManager {
     tapSticker.name = AppConstants.ComponentNames.tutorialThrowStickerName
     tapSticker.zPosition = SpriteZPosition.inGameUI2.rawValue
     tapSticker.anchorPoint = CGPoint(x: 0.2, y: 0.9)
-    tapSticker.alignMidRight()
+    tapSticker.alignMidBottom()
     tapSticker.alpha = 0.0
     
     let pinchSticker = SKSpriteNode(imageNamed: "pinch-out")
@@ -740,7 +743,6 @@ extension EntityManager {
   private func initializeTutorial() {
     guard let hero = playerEntites[0] as? General,
           let heroAliasComponent = hero.component(ofType: AliasComponent.self),
-          let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
           let heroPhysicsComponent = hero.component(ofType: PhysicsComponent.self),
           let ghost = playerEntites[1] as? General,
           let ghostAliasComponent = ghost.component(ofType: AliasComponent.self),

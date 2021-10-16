@@ -28,7 +28,7 @@ class LaunchComponent: GKComponent {
     launchLineNode.strokeColor = .gray
     launchLineNode.zPosition = -1
     launchLineNode.alpha = 0.0
-    self.node.addChild(launchLineNode)
+    node.addChild(launchLineNode)
     
     let targetLineNode = SKShapeNode(rectOf: CGSize(width: 0.2, height: size))
     targetLineNode.name = AppConstants.ComponentNames.targetLineName
@@ -36,22 +36,21 @@ class LaunchComponent: GKComponent {
     targetLineNode.strokeColor = .gray
     targetLineNode.position = CGPoint(x: 0.0, y: size / 2)
     targetLineNode.zPosition = -1
-    self.node.addChild(targetLineNode)
+    node.addChild(targetLineNode)
     
-    let targetBaseLineNode = SKShapeNode(rectOf: CGSize(width: Self.targetNodeWidth,
-                                                        height: 0.0))
+    let targetBaseLineNode = SKShapeNode(rectOf: CGSize(width: Self.targetNodeWidth, height: 0.0))
     targetBaseLineNode.name = AppConstants.ComponentNames.targetBaseLineName
     targetBaseLineNode.lineWidth = 2.5
     targetBaseLineNode.strokeColor = .gray
     targetBaseLineNode.zPosition = -1
-    self.node.addChild(targetBaseLineNode)
+    node.addChild(targetBaseLineNode)
     
     let targetMidCircleNode = SKShapeNode(circleOfRadius: Self.targetNodeWidth / 2)
     targetMidCircleNode.name = AppConstants.ComponentNames.targetMidCircleName
     targetMidCircleNode.lineWidth = 2.5
     targetMidCircleNode.strokeColor = .gray
     targetMidCircleNode.zPosition = -1
-    self.node.addChild(targetMidCircleNode)
+    node.addChild(targetMidCircleNode)
     
     let chevronSize = CGSize(width: Self.targetNodeWidth * 0.8, height: 0.0)
     
@@ -62,7 +61,7 @@ class LaunchComponent: GKComponent {
     targetLeftChecvronNode.position = CGPoint(x: 0.0, y: 0.0)
     targetLeftChecvronNode.zPosition = -1
     targetLeftChecvronNode.zRotation = -1.0
-    self.node.addChild(targetLeftChecvronNode)
+    node.addChild(targetLeftChecvronNode)
     
     let targetRightChecvronNode = SKShapeNode(rectOf: chevronSize)
     targetRightChecvronNode.name = AppConstants.ComponentNames.targetRightChevronName
@@ -71,22 +70,22 @@ class LaunchComponent: GKComponent {
     targetRightChecvronNode.position = CGPoint(x: 0.0, y: 0.0)
     targetRightChecvronNode.zPosition = -1
     targetRightChecvronNode.zRotation = 1.0
-    self.node.addChild(targetRightChecvronNode)
+    node.addChild(targetRightChecvronNode)
     
     let roationCircleNode = SKSpriteNode(imageNamed: "launch-rotation-1")
     roationCircleNode.name = AppConstants.ComponentNames.rotationCircleName
     roationCircleNode.zPosition = -2
-    self.node.addChild(roationCircleNode)
+    node.addChild(roationCircleNode)
     
     let magnitudePilarNode = SKSpriteNode(imageNamed: "launch-magnitude-1")
     magnitudePilarNode.name = AppConstants.ComponentNames.magnitudePilarName
     magnitudePilarNode.anchorPoint = CGPoint(x: 0.5, y: 0.0)
     magnitudePilarNode.zPosition = -3
-    self.node.addChild(magnitudePilarNode)
+    node.addChild(magnitudePilarNode)
     
     super.init()
     
-    self.hide()
+    hide()
   }
   
   required init?(coder: NSCoder) {
@@ -94,42 +93,42 @@ class LaunchComponent: GKComponent {
   }
   
   func update(touchPosition: CGPoint) {
-    guard let hero = self.entity as? General,
+    guard let hero = entity as? General,
       let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
-      let targetPosition = self.launchInfo.lastTouchBegan else { return }
+      let targetPosition = launchInfo.lastTouchBegan else { return }
     
     let heroPosition = heroSpriteComponent.node.position
     let heroRotation = heroSpriteComponent.node.zRotation
     
-    let isFarNegitiveVector = self.getIsNegitiveLaunchVector(p1: heroPosition,
+    let isFarNegitiveVector = getIsNegitiveLaunchVector(p1: heroPosition,
                                                              p2: targetPosition,
                                                              touchPosition: touchPosition,
                                                              linePosition: heroPosition)
     guard !isFarNegitiveVector else {
-      self.hide()
+      hide()
       return
     }
     
-    let intersect = self.getIntersect(heroPosition: heroPosition,
+    let intersect = getIntersect(heroPosition: heroPosition,
                                       targetPosition: targetPosition,
                                       touchPosition: touchPosition)
     
     let launchVector = heroPosition.vectorTo(point: targetPosition)
     
-    let midSwipeDistPos = self.getSwipeDistPos(vector: launchVector,
+    let midSwipeDistPos = getSwipeDistPos(vector: launchVector,
                                                targetPosition: targetPosition,
                                                percent: 0.5)
     
     let swipeIntersectVector = intersect.vectorTo(point: midSwipeDistPos)
     
     let heroLaunchRotation = launchVector.rotation - heroRotation
-    let isLeftRotation = self.getIsLeftRotation(heroPosition: heroPosition,
+    let isLeftRotation = getIsLeftRotation(heroPosition: heroPosition,
                                                 targetPosition: targetPosition,
                                                 touchPosition: touchPosition)
     
     let rotationVector = touchPosition.vectorTo(point: intersect)
     
-    let isNegitiveVector = self.getIsNegitiveLaunchVector(p1: heroPosition,
+    let isNegitiveVector = getIsNegitiveLaunchVector(p1: heroPosition,
                                                           p2: midSwipeDistPos,
                                                           touchPosition: touchPosition,
                                                           linePosition: midSwipeDistPos)
@@ -142,7 +141,7 @@ class LaunchComponent: GKComponent {
     let rotationMagnitude = min(AppConstants.Touch.maxRotation, rotationVector.length())
     let rotationStepPercent = MagnitudeLevel.rotationStep(magnitude: rotationMagnitude)
     
-    self.updateCompontUI(launchVector: launchVector,
+    updateCompontUI(launchVector: launchVector,
                          launchRotation: heroLaunchRotation,
                          launchMagnitude: launchMagnitude,
                          launchPercent: launchPercent,
@@ -150,10 +149,10 @@ class LaunchComponent: GKComponent {
                          rotationStepPercent: rotationStepPercent,
                          isLeftRotation: isLeftRotation)
     
-    self.launchInfo.direction = launchVector
-    self.launchInfo.directionPercent = launchPercent
-    self.launchInfo.rotationPercent = rotationStepPercent
-    self.launchInfo.isLeftRotation = isLeftRotation
+    launchInfo.direction = launchVector
+    launchInfo.directionPercent = launchPercent
+    launchInfo.rotationPercent = rotationStepPercent
+    launchInfo.isLeftRotation = isLeftRotation
   }
   
   private func updateCompontUI(launchVector: CGVector,
@@ -163,26 +162,26 @@ class LaunchComponent: GKComponent {
                                rotaitonMagnitude: CGFloat,
                                rotationStepPercent: CGFloat,
                                isLeftRotation: Bool) {
-    let magnitudePilarNode = self.node.childNode(withName: AppConstants.ComponentNames.magnitudePilarName) as? SKSpriteNode
-    let rotationCircleNode = self.node.childNode(
+    let magnitudePilarNode = node.childNode(withName: AppConstants.ComponentNames.magnitudePilarName) as? SKSpriteNode
+    let rotationCircleNode = node.childNode(
       withName: AppConstants.ComponentNames.rotationCircleName) as? SKSpriteNode
-    let targetLineNode = self.node.childNode(
+    let targetLineNode = node.childNode(
       withName: AppConstants.ComponentNames.targetLineName) as? SKShapeNode
-    let baseLineNode = self.node.childNode(
+    let baseLineNode = node.childNode(
       withName: AppConstants.ComponentNames.targetBaseLineName) as? SKShapeNode
-    let midCircleNode = self.node.childNode(
+    let midCircleNode = node.childNode(
       withName: AppConstants.ComponentNames.targetMidCircleName) as? SKShapeNode
-    let chevronLeftNode = self.node.childNode(
+    let chevronLeftNode = node.childNode(
       withName: AppConstants.ComponentNames.targetLeftChevronName) as? SKShapeNode
-    let chevronRightNode = self.node.childNode(
+    let chevronRightNode = node.childNode(
       withName: AppConstants.ComponentNames.targetRightChevronName) as? SKShapeNode
-    let launchLineNode = self.node.childNode(withName: AppConstants.ComponentNames.launchLineName)
+    let launchLineNode = node.childNode(withName: AppConstants.ComponentNames.launchLineName)
     let halfSwipeDistance = AppConstants.Touch.maxSwipeDistance / 2
     
     launchLineNode?.alpha = 0.0
     
     // Rotate the parent node
-    self.node.zRotation = launchRotation
+    node.zRotation = launchRotation
     
     // Pilar image
     let magnitudeImage = MagnitudeLevel.imageNameFor(fileName: "launch-magnitude",
@@ -223,14 +222,15 @@ class LaunchComponent: GKComponent {
   }
   
   func hide() {
-    self.node.childNode(withName: AppConstants.ComponentNames.targetLineName)?.alpha = 0.0
-    self.node.childNode(withName: AppConstants.ComponentNames.rotationCircleName)?.alpha = 0.0
-    self.node.childNode(withName: AppConstants.ComponentNames.targetBaseLineName)?.alpha = 0.0
-    self.node.childNode(withName: AppConstants.ComponentNames.targetMidCircleName)?.alpha = 0.0
-    self.node.childNode(withName: AppConstants.ComponentNames.targetLeftChevronName)?.alpha = 0.0
-    self.node.childNode(withName: AppConstants.ComponentNames.targetRightChevronName)?.alpha = 0.0
-    self.node.childNode(withName: AppConstants.ComponentNames.magnitudePilarName)?.alpha = 0.0
-    self.launchInfo.clear()
+    launchInfo.lastTouchBegan = nil
+    node.childNode(withName: AppConstants.ComponentNames.targetLineName)?.alpha = 0.0
+    node.childNode(withName: AppConstants.ComponentNames.rotationCircleName)?.alpha = 0.0
+    node.childNode(withName: AppConstants.ComponentNames.targetBaseLineName)?.alpha = 0.0
+    node.childNode(withName: AppConstants.ComponentNames.targetMidCircleName)?.alpha = 0.0
+    node.childNode(withName: AppConstants.ComponentNames.targetLeftChevronName)?.alpha = 0.0
+    node.childNode(withName: AppConstants.ComponentNames.targetRightChevronName)?.alpha = 0.0
+    node.childNode(withName: AppConstants.ComponentNames.magnitudePilarName)?.alpha = 0.0
+    launchInfo.clear()
   }
 }
 
@@ -345,11 +345,11 @@ extension LaunchComponent {
     var isLeftRotation: Bool?
     
     mutating func clear() {
-      self.lastTouchBegan = nil
-      self.direction = nil
-      self.directionPercent = nil
-      self.rotationPercent = nil
-      self.isLeftRotation = nil
+      lastTouchBegan = nil
+      direction = nil
+      directionPercent = nil
+      rotationPercent = nil
+      isLeftRotation = nil
     }
   }
 }
@@ -389,7 +389,7 @@ extension LaunchComponent {
 extension LaunchComponent.MagnitudeLevel {
   static func rotationStep(magnitude: CGFloat) -> CGFloat {
     let rotationPercent = magnitude / 100
-    let magnitudeLevel = Self.magnitudeStep(percent: rotationPercent)
+    let magnitudeLevel = magnitudeStep(percent: rotationPercent)
     
     return magnitudeLevel.magnitudePecent
   }
