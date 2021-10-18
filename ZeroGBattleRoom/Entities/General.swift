@@ -36,10 +36,6 @@ class General: GKEntity, BeamableProtocol {
     }
   }
   
-  lazy var hands: HandsComponent? = { component(ofType: HandsComponent.self) }()
-  lazy var alias: AliasComponent? = { component(ofType: AliasComponent.self) }()
-  lazy var delivered: DeliveredComponent? = { component(ofType: DeliveredComponent.self) }()
-  lazy var team: TeamComponent? = { component(ofType: TeamComponent.self) }()
   var numberOfDeposits: Int {
     guard let deliveredComponent = delivered else { return 0 }
     

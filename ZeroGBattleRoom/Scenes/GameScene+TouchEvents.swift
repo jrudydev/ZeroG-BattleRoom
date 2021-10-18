@@ -296,7 +296,7 @@ extension GameScene {
     guard let tutorialStep = currentTutorialStep else { return }
     guard !excludedSteps.contains(tutorialStep) else { return }
 
-    stopAllTutorialAnimations()
+    removeTutorialAnimations()
   }
 
   private func showTutorialIfNeeded(excludedSteps: [Tutorial.Step] = []) {
