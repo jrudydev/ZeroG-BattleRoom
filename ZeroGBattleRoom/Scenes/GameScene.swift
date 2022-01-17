@@ -19,8 +19,13 @@ extension Notification.Name {
   
 }
 
-
 class GameScene: SKScene {
+  
+  enum Constants {
+  
+    static let heroThrowPoint: CGPoint = .init(x: 0.0, y: 0.5)
+    
+  }
   
   enum GameOverStatus: Int {
     case tutorialDone
@@ -101,6 +106,9 @@ class GameScene: SKScene {
   var numberOfTouches = 0
   var cam: SKCameraNode?
   var gameMessage: SKLabelNode?
+  
+  lazy private(set) var hero: General? = { entityManager.hero as? General }()
+  lazy private(set) var ghost: General? = { entityManager.playerEntites[1] as? General }()
   
   private var subscriptions = Set<AnyCancellable>()
   private var lastUpdateTime: TimeInterval = 0

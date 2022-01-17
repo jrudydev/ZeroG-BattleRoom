@@ -18,9 +18,7 @@ extension GameScene: TutorialActionDelegate {
   var throwButton: SKNode? { cam?.childNode(withName: AppConstants.ButtonNames.throwButtonName) }
   
   private func hideTutorialHints() {
-    guard let ghost = entityManager.playerEntites[1] as? General else { return }
-  
-    ghost.sprite?.alpha = 0.0
+    ghost?.sprite?.alpha = 0.0
     tapSticker?.alpha = 0.0
     pinchSticker?.alpha = 0.0
   }
@@ -193,7 +191,7 @@ extension GameScene: TutorialActionDelegate {
       let throwResource = SKAction.run {
         guard let sprite = ghost.sprite else { return }
         
-        let throwPoint = self.convert(CGPoint(x: 0.0, y: 1.0), from: sprite)
+        let throwPoint = self.convert(Constants.heroThrowPoint, from: sprite)
         ghost.throwResourceAt(point: throwPoint)
       }
       
@@ -206,7 +204,7 @@ extension GameScene: TutorialActionDelegate {
         spawnSpinnyNode,
         SKAction.wait(forDuration: 3.3),
         throwResource,
-        SKAction.wait(forDuration: 0.2),
+        SKAction.wait(forDuration: 0.5),
       ]))
 
       let swipeAction = SKAction.repeatForever(SKAction.sequence([
@@ -217,7 +215,7 @@ extension GameScene: TutorialActionDelegate {
                       duration: Double(swipeFrames) * swipeFrameDuration),
         SKAction.wait(forDuration: 1.5),
         SKAction.fadeOut(withDuration: 0.5),
-        SKAction.wait(forDuration: 3.0),
+        SKAction.wait(forDuration: 3.3),
       ]))
 
       let touchUpdateAction = SKAction.sequence([
@@ -230,7 +228,7 @@ extension GameScene: TutorialActionDelegate {
       let touchAction = SKAction.repeatForever(SKAction.sequence([
         SKAction.wait(forDuration: initialWait + 0.5),
         SKAction.repeat(touchUpdateAction, count: swipeFrames),
-        SKAction.wait(forDuration: 5.0)
+        SKAction.wait(forDuration: 5.3)
       ]))
       
       let hintStickerAction = SKAction.repeatForever(SKAction.sequence([
@@ -247,29 +245,31 @@ extension GameScene: TutorialActionDelegate {
   }
   
   func removeTutorialAnimations() {
-    guard let hero = entityManager.hero as? General,
-          let ghost = entityManager.playerEntites[1] as? General,
-          let tutorialStep = tutorialAction?.currentStep else { return }
+    guard let tutorialStep = tutorialAction?.currentStep else { return }
     
     tapSticker?.removeAllActions()
     pinchSticker?.removeAllActions()
     throwSticker?.removeAllActions()
-    ghost.sprite?.removeAllActions()
+    ghost?.sprite?.removeAllActions()
+    
+    ghost?.physics?.collisionBitMask = 0
+    ghost?.physics?.contactTestBitMask = 0
+    entityManager.resourcesEntities[0].physics?.collisionBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.wall
+    entityManager.resourcesEntities[0].physics?.contactTestBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.wall | PhysicsCategoryMask.deposit
   
     // Reposition the resource when needed
-//    if let package = heroHands.leftHandSlot,
-//      let shapeComponent = package.component(ofType: ShapeComponent.self) {
-//
-//      ghostHandsComponent.release(resource: package)
-//      shapeComponent.node.removeFromParent()
-//
-//      throwButton.alpha = 0.5
-//
-//      package.placeFor(tutorialStep: tutorialStep)
-//      scene?.addChild(shapeComponent.node)
-//    } else
-    if let hands = ghost.hands, let package = ghost.hands?.leftHandSlot, let shape = package.shape {
-      hands.release(resource: package)
+    if let package = hero?.hands?.leftHandSlot,
+      let shapeComponent = package.component(ofType: ShapeComponent.self) {
+
+      ghost?.hands?.release(resource: package)
+      shapeComponent.node.removeFromParent()
+
+      throwButton?.alpha = 0.5
+
+      package.placeFor(tutorialStep: tutorialStep)
+      scene?.addChild(shapeComponent.node)
+    } else if let package = ghost?.hands?.leftHandSlot, let shape = package.shape {
+      ghost?.hands?.release(resource: package)
       shape.removeFromParent()
 
       throwButton?.alpha = 0.5
@@ -286,9 +286,14 @@ extension GameScene: TutorialActionDelegate {
   
   
   private func positionTutorialElements(step: Tutorial.Step) {
-    guard let hero = entityManager.hero as? General,
-      let ghost = entityManager.playerEntites[1] as? General,
-      let tapSticker = childNode(withName: AppConstants.ComponentNames.tutorialTapStickerName) else { return }
+    guard let hero = hero,
+          let ghost = ghost,
+          let tapSticker = tapSticker else { return }
+    
+    ghost.physics?.collisionBitMask = PhysicsCategoryMask.package
+    ghost.physics?.contactTestBitMask = PhysicsCategoryMask.package
+    entityManager.resourcesEntities[0].physics?.collisionBitMask = PhysicsCategoryMask.ghost | PhysicsCategoryMask.hero | PhysicsCategoryMask.wall
+    entityManager.resourcesEntities[0].physics?.contactTestBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.wall
 
     DispatchQueue.main.async {
       tapSticker.position = step.tapPosition

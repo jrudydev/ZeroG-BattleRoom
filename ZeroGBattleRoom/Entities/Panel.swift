@@ -38,7 +38,7 @@ class Panel: GKEntity {
     let beamPhysicsBody = SKPhysicsBody(rectangleOf: tractorSize)
     beamPhysicsBody.isDynamic = false
     beamPhysicsBody.categoryBitMask = PhysicsCategoryMask.tractor
-    beamPhysicsBody.contactTestBitMask = PhysicsCategoryMask.hero
+    beamPhysicsBody.contactTestBitMask = PhysicsCategoryMask.ghost | PhysicsCategoryMask.hero
     
     if let team = team {
       shapeNode.strokeColor = team.color

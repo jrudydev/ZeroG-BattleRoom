@@ -17,15 +17,25 @@ extension GameScene: SKPhysicsContactDelegate {
       gameState.currentState is Tutorial else { return }
     
     let (firstBody, secondBody) = contact.physicsBodies
-  
+    
     if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
-      secondBody.categoryBitMask == PhysicsCategoryMask.tractor {
+        secondBody.categoryBitMask == PhysicsCategoryMask.tractor {
       
       guard let heroNode = firstBody.node as? SKSpriteNode else { return }
       
       guard let hero = entityManager.heroWith(node: heroNode) as? General else { return }
       
       hero.isBeamable = true
+    }
+    
+    if firstBody.categoryBitMask == PhysicsCategoryMask.ghost &&
+        secondBody.categoryBitMask == PhysicsCategoryMask.tractor {
+      
+      guard let ghostNode = firstBody.node as? SKSpriteNode else { return }
+      
+      guard let ghost = entityManager.heroWith(node: ghostNode) as? General else { return }
+      
+      ghost.isBeamable = true
     }
   }
   
@@ -41,10 +51,22 @@ extension GameScene: SKPhysicsContactDelegate {
       handleHeroHeroCollision(firstBody: firstBody, secondBody: secondBody)
     }
     
+    if firstBody.categoryBitMask == PhysicsCategoryMask.ghost &&
+      secondBody.categoryBitMask == PhysicsCategoryMask.package {
+
+      handleHeroPackageCollision(firstBody: firstBody, secondBody: secondBody)
+    }
+    
     if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
       secondBody.categoryBitMask == PhysicsCategoryMask.package {
 
       handleHeroPackageCollision(firstBody: firstBody, secondBody: secondBody)
+    }
+    
+    if firstBody.categoryBitMask == PhysicsCategoryMask.ghost &&
+      secondBody.categoryBitMask == PhysicsCategoryMask.tractor {
+      
+      handleHeroTractorCollision(firstBody: firstBody, secondBody: secondBody)
     }
     
     if firstBody.categoryBitMask == PhysicsCategoryMask.hero &&
@@ -214,7 +236,7 @@ extension GameScene: SKPhysicsContactDelegate {
     guard let packageNode = firstBody.node as? SKShapeNode,
       let depositNode = secondBody.node as? SKShapeNode else { return }
     
-    guard let deposite = entityManager.entityWith(node: depositNode) as? Deposit,
+    guard let deposit = entityManager.entityWith(node: depositNode) as? Deposit,
           let package = entityManager.resourceWith(node: packageNode) as? Package else { return }
     
     guard !(gameState.currentState is Tutorial) else {
@@ -222,7 +244,7 @@ extension GameScene: SKPhysicsContactDelegate {
       return
     }
     
-    handleResourceDeposit(package: package, deposit: deposite)
+    handleResourceDeposit(package: package, deposit: deposit)
   }
   
   // MARK: Handle Deposits

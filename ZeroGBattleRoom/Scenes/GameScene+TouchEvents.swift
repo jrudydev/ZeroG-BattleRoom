@@ -99,6 +99,7 @@ extension GameScene {
         print("👆🚀 Player Luanched")
         
         handlePlayerLaunch(pos: pos)
+        handleHeroStillBeamed()
       }
     case is GameOver:
       NotificationCenter.default.post(name: .restartGame, object: nil)
@@ -128,7 +129,7 @@ extension GameScene {
           let throwButton = cam?.childNode(withName: AppConstants.ButtonNames.throwButtonName),
           throwButton.alpha == 1.0 else { return }
       
-    let throwPoint = convert(CGPoint(x: 0.0, y: 1.0), from: spriteComponent.node)
+    let throwPoint = convert(Constants.heroThrowPoint, from: spriteComponent.node)
     hero.throwResourceAt(point: throwPoint)
     
     throwButton.alpha = handsComponent.hasResourceInHand ? 1.0 : throwButton.alpha
@@ -256,8 +257,6 @@ extension GameScene {
   
   override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
     numberOfTouches = 0
-
-    handleHeroStillBeamed()
     
     for t in touches { touchUp(atPoint: t.location(in: self)) }
   }

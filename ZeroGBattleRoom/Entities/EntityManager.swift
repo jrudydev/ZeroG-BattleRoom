@@ -12,7 +12,7 @@ import GameplayKit
 
 class EntityManager {
   
-  struct Constants {
+  enum Constants {
     static let heroImageName = "spaceman-idle"
     static let numberOfSpawnedResources = 10
     static let resourcesNeededToWin = 3
@@ -64,11 +64,11 @@ class EntityManager {
           let depositComponent = deposit.component(ofType: DepositComponent.self) else { return nil }
     
     if depositComponent.team1Deposits >= Constants.resourcesNeededToWin {
-      return Team.team1
+      return .team1
     }
     
     if depositComponent.team2Deposits >= Constants.resourcesNeededToWin {
-      return Team.team2
+      return .team2
     }
     
     return nil
@@ -327,10 +327,10 @@ extension EntityManager {
     physicsBody.angularDamping = 0.0
     physicsBody.categoryBitMask = PhysicsCategoryMask.package
     
-    // Make sure resources are only colliding on the designated host device
+    // Make sure resources are only colliding on the designatedhost device
     if isHost {
-      physicsBody.contactTestBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.tractor | PhysicsCategoryMask.wall
-      physicsBody.collisionBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.package | PhysicsCategoryMask.wall
+      physicsBody.collisionBitMask = PhysicsCategoryMask.ghost | PhysicsCategoryMask.hero | PhysicsCategoryMask.package | PhysicsCategoryMask.wall
+      physicsBody.contactTestBitMask = PhysicsCategoryMask.ghost | PhysicsCategoryMask.hero | PhysicsCategoryMask.wall
     } else {
       physicsBody.contactTestBitMask = 0
       physicsBody.collisionBitMask = 0
@@ -752,9 +752,9 @@ extension EntityManager {
     heroAliasComponent.node.text = ""
     ghostAliasComponent.node.text = ""
     
+    ghost.physics?.categoryBitMask = PhysicsCategoryMask.ghost
     ghost.switchToState(.moving)
     ghostSpriteComponent.node.alpha = 0.5
-    ghostPhysicsComponent.physicsBody.collisionBitMask = PhysicsCategoryMask.package
     heroPhysicsComponent.physicsBody.collisionBitMask = PhysicsCategoryMask.package | PhysicsCategoryMask.wall
     
     let tutorialAction = TutorialAction(delegate: scene)
@@ -763,8 +763,9 @@ extension EntityManager {
     }
     
     // Spawn resource when starting on throw tutorial
+    let resource = spawnResource(position: .zero, velocity: .zero)
     if let nextStep = tutorialAction.setupNextStep(), nextStep == .rotateThrow {
-      spawnResource(position: nextStep.midPosition, velocity: .zero)
+      resource?.shape?.position = nextStep.midPosition
     }
     
     tutorialEntities.append(tutorialAction)

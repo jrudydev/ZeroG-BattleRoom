@@ -324,7 +324,6 @@ extension General: ThrowableProtocol {
          let resourcePhysicsComponent = rightResource.component(ofType: PhysicsComponent.self) {
         
         resourcePhysicsComponent.physicsBody.velocity = .zero
-        
         resourcePhysicsComponent.physicsBody.velocity = physicsComponent.physicsBody.velocity
         resourcePhysicsComponent.physicsBody.applyImpulse(throwVector * defaultThrowMagnitude)
       }
@@ -338,7 +337,6 @@ extension General: ThrowableProtocol {
          let resourcePhysicsComponent = leftResource.component(ofType: PhysicsComponent.self) {
         
         resourcePhysicsComponent.physicsBody.velocity = .zero
-        
         resourcePhysicsComponent.physicsBody.velocity = physicsComponent.physicsBody.velocity
         resourcePhysicsComponent.physicsBody.applyImpulse(throwVector * defaultThrowMagnitude )
       }

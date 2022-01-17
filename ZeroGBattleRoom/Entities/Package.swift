@@ -10,7 +10,6 @@ import Foundation
 import SpriteKit
 import GameplayKit
 
-
 class Package: GKEntity {
   
   static let maxSpeed: CGFloat = 400.0
@@ -25,7 +24,7 @@ class Package: GKEntity {
     super.init()
     
     addComponent(ShapeComponent(node: shapeNode))
-    addComponent(PhysicsComponent(physicsBody: self.physicsBody))
+    addComponent(PhysicsComponent(physicsBody: physicsBody))
     
     let trailComponent = TrailComponent()
     addComponent(trailComponent)
@@ -33,7 +32,7 @@ class Package: GKEntity {
       shapeNode.addChild(emitter)
     }
     
-    shapeNode.physicsBody = self.physicsBody
+    shapeNode.physicsBody = physicsBody
   }
   
   required init?(coder: NSCoder) {
