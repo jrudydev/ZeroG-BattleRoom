@@ -20,7 +20,7 @@ class SnapshotManager {
   var includeResources = false
   
   var playerysInfo: MultiplayerNetworking.SnapshotElementGroup {
-    guard let entities = self.scene?.entityManager.playerEntites else { return [] }
+    guard let entities = self.scene?.entityManager.playerEntities else { return [] }
     
     var info = MultiplayerNetworking.SnapshotElementGroup()
     for entity in entities {

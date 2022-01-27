@@ -19,8 +19,6 @@ class EntityManager {
     static let minDriftVelocity: CGFloat = 5.0
     static let resourcePullDamper: CGFloat = 0.015
     static let distanceFromCenter: CGFloat = 140.0
-    static let fieldRadius: CGFloat = 50.0
-    static let fieldAlpha: CGFloat = 0.3
   }
   
   lazy var componentSystems: [GKComponentSystem] = {
@@ -29,11 +27,12 @@ class EntityManager {
     return [aliasComponent, interfaceComponent]
   }()
   
-  var playerEntites: [GKEntity] = [
+  var playerEntities: [GKEntity] = [
     General(imageName: "\(Constants.heroImageName)-0", team: .team1),
     General(imageName: "\(Constants.heroImageName)-0", team: .team2)
   ]
   var resourcesEntities = [GKEntity]()
+  var fieldEntities = [GKEntity]()
   var wallEntities = [GKEntity]()
   var tutorialEntities = [GKEntity]()
   var uiEntities = Set<GKEntity>()
@@ -44,10 +43,10 @@ class EntityManager {
   var isHost: Bool { currentPlayerIndex == 0 }
   
   var hero: GKEntity? {
-    guard playerEntites.count > 0 else { return nil }
-    guard currentPlayerIndex < playerEntites.count else { return nil }
+    guard playerEntities.count > 0 else { return nil }
+    guard currentPlayerIndex < playerEntities.count else { return nil }
     
-    return playerEntites[currentPlayerIndex]
+    return playerEntities[currentPlayerIndex]
   }
   
   var deposit: GKEntity? {
@@ -167,12 +166,13 @@ extension EntityManager {
     
 //    updateUIElements()
     updateResourceVelocity()
+    checkFieldInteractions()
   }
   
 //  private func updateUIElements() {
 //    guard let restartButton = scene.cam?.childNode(withName: AppConstants.ButtonNames.refreshButtonName) else { return }
 //
-//    guard let hero = playerEntites[0] as? General,
+//    guard let hero = playerEntities[0] as? General,
 //          let heroSpriteComponent = hero.component(ofType: SpriteComponent.self),
 //          let physicsBody = heroSpriteComponent.node.physicsBody,
 //          !hero.isBeamed else { return }
@@ -191,9 +191,7 @@ extension EntityManager {
             let physicsComponent = package.component(ofType: PhysicsComponent.self),
             let shapeComponent = package.component(ofType: ShapeComponent.self) else { return }
       
-      let dx = depositNode.position.x - shapeComponent.node.position.x
-      let dy = depositNode.position.y - shapeComponent.node.position.y
-      let distanceToDeposit = sqrt(pow(dx, 2.0) + pow(dy, 2.0))
+      let distanceToDeposit = depositNode.position.distanceTo(point: shapeComponent.node.position)
   
       if distanceToDeposit < Deposit.pullDistance && !isHeld(resource: package) {
         let pullStength = (Deposit.pullDistance - distanceToDeposit) * Constants.resourcePullDamper
@@ -221,14 +219,53 @@ extension EntityManager {
     }
   }
   
+  private func checkFieldInteractions() {
+    for hero in playerEntities {
+      for field in fieldEntities {
+        guard let hero = hero as? General,
+              let field = field as? Field,
+              let heroSprite = hero.sprite,
+              let fieldShape = field.shape,
+              field.isEngaged,
+              hero !== playerEntities[1] else { return }
+        
+        let distanceToField = fieldShape.position.distanceTo(point: heroSprite.position)
+        
+        if distanceToField < FieldEntityModel.Constants.fieldRadius {
+          if let tutorialStep = scene.tutorialAction?.currentStep {
+            scene.setupHintAnimations(step: tutorialStep)
+          } else {
+            DispatchQueue.main.async {
+              hero.impactedAt(point: heroSprite.position)
+              let respawnParams = hero.respawnParams(playerEntities: self.playerEntities)
+              hero.respawn(point: respawnParams?.point, rotation: respawnParams?.rotation)
+            }
+          }
+        }
+      }
+    }
+  }
+  
+}
+
+extension CGPoint {
+  
+  func distanceTo(point: CGPoint) -> CGFloat {
+    let dx = self.x - point.x
+    let dy = self.y - point.y
+    return sqrt(pow(dx, 2.0) + pow(dy, 2.0))
+  }
+  
 }
 
 // MARK: - Spawn Methods
 
 extension EntityManager {
   
-  func spawnHeros(mapSize: CGSize) {
-    let heroBlue = playerEntites[0]
+  func spawnHeroes(mapSize: CGSize) {
+    guard let heroBlue = playerEntities[0] as? General,
+          let heroRed = playerEntities[1] as? General else { return }
+    
     if let spriteComponent = heroBlue.component(ofType: SpriteComponent.self),
        let trailComponent = heroBlue.component(ofType: TrailComponent.self),
        let aliasComponent = heroBlue.component(ofType: AliasComponent.self),
@@ -241,9 +278,11 @@ extension EntityManager {
         self.scene.addChild(shapeComponent.node)
       }
       
-      spriteComponent.node.position = CGPoint(x: 0.0, y: -mapSize.height/2 + 20)
       spriteComponent.node.zPosition = SpriteZPosition.hero.rawValue
       scene.addChild(spriteComponent.node)
+      
+      let respawnParams = heroBlue.respawnParams(playerEntities: playerEntities)
+      heroBlue.respawn(point: respawnParams?.point, rotation: respawnParams?.rotation)
       
       scene.addChild(trailComponent.node)
       
@@ -253,7 +292,6 @@ extension EntityManager {
     
     addToComponentSysetem(entity: heroBlue)
     
-    let heroRed = playerEntites[1]
     if let spriteComponent = heroRed.component(ofType: SpriteComponent.self),
        let trailComponent = heroRed.component(ofType: TrailComponent.self),
        let aliasComponent = heroRed.component(ofType: AliasComponent.self),
@@ -266,10 +304,11 @@ extension EntityManager {
         self.scene.addChild(shapeComponent.node)
       }
       
-      spriteComponent.node.position = CGPoint(x: 0.0, y: mapSize.height/2 - 20)
       spriteComponent.node.zPosition = SpriteZPosition.hero.rawValue
-      spriteComponent.node.zRotation = CGFloat.pi
       scene.addChild(spriteComponent.node)
+      
+      let respawnParams = heroRed.respawnParams(playerEntities: playerEntities)
+      heroRed.respawn(point: respawnParams?.point, rotation: respawnParams?.rotation)
       
       scene.addChild(trailComponent.node)
       
@@ -354,21 +393,14 @@ extension EntityManager {
   }
   
   private func spawnField(position: CGPoint = .zero) {
-    let fieldShapeNode: SKShapeNode = {
-      let node = SKShapeNode(circleOfRadius: Constants.fieldRadius)
-      node.fillColor = .blue
-      node.alpha = Constants.fieldAlpha
-      node.strokeColor = .white
-      node.position = position
-      
-      return node
-    }()
-    let physicsBody = SKPhysicsBody(circleOfRadius: Constants.fieldRadius)
-    physicsBody.isDynamic = false
-    physicsBody.categoryBitMask = PhysicsCategoryMask.field
-    let fieldEntityModel = FieldEntityModel(shapeNode: fieldShapeNode, physicsBody: physicsBody)
-
-    add(Field(entityModel: fieldEntityModel))
+    let fieldEntity = Field(entityModel: FieldEntityModel())
+    fieldEntity.shape?.position = position
+    
+    if let node = fieldEntity.shape {
+      scene.addChild(node)
+    }
+    
+    fieldEntities.append(fieldEntity)
   }
   
   func spawnPanels() {
@@ -460,7 +492,7 @@ extension EntityManager {
 
 extension EntityManager {
   func heroWith(node: SKSpriteNode) -> GKEntity? {
-    let player = playerEntites.first { entity -> Bool in
+    let player = playerEntities.first { entity -> Bool in
       guard let hero = entity as? General else { return false }
       guard let spriteComponent = hero.component(ofType: SpriteComponent.self) else { return false }
       
@@ -554,7 +586,7 @@ extension EntityManager {
   
   private func isHeld(resource: Package) -> Bool {
     var isHeld = false
-    playerEntites.forEach { player in
+    playerEntities.forEach { player in
       guard isHeld == false else { return }
       guard let hero = player as? General,
             let heroHands = hero.component(ofType: HandsComponent.self),
@@ -569,7 +601,7 @@ extension EntityManager {
   
   func isScored(resource: Package) -> Bool {
     var isScored = false
-    playerEntites.forEach { player in
+    playerEntities.forEach { player in
       guard isScored == false else { return }
       guard let deliveredComponent = player.component(ofType: DeliveredComponent.self) else { return }
       
@@ -702,8 +734,9 @@ extension EntityManager {
     
     loadTutorialLevel()
     
-    spawnHeros(mapSize: AppConstants.Layout.tutorialBoundrySize)
+    spawnHeroes(mapSize: AppConstants.Layout.tutorialBoundrySize)
     spawnDeposit()
+    spawnField(position: CGPoint(x: -210.0, y: 0.0))
     
     initializeTutorial()
   }
@@ -741,10 +774,10 @@ extension EntityManager {
   }
   
   private func initializeTutorial() {
-    guard let hero = playerEntites[0] as? General,
+    guard let hero = playerEntities[0] as? General,
           let heroAliasComponent = hero.component(ofType: AliasComponent.self),
           let heroPhysicsComponent = hero.component(ofType: PhysicsComponent.self),
-          let ghost = playerEntites[1] as? General,
+          let ghost = playerEntities[1] as? General,
           let ghostAliasComponent = ghost.component(ofType: AliasComponent.self),
           let ghostSpriteComponent = ghost.component(ofType: SpriteComponent.self),
           let ghostPhysicsComponent = ghost.component(ofType: PhysicsComponent.self) else { return }
@@ -763,8 +796,8 @@ extension EntityManager {
     }
     
     // Spawn resource when starting on throw tutorial
-    let resource = spawnResource(position: .zero, velocity: .zero)
     if let nextStep = tutorialAction.setupNextStep(), nextStep == .rotateThrow {
+      let resource = spawnResource(position: .zero, velocity: .zero)
       resource?.shape?.position = nextStep.midPosition
     }
     

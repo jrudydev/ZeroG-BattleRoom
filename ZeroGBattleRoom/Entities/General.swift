@@ -106,8 +106,8 @@ class General: GKEntity, BeamableProtocol {
     // TODO: Send and handle a state parameter here
     let physicsBody = SKPhysicsBody(circleOfRadius: 10)
     physicsBody.categoryBitMask = PhysicsCategoryMask.hero
-    physicsBody.collisionBitMask = PhysicsCategoryMask.package | PhysicsCategoryMask.hero | PhysicsCategoryMask.wall | PhysicsCategoryMask.field
-    physicsBody.contactTestBitMask = PhysicsCategoryMask.hero
+    physicsBody.collisionBitMask = PhysicsCategoryMask.package | PhysicsCategoryMask.hero | PhysicsCategoryMask.wall
+    physicsBody.contactTestBitMask = PhysicsCategoryMask.hero// | PhysicsCategoryMask.field
     
     return physicsBody
   }
@@ -216,19 +216,17 @@ extension General {
 extension General: ImpactableProtocol {
   
   func impactedAt(point: CGPoint) {
-    guard let heroHandsComponent = component(ofType: HandsComponent.self) else { return }
+    hands?.isImpacted = true
     
-    heroHandsComponent.isImpacted = true
-    
-    if let resource = heroHandsComponent.leftHandSlot,
+    if let resource = hands?.leftHandSlot,
        let resourceTrail = resource.component(ofType: TrailComponent.self) {
-      heroHandsComponent.release(resource: resource, point: point)
+      hands?.release(resource: resource, point: point)
       resourceTrail.type = .resource
     }
     
-    if let resource = heroHandsComponent.rightHandSlot,
+    if let resource = hands?.rightHandSlot,
        let resourceTrail = resource.component(ofType: TrailComponent.self) {
-      heroHandsComponent.release(resource: resource, point: point)
+      hands?.release(resource: resource, point: point)
       resourceTrail.type = .resource
     }
   }
@@ -343,6 +341,28 @@ extension General: ThrowableProtocol {
       
       leftResource.wasThrownBy = self
     }
+  }
+  
+}
+
+extension General {
+  
+  func respawn(point: CGPoint?, rotation: CGFloat?) {
+    guard let sprite = sprite else { return }
+    
+    sprite.position = point ?? sprite.position
+    sprite.zRotation = rotation ?? sprite.zRotation
+  }
+  
+  func respawnParams(playerEntities: [GKEntity]) -> (point: CGPoint, rotation: CGFloat)? {
+    if self === playerEntities[0] {
+      return (CGPoint(x: 0.0, y: -AppConstants.Layout.boundarySize.height/2 + 20), 0.0)
+    }
+    if self === playerEntities[1] {
+      return (CGPoint(x: 0.0, y: AppConstants.Layout.boundarySize.height/2 + -20), CGFloat.pi)
+    }
+    
+    return nil
   }
   
 }

@@ -29,7 +29,7 @@ extension GameScene: TutorialActionDelegate {
   }
   
   func setupHintAnimations(step: Tutorial.Step) {
-    guard let ghost = entityManager.playerEntites[1] as? General else { return }
+    guard let ghost = entityManager.playerEntities[1] as? General else { return }
   
     removeTutorialAnimations()
     positionTutorialElements(step: step)
@@ -75,7 +75,7 @@ extension GameScene: TutorialActionDelegate {
         SKAction.wait(forDuration: 2.0),
         launchGhost,
         spawnSpinnyNode,
-        SKAction.wait(forDuration: 3.25)
+        SKAction.wait(forDuration: 3.24)
       ]))
 
       let tapSequece = SKAction.repeatForever(SKAction.sequence([
@@ -84,7 +84,7 @@ extension GameScene: TutorialActionDelegate {
         SKAction.fadeIn(withDuration: 0.5),
         SKAction.wait(forDuration: 1.5),
         SKAction.fadeOut(withDuration: 0.5),
-        SKAction.wait(forDuration: 2.75)]))
+        SKAction.wait(forDuration: 2.74)]))
 
       let runGroup = SKAction.group([launchSequence, tapSequece])
       tapSticker?.run(runGroup)
@@ -254,8 +254,10 @@ extension GameScene: TutorialActionDelegate {
     
     ghost?.physics?.collisionBitMask = 0
     ghost?.physics?.contactTestBitMask = 0
-    entityManager.resourcesEntities[0].physics?.collisionBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.wall
-    entityManager.resourcesEntities[0].physics?.contactTestBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.wall | PhysicsCategoryMask.deposit
+    if entityManager.resourcesEntities.count > 1 {
+      entityManager.resourcesEntities[0].physics?.collisionBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.wall
+      entityManager.resourcesEntities[0].physics?.contactTestBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.wall | PhysicsCategoryMask.deposit
+    }
   
     // Reposition the resource when needed
     if let package = hero?.hands?.leftHandSlot,
@@ -292,9 +294,11 @@ extension GameScene: TutorialActionDelegate {
     
     ghost.physics?.collisionBitMask = PhysicsCategoryMask.package
     ghost.physics?.contactTestBitMask = PhysicsCategoryMask.package
-    entityManager.resourcesEntities[0].physics?.collisionBitMask = PhysicsCategoryMask.ghost | PhysicsCategoryMask.hero | PhysicsCategoryMask.wall
-    entityManager.resourcesEntities[0].physics?.contactTestBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.wall
-
+    if entityManager.resourcesEntities.count > 1 {
+      entityManager.resourcesEntities[0].physics?.collisionBitMask = PhysicsCategoryMask.ghost | PhysicsCategoryMask.hero | PhysicsCategoryMask.wall
+      entityManager.resourcesEntities[0].physics?.contactTestBitMask = PhysicsCategoryMask.hero | PhysicsCategoryMask.wall
+    }
+  
     DispatchQueue.main.async {
       tapSticker.position = step.tapPosition
       

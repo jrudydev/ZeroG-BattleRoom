@@ -155,8 +155,8 @@ extension GameScene {
       setupHintAnimations(step: tutorialStep)
     } else {
       hero.impactedAt(point: heroSprite.position)
-      heroSprite.position = CGPoint(x: 0.0, y: -AppConstants.Layout.boundarySize.height/2 + 20)
-      heroSprite.zRotation = 0.0
+      let respawnParams = hero.respawnParams(playerEntities: entityManager.playerEntities)
+      hero.respawn(point: respawnParams?.point, rotation: respawnParams?.rotation)
     }
     
     audioPlayer.play(effect: Audio.EffectFiles.uiMenuSelect)

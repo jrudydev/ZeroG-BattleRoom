@@ -18,7 +18,7 @@ extension GameScene: MultiplayerNetworkingProtocol {
   
   func setPlayerAliases(playerAliases: [String]) {
     for (idx, alias) in playerAliases.enumerated() {
-      let entity = entityManager.playerEntites[idx]
+      let entity = entityManager.playerEntities[idx]
       if let aliasComponent = entity.component(ofType: AliasComponent.self) {
         aliasComponent.node.text = "\(alias) (0/\(EntityManager.Constants.resourcesNeededToWin))"
       }
@@ -31,7 +31,7 @@ extension GameScene: MultiplayerNetworkingProtocol {
                     velocity: CGVector,
                     angularVelocity: CGFloat,
                     wasLaunch: Bool) {
-    if let player = entityManager.playerEntites[index] as? General,
+    if let player = entityManager.playerEntities[index] as? General,
       let spriteComponent = player.component(ofType: SpriteComponent.self),
       let physicsComponent = player.component(ofType: PhysicsComponent.self),
       let impulseComponent = player.component(ofType: ImpulseComponent.self) {
@@ -64,7 +64,7 @@ extension GameScene: MultiplayerNetworkingProtocol {
                     velocity: CGVector,
                     angularVelocity: CGFloat,
                     resourceIndecies: [Int]) {
-    if let player = entityManager.playerEntites[index] as? General,
+    if let player = entityManager.playerEntities[index] as? General,
       let spriteComponent = player.component(ofType: SpriteComponent.self),
       let physicsComponent = player.component(ofType: PhysicsComponent.self) {
       
@@ -109,7 +109,7 @@ extension GameScene: MultiplayerNetworkingProtocol {
   
   func syncPlayerResources(players: MultiplayerNetworking.SnapshotElementGroup) {
     for (idx, playerSnap) in players.enumerated() {
-      if let player = entityManager.playerEntites[idx] as? General,
+      if let player = entityManager.playerEntities[idx] as? General,
         let handsComponent = player.component(ofType: HandsComponent.self),
         let deliveredComponent = player.component(ofType: DeliveredComponent.self) {
         
@@ -174,7 +174,7 @@ extension GameScene: MultiplayerNetworkingProtocol {
   }
   
 //  func impactPlayerAt(senderIndex: Int) {
-//    if let hero = entityManager.playerEntites[senderIndex] as? General,
+//    if let hero = entityManager.playerEntities[senderIndex] as? General,
 //      let spriteComponent = hero.component(ofType: SpriteComponent.self),
 //      let heroHandsComponent = hero.component(ofType: HandsComponent.self),
 //      !heroHandsComponent.isImpacted {
@@ -185,16 +185,16 @@ extension GameScene: MultiplayerNetworkingProtocol {
 //  }
 //
 //  func grabResourceAt(index: Int, playerIndex: Int, senderIndex: Int) {
-//    let senderEntity = entityManager.playerEntites[senderIndex]
-//    let playerEntity = entityManager.playerEntites[playerIndex]
+//    let senderEntity = entityManager.playerEntities[senderIndex]
+//    let playerEntity = entityManager.playerEntities[playerIndex]
 //
 //    guard let playerHandsComponent = playerEntity.component(ofType: HandsComponent.self),
 //      let resource = entityManager.resourcesEntities[index] as? Package,
 //      let resourceShapeComponent = resource.component(ofType: ShapeComponent.self),
 //      !playerHandsComponent.isHolding(shapeComponent: resourceShapeComponent) else { return }
 //
-//    if senderEntity == entityManager.playerEntites[0] {
-//      for player in entityManager.playerEntites {
+//    if senderEntity == entityManager.playerEntities[0] {
+//      for player in entityManager.playerEntities {
 //        guard player != playerEntity else { continue }
 //        guard let handsComponent = player.component(ofType: HandsComponent.self) else { continue }
 //
@@ -208,7 +208,7 @@ extension GameScene: MultiplayerNetworkingProtocol {
 //        }
 //      }
 //    } else {
-//      for player in entityManager.playerEntites {
+//      for player in entityManager.playerEntities {
 //        guard player != playerEntity else { continue }
 //        guard let handsComponent = player.component(ofType: HandsComponent.self) else { continue }
 //
@@ -225,7 +225,7 @@ extension GameScene: MultiplayerNetworkingProtocol {
 //  func assignResourceAt(index: Int, playerIndex: Int) {
 //    guard let hero = entityManager.hero as? General,
 //      let heroHandscomponent = hero.component(ofType: HandsComponent.self),
-//      let player = entityManager.playerEntites[playerIndex] as? General,
+//      let player = entityManager.playerEntities[playerIndex] as? General,
 //      let playerHandsComponent = player.component(ofType: HandsComponent.self),
 //      let package = entityManager.resourcesEntities[index] as? Package else { return }
 //

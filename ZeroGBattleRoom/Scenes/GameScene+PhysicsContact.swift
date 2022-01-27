@@ -149,7 +149,7 @@ extension GameScene: SKPhysicsContactDelegate {
       }
       
       if let resourceIndex = entityManager.indexForResource(shape: resourceShapeComponent.node),
-        let heroIndex = entityManager.playerEntites.firstIndex(of: hero) {
+        let heroIndex = entityManager.playerEntities.firstIndex(of: hero) {
       
 //        multiplayerNetworking
 //          .sendGrabbedResource(index: resourceIndex,
@@ -190,7 +190,7 @@ extension GameScene: SKPhysicsContactDelegate {
       let heroTeamComponent = hero.component(ofType: TeamComponent.self),
       panelTeamComponent.team != heroTeamComponent.team,
       gameState.currentState is Tutorial,
-      hero !== entityManager.playerEntites[1],
+      hero !== entityManager.playerEntities[1],
       let tutorial = entityManager.tutorialEntities[0] as? TutorialAction {
       
       if let step = tutorial.setupNextStep(), step == .rotateThrow {
@@ -214,7 +214,7 @@ extension GameScene: SKPhysicsContactDelegate {
     }
     
     hero.switchToState(.beamed)
-    if hero == entityManager.playerEntites[entityManager.currentPlayerIndex] {
+    if hero == entityManager.playerEntities[entityManager.currentPlayerIndex] {
       let launchLineNode = launchComponent.node.childNode(withName: AppConstants.ComponentNames.launchLineName) as? SKShapeNode
       launchLineNode?.alpha = LaunchComponent.targetLineAlpha
     }
@@ -222,12 +222,12 @@ extension GameScene: SKPhysicsContactDelegate {
     hero.occupiedPanel = panel
     tractorBeamComponent.isOccupied = true
     
-    //      if let index = entityManager.indexForWall(panel: panel) {
-    //        multiplayerNetworking.sendWall(index: index, isOccupied: true)
-    //      }
+//      if let index = entityManager.indexForWall(panel: panel) {
+//        multiplayerNetworking.sendWall(index: index, isOccupied: true)
+//      }
     impulseComponent.isOnCooldown = false
     
-    if hero != entityManager.playerEntites[1] {
+    if hero != entityManager.playerEntities[1] {
       audioPlayer.play(effect: Audio.EffectFiles.blipSound)
     }
   }
@@ -277,7 +277,7 @@ extension GameScene: SKPhysicsContactDelegate {
     hero.hands?.leftHandSlot?.deposit(delivered)
     hero.hands?.rightHandSlot?.deposit(delivered)
     
-    let heroIndex = (hero == entityManager.playerEntites[0]) ? 0 : 1
+    let heroIndex = (hero == entityManager.playerEntities[0]) ? 0 : 1
     let playerAlias = getPlayerAliasAt(index: heroIndex)
     alias.node.text = "\(playerAlias) (\(hero.numberOfDeposits)/\(EntityManager.Constants.resourcesNeededToWin))"
     

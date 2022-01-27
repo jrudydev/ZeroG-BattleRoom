@@ -108,7 +108,7 @@ class GameScene: SKScene {
   var gameMessage: SKLabelNode?
   
   lazy private(set) var hero: General? = { entityManager.hero as? General }()
-  lazy private(set) var ghost: General? = { entityManager.playerEntites[1] as? General }()
+  lazy private(set) var ghost: General? = { entityManager.playerEntities[1] as? General }()
   
   private var subscriptions = Set<AnyCancellable>()
   private var lastUpdateTime: TimeInterval = 0
